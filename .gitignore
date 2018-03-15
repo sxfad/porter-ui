@@ -3,6 +3,7 @@ output
 test/unit/coverage
 test/e2e/reports
 node_modules
+bower_components
 # dist
 .naeindex
 coverage.html
