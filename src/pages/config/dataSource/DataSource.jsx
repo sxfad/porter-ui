@@ -71,11 +71,11 @@ export class LayoutComponent extends Component {
     ];
 
 
-    componentWillMount() {
-        const {endTime} = this.state;
-        let stratTime = getBeforeHoursTime(endTime, 172);  //根据结束时间得到开始时间
-        let endTimeStr = moment(endTime).format('YYYY-MM-DD HH:mm:ss');
-        let startTimeStr = moment(stratTime).format('YYYY-MM-DD HH:mm:ss');
+    componentDidMount() {
+        const {form: {getFieldValue}} = this.props;
+        let times = getFieldValue('times');
+        let endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
+        let startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
         this.setState({
             startTimeStr,
             endTimeStr,
@@ -119,7 +119,10 @@ export class LayoutComponent extends Component {
     search = (args) => {
         const {form: {getFieldValue}} = this.props;
         let name = getFieldValue('name');
-        const {pageNum, pageSize, startTimeStr, endTimeStr} = this.state;
+        let times = getFieldValue('times');
+        let endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
+        let startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
+        const {pageNum, pageSize} = this.state;
 
         let params = {
             name,
@@ -139,6 +142,8 @@ export class LayoutComponent extends Component {
                     pageSize: rsp.data.pageSize,
                     total: parseInt(rsp.data.totalItems),
                     dataSource: rsp.data.result,
+                    startTimeStr,
+                    endTimeStr,
                 });
             } else {
                 this.setState({
@@ -253,7 +258,7 @@ export class LayoutComponent extends Component {
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
                                     {getFieldDecorator('times', {
-                                        initialValue: [moment().add(-172, 'hour'), moment()]
+                                        initialValue: [moment().add(-172, 'hour'), moment().add(1, 'hour')]
                                     })(
                                         <RangePicker
                                             showTime

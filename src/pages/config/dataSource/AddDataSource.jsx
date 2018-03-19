@@ -90,7 +90,6 @@ export class LayoutComponent extends Component {
         form.validateFieldsAndScroll((err, values) => {
             if (!err) {
                 var plugins = [];
-                console.log('Received values of form: ', values);
                 for (let key in values) {
                     if (key.indexOf("--") != -1) {
                         var pluginsItem = {};
