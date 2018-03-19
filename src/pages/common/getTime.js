@@ -31,6 +31,17 @@ export function getBeforeSecondsTime(endTime, i) {
 }
 
 /**
+ * 得到 YYYY-MM-DD HH:mm:ss 格式的字符串
+ * @param time
+ * @returns {string}
+ */
+export function formatDefaultTime(time) {
+    var d = (new Date(time));
+    var timeStr = fillDateStr(d.getFullYear()).toString() +'-' + fillDateStr(d.getMonth() + 1).toString() +'-' + fillDateStr(d.getDate().toString())  +' ' + fillDateStr(d.getHours()).toString() +':' + fillDateStr(d.getMinutes()).toString() +':' + fillDateStr(d.getSeconds()).toString();
+    return timeStr;
+}
+
+/**
  * 得到 YYYYMMDDHHmmss 格式的字符串
  * @param time
  * @returns {string}

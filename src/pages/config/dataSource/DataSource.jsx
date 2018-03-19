@@ -1,12 +1,12 @@
 /**
- * Created by lhyin on 2017/12/5.
+ * Created by lhyin on 2018/19/3.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Select, Row, Col, DatePicker} from 'antd';
+import {Form, Input, Button, Table, Row, Col, DatePicker, Popconfirm} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import {promiseAjax} from 'sx-ui';
 import moment from 'moment';
-import {getBeforeHoursTime, formatMinuteTime} from '../../common/getTime';
+import {getBeforeHoursTime, formatDefaultTime} from '../../common/getTime';
 import {browserHistory} from 'react-router';
 import connectComponent from '../../../redux/store/connectComponent';
 
@@ -23,127 +23,14 @@ export class LayoutComponent extends Component {
         startTimeStr: '', //开始时间
         endTimeStr: '',   //结束时间(默认当前时间)
         endTime: Date(),
-        dataSource: [
-            // {
-            //     "id": "8",
-            //     "name1": "string",
-            //     "dataType": {
-            //         "code": "ZOOKEEPER",
-            //         "name": "zookeeper"
-            //     },
-            //     "creater": null,
-            //     "createTime": 1521013899000,
-            //     "state": null,
-            //     "iscancel": null,
-            //     "remark": null,
-            //     "plugins": []
-            // },
-            // {
-            //     "id": "15",
-            //     "name1": "string",
-            //     "dataType": {
-            //         "code": "ZOOKEEPER",
-            //         "name": "zookeeper"
-            //     },
-            //     "creater": null,
-            //     "createTime": 1521013899000,
-            //     "state": null,
-            //     "iscancel": null,
-            //     "remark": null,
-            //     "plugins": []
-            // },
-            // {
-            //     "id": "16",
-            //     "name1": "kafka",
-            //     "dataType": {
-            //         "code": "KAFKA",
-            //         "name": "kafka"
-            //     },
-            //     "creater": null,
-            //     "createTime": 1521013899000,
-            //     "state": null,
-            //     "iscancel": null,
-            //     "remark": null,
-            //     "plugins": []
-            // },
-            // {
-            //     "id": "7",
-            //     "name1": "string",
-            //     "dataType": {
-            //         "code": "ZOOKEEPER",
-            //         "name": "zookeeper"
-            //     },
-            //     "creater": null,
-            //     "createTime": 1520996292000,
-            //     "state": null,
-            //     "iscancel": null,
-            //     "remark": null,
-            //     "plugins": []
-            // },
-            // {
-            //     "id": "6",
-            //     "name1": "string",
-            //     "dataType": {
-            //         "code": "ZOOKEEPER",
-            //         "name": "zookeeper"
-            //     },
-            //     "creater": null,
-            //     "createTime": 1520994403000,
-            //     "state": null,
-            //     "iscancel": null,
-            //     "remark": null,
-            //     "plugins": []
-            // },
-            // {
-            //     "id": "5",
-            //     "name1": "string",
-            //     "dataType": {
-            //         "code": "KAFKA",
-            //         "name": "kafka"
-            //     },
-            //     "creater": null,
-            //     "createTime": 1520923103000,
-            //     "state": null,
-            //     "iscancel": null,
-            //     "remark": null,
-            //     "plugins": []
-            // },
-            // {
-            //     "id": "4",
-            //     "name1": "string",
-            //     "dataType": {
-            //         "code": "KAFKA",
-            //         "name": "kafka"
-            //     },
-            //     "creater": null,
-            //     "createTime": 1520923002000,
-            //     "state": null,
-            //     "iscancel": null,
-            //     "remark": null,
-            //     "plugins": []
-            // },
-            // {
-            //     "id": "3",
-            //     "name1": "oracle",
-            //     "dataType": {
-            //         "code": "ZOOKEEPER",
-            //         "name": "zookeeper"
-            //     },
-            //     "creater": null,
-            //     "createTime": 1520922484000,
-            //     "state": null,
-            //     "iscancel": null,
-            //     "remark": null,
-            //     "plugins": []
-            // }
-        ],
+        dataSource: [],
         tabLoading: false,
     }
 
     columns = [
         {
             title: '编号',
-            render: (text, record, index) => (index + 1) + ((this.state.pageNum - 2) * this.state.pageSize),
+            render: (text, record, index) => (index + 1) + ((this.state.pageNum - 1) * this.state.pageSize),
         },
         {
             title: '数据源名称',
@@ -163,32 +50,30 @@ export class LayoutComponent extends Component {
         },
         {
             title: '创建时间',
-            dataIndex: 'createTime',
-            key: 'createTime',
+            render: (text, record) => {
+                return (
+                    formatDefaultTime(record.createTime)
+                );
+            },
         },
         {
             title: '操作',
-            key: 'operator',
-            render: (text, record) => {
-                const items = [
-                    {
-                        label: '查看',
-                        onClick: () => this.handleDetail(record),
-                    },
-                    {
-                        label: '删除',
-                        onClick: () => this.deleteItem(record),
-                    },
-                ];
-                return (<Operator items={items}/>);
-            },
+            render: (text, record) => (
+                <span>
+                    <a onClick={() => this.handleDetail(record.id)}>查看</a>
+                    <span className="ant-divider"/>
+                    <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
+                      <a href="#">删除</a>
+                    </Popconfirm>
+                </span>
+            )
         },
     ];
 
 
     componentWillMount() {
         const {endTime} = this.state;
-        let stratTime = getBeforeHoursTime(endTime, 72);  //根据结束时间得到开始时间
+        let stratTime = getBeforeHoursTime(endTime, 172);  //根据结束时间得到开始时间
         let endTimeStr = moment(endTime).format('YYYY-MM-DD HH:mm:ss');
         let startTimeStr = moment(stratTime).format('YYYY-MM-DD HH:mm:ss');
         this.setState({
@@ -201,6 +86,35 @@ export class LayoutComponent extends Component {
         };
         this.search(searchData);
     }
+
+    /**
+     * 删除元素
+     */
+    handleDelete = (sourceid)=> {
+        this.setState({
+            tabLoading: true,
+        });
+        promiseAjax.del(`/datasource/${sourceid}`).then(rsp => {
+            if (rsp.success) {
+                const {dataSource, total} = this.state
+                this.setState({
+                    dataSource: dataSource.filter(item => item.id !== sourceid),
+                    total: total - 1
+                });
+            }
+        }).finally(() => {
+            this.setState({
+                tabLoading: false,
+            });
+        });
+    };
+
+    /**
+     * 查看元素
+     */
+    handleDetail = (sourceid)=> {
+        browserHistory.push(`/dataSource/+detail/${sourceid}`);
+    };
 
     search = (args) => {
         const {form: {getFieldValue}} = this.props;
@@ -221,7 +135,7 @@ export class LayoutComponent extends Component {
         promiseAjax.get(`/datasource`, params).then(rsp => {
             if (rsp.data != undefined) {
                 this.setState({
-                    pageNum: rsp.data.pageNo + 1,
+                    pageNum: rsp.data.pageNo,
                     pageSize: rsp.data.pageSize,
                     total: parseInt(rsp.data.totalItems),
                     dataSource: rsp.data.result,
@@ -339,7 +253,7 @@ export class LayoutComponent extends Component {
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
                                     {getFieldDecorator('times', {
-                                        initialValue: [moment().add(-72, 'hour'), moment()]
+                                        initialValue: [moment().add(-172, 'hour'), moment()]
                                     })(
                                         <RangePicker
                                             showTime
