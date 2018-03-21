@@ -121,7 +121,7 @@ export class LayoutComponent extends Component {
      * 查看元素
      */
     handleDetail = (sourceid)=> {
-        browserHistory.push(`/dataSource/+detail/${sourceid}`);
+        browserHistory.push(`/dataTable/+detail/${sourceid}`);
     };
 
     search = (args) => {
