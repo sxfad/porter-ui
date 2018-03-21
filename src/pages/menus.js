@@ -59,7 +59,7 @@ export default [
         parentKey: 'sysmenu-config',
         text: '数据表配置',
         icon: 'api',
-        path: '/serviceTree',
+        path: '/dataTable',
     },
     {
         key: 'sysmenu-config-all',

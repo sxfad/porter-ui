@@ -125,11 +125,11 @@ export class LayoutComponent extends Component {
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
-                sm: {span: 6},
+                sm: {span: 5},
             },
             wrapperCol: {
                 xs: {span: 24},
-                sm: {span: 14},
+                sm: {span: 15},
             },
         };
         const tailFormItemLayout = {
@@ -140,7 +140,7 @@ export class LayoutComponent extends Component {
                 },
                 sm: {
                     span: 14,
-                    offset: 6,
+                    offset: 5,
                 },
             },
         };

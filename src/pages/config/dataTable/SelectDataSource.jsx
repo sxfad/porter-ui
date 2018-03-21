@@ -1,30 +1,30 @@
 /**
- * Created by lhyin on 2018/19/3.
+ * Created by lhyin on 2018/20/3.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Row, Col, DatePicker, Popconfirm} from 'antd';
+import {Form, Table, Row, Col, Input, Button, DatePicker} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import {promiseAjax} from 'sx-ui';
-import moment from 'moment';
 import {getBeforeHoursTime, formatDefaultTime} from '../../common/getTime';
-import {browserHistory} from 'react-router';
+import moment from 'moment';
+import './style.less';
 import connectComponent from '../../../redux/store/connectComponent';
 
+export const PAGE_ROUTE = '/selectDataSource';
 const {RangePicker} = DatePicker;
 const FormItem = Form.Item;
-export const PAGE_ROUTE = '/dataSource';
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 8,
         total: 0,
         startTimeStr: '', //开始时间
         endTimeStr: '',   //结束时间(默认当前时间)
         endTime: Date(),
         dataSource: [],
         tabLoading: false,
-    }
+    };
 
     columns = [
         {
@@ -55,18 +55,6 @@ export class LayoutComponent extends Component {
                 );
             },
         },
-        {
-            title: '操作',
-            render: (text, record) => (
-                <span>
-                    <a onClick={() => this.handleDetail(record.id)}>查看</a>
-                    <span className="ant-divider"/>
-                    <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
-                      <a href="#">删除</a>
-                    </Popconfirm>
-                </span>
-            )
-        },
     ];
 
 
@@ -85,35 +73,6 @@ export class LayoutComponent extends Component {
         };
         this.search(searchData);
     }
-
-    /**
-     * 删除元素
-     */
-    handleDelete = (sourceid)=> {
-        this.setState({
-            tabLoading: true,
-        });
-        promiseAjax.del(`/datasource/${sourceid}`).then(rsp => {
-            if (rsp.success) {
-                const {dataSource, total} = this.state
-                this.setState({
-                    dataSource: dataSource.filter(item => item.id !== sourceid),
-                    total: total - 1
-                });
-            }
-        }).finally(() => {
-            this.setState({
-                tabLoading: false,
-            });
-        });
-    };
-
-    /**
-     * 查看元素
-     */
-    handleDetail = (sourceid)=> {
-        browserHistory.push(`/dataSource/+detail/${sourceid}`);
-    };
 
     search = (args) => {
         const {form: {getFieldValue}} = this.props;
@@ -217,27 +176,31 @@ export class LayoutComponent extends Component {
         this.search(data);
     }
 
-    handleAddTask = () => {
-        browserHistory.push('/dataSource/+add/addId');
-    }
-
     render() {
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
-        const {dataSource, total, pageNum, pageSize, tabLoading} =this.state;
+        const {dataSource, total, pageNum, pageSize, tabLoading} = this.state;
+
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
-                sm: {span: 7},
+                sm: {span: 9},
             },
             wrapperCol: {
                 xs: {span: 24},
-                sm: {span: 17},
+                sm: {span: 15},
             },
         };
         const queryItemLayout = {
             xs: 12,
             md: 8,
             lg: 6,
+        };
+
+        const rowSelection = {
+            type: 'radio',
+            onChange: (selectedRowKeys, selectedRows) => {
+                this.props.changeDataSource(selectedRows);
+            },
         };
         return (
             <PageContent>
@@ -253,7 +216,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
+                            <Col span={10}>
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
                                     {getFieldDecorator('times', {
@@ -274,8 +237,6 @@ export class LayoutComponent extends Component {
                                 <FormItem
                                     label=""
                                     colon={false}>
-                                    <Button type="primary" onClick={() => this.handleAddTask()}
-                                            style={{marginLeft: 15}}><FontIcon type="plus"/>新增</Button>
                                     <Button type="primary" onClick={()=>this.handleQuery(getFieldsValue())}
                                             style={{marginLeft: 15}}><FontIcon type="search"/>查询</Button>
                                     <Button type="ghost" onClick={() => this.handleReset()}
@@ -285,24 +246,20 @@ export class LayoutComponent extends Component {
                         </Row>
                     </Form>
                 </QueryBar>
-
-                <div style={{marginTop: '10px'}}>
-                    <Table
-                        dataSource={dataSource}
-                        loading={tabLoading}
-                        size="middle"
-                        rowKey={(record) => record.id}
-                        columns={this.columns}
-                        pagination={false}
-                    />
-                </div>
+                <Table
+                    rowSelection={rowSelection}
+                    size="middle"
+                    rowKey={(record) => record.id}
+                    columns={this.columns}
+                    dataSource={dataSource}
+                    pagination={false}
+                />
                 <PaginationComponent
                     pageSize={pageSize}
                     pageNum={pageNum}
                     total={total}
                     onPageNumChange={this.handlePageNumChange}
                     onPageSizeChange={this.handlePageSizeChange}
-
                 />
             </PageContent>
         )
@@ -313,5 +270,4 @@ export function mapStateToProps(state) {
         ...state.frame,
     };
 }
-
 export default connectComponent({LayoutComponent, mapStateToProps});

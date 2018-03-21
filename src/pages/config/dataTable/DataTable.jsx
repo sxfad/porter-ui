@@ -12,13 +12,14 @@ import connectComponent from '../../../redux/store/connectComponent';
 
 const {RangePicker} = DatePicker;
 const FormItem = Form.Item;
-export const PAGE_ROUTE = '/dataSource';
+export const PAGE_ROUTE = '/dataTable';
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
         pageNum: 1,
         pageSize: 10,
         total: 0,
+        application: [],
         startTimeStr: '', //开始时间
         endTimeStr: '',   //结束时间(默认当前时间)
         endTime: Date(),
@@ -32,18 +33,26 @@ export class LayoutComponent extends Component {
             render: (text, record, index) => (index + 1) + ((this.state.pageNum - 1) * this.state.pageSize),
         },
         {
-            title: '数据源名称',
+            title: '分组名',
             render: (text, record) => {
                 return (
-                    record.name
+                    record.bankName
                 );
             },
         },
         {
-            title: '类型',
+            title: '表名',
             render: (text, record) => {
                 return (
-                    record.dataType.name
+                    record.tableName
+                );
+            },
+        },
+        {
+            title: '数据源',
+            render: (text, record) => {
+                return (
+                    record.dataType
                 );
             },
         },
@@ -93,7 +102,7 @@ export class LayoutComponent extends Component {
         this.setState({
             tabLoading: true,
         });
-        promiseAjax.del(`/datasource/${sourceid}`).then(rsp => {
+        promiseAjax.del(`/datatable/${sourceid}`).then(rsp => {
             if (rsp.success) {
                 const {dataSource, total} = this.state
                 this.setState({
@@ -117,14 +126,14 @@ export class LayoutComponent extends Component {
 
     search = (args) => {
         const {form: {getFieldValue}} = this.props;
-        let name = getFieldValue('name');
+        let bankName = getFieldValue('bankName');
         let times = getFieldValue('times');
         let endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
         let startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
         const {pageNum, pageSize} = this.state;
 
         let params = {
-            name,
+            bankName,
             pageNo: pageNum,
             pageSize,
             beginTime: startTimeStr,
@@ -134,8 +143,8 @@ export class LayoutComponent extends Component {
         this.setState({
             tabLoading: true,
         });
-        promiseAjax.get(`/datasource`, params).then(rsp => {
-            if (rsp.data != undefined) {
+        promiseAjax.get(`/datatable`, params).then(rsp => {
+            if (rsp.success && rsp.data != undefined) {
                 this.setState({
                     pageNum: rsp.data.pageNo,
                     pageSize: rsp.data.pageSize,
@@ -218,7 +227,7 @@ export class LayoutComponent extends Component {
     }
 
     handleAddTask = () => {
-        browserHistory.push('/dataSource/+add/addId');
+        browserHistory.push('/dataTable/+add/DataTableId');
     }
 
     render() {
@@ -247,9 +256,9 @@ export class LayoutComponent extends Component {
                             <Col {...queryItemLayout}>
                                 <FormItem
                                     {...formItemLayout}
-                                    label="数据源名称">
-                                    {getFieldDecorator('name')(
-                                        <Input placeholder="请填写数据源名称" style={{width: '100%'}}/>
+                                    label="分组名称">
+                                    {getFieldDecorator('bankName')(
+                                        <Input placeholder="请填写分组名称" style={{width: '100%'}}/>
                                     )}
                                 </FormItem>
                             </Col>
