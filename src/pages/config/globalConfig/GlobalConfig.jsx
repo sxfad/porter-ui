@@ -131,13 +131,10 @@ export class LayoutComponent extends Component {
      * 获取表单列表(根据选择的数据源类型)
      */
     getFieldType = (alertPluginType)=> {
-        console.log(alertPluginType);
         promiseAjax.get(`/alarm/info`).then(rsp => {
             if (rsp.success && rsp.data != null) {
                 const alarmInfo = rsp.data.alarmPlugins,
                     alarmUsers = rsp.data.alarmUsers;
-
-                console.log(alarmInfo);
                 const users = [];
                 alarmUsers.map((k, v) => {
                     users.push(alarmUsers[v].userId);
@@ -152,9 +149,6 @@ export class LayoutComponent extends Component {
                                 }
                             })
                         });
-
-                        console.log(alarmInfo);
-                        console.log(fieldType);
                         this.setState({fieldType, users, alarmInfo: rsp.data});
                     }
                 }).finally(() => {
@@ -207,9 +201,6 @@ export class LayoutComponent extends Component {
         const {form} = this.props;
         form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-
-                console.log(values);
-
                 const alarmPlugins = [];
                 for (let key in values) {
                     if (key.indexOf("--") != -1) {
@@ -340,7 +331,6 @@ export class LayoutComponent extends Component {
     }
 
     handleUsersChange = (value) => {
-        console.log(`selected ${value}`);
         this.setState({users: value});
     }
 
