@@ -66,7 +66,7 @@ export default [
         parentKey: 'sysmenu-config',
         text: '全局配置',
         icon: 'fa-database',
-        path: '/serviceTree',
+        path: '/globalConfig',
     },
     {
         key: 'sysmenu-monitor',
