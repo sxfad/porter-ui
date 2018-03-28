@@ -6,7 +6,7 @@ import {Steps, Button, message} from 'antd';
 import './style.less';
 import connectComponent from '../../redux/store/connectComponent';
 
-export const PAGE_ROUTE = '/addtask';
+export const PAGE_ROUTE = '/synchtask/+add/:TaskId';
 const Step = Steps.Step;
 const steps = [{
     title: 'First',
