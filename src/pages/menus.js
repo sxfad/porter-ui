@@ -38,7 +38,7 @@ export default [
         parentKey: 'sysmenu-cluster',
         text: '同步节点管理',
         icon: 'scan',
-        path: '/track',
+        path: '/nodeCluster',
     },
     {
         key: 'sysmenu-config',
