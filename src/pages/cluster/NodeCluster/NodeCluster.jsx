@@ -89,7 +89,7 @@ export class LayoutComponent extends Component {
             title: '任务推送状态',
             render: (text, record) => {
                 return (
-                    record.taskPushState.name
+                    record.taskPushState && record.taskPushState.name
                 );
             },
         },
@@ -214,11 +214,11 @@ export class LayoutComponent extends Component {
         const {form} = this.props;
         const {pageNum, pageSize} = this.state;
         form.validateFieldsAndScroll((err, values) => {
-            console.log(values);
             let params = {
                 pageNo: pageNum,
                 pageSize,
                 ...values,
+                ...args,
             };
             this.setState({
                 tabLoading: true,
@@ -273,6 +273,7 @@ export class LayoutComponent extends Component {
     }
 
     handlePageSizeChange = (pageSize) => {
+        console.log('value',pageSize);
         this.setState({
             pageNum: 1,
         });
@@ -284,6 +285,8 @@ export class LayoutComponent extends Component {
     }
 
     handlePageNumChange = (value) => {
+        console.log('value',value);
+
         const {pageSize} = this.state;
         this.setState({
             pageNum: value,

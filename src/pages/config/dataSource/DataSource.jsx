@@ -302,7 +302,6 @@ export class LayoutComponent extends Component {
                     total={total}
                     onPageNumChange={this.handlePageNumChange}
                     onPageSizeChange={this.handlePageSizeChange}
-
                 />
             </PageContent>
         )
