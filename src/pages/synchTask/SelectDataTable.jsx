@@ -1,35 +1,30 @@
 /**
- * Created by lhyin on 2017/12/5.
+ * Created by lhyin on 2018/20/3.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Select, Row, Col, DatePicker} from 'antd';
+import {Form, Input, Button, Table, Row, Col, DatePicker, Popconfirm} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
-import moment from 'moment';
 import {promiseAjax} from 'sx-ui';
+import {getBeforeHoursTime, formatDefaultTime} from '../common/getTime';
+import moment from 'moment';
 import './style.less';
-import {formatDefaultTime} from '../common/getTime';
-import {browserHistory} from 'react-router';
 import connectComponent from '../../redux/store/connectComponent';
 
+export const PAGE_ROUTE = '/selectDataTable';
 const {RangePicker} = DatePicker;
 const FormItem = Form.Item;
-const Option = Select.Option;
-export const PAGE_ROUTE = '/synchtask';
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 8,
         total: 0,
-        application: [],
         startTimeStr: '', //开始时间
         endTimeStr: '',   //结束时间(默认当前时间)
         endTime: Date(),
         dataSource: [],
         tabLoading: false,
-        visible: false,
-        applicationName: '',
-    }
+    };
 
     columns = [
         {
@@ -37,34 +32,27 @@ export class LayoutComponent extends Component {
             render: (text, record, index) => (index + 1) + ((this.state.pageNum - 1) * this.state.pageSize),
         },
         {
-            title: '任务名称',
+            title: '分组名',
             render: (text, record) => {
                 return (
-                    record.jobName
+                    record.bankName
                 );
             },
         },
         {
-            title: '来源数据-消费插件',
+            title: '表名',
             render: (text, record) => {
                 return (
-                    record.sourceConsumeAdt
+                    record.tableName
                 );
             },
+            width: '55%',
         },
         {
-            title: '来源数据-消费转换插件',
+            title: '数据源',
             render: (text, record) => {
                 return (
-                    record.sourceConvertAdt
-                );
-            },
-        },
-        {
-            title: '目标数据-载入插件',
-            render: (text, record) => {
-                return (
-                    record.targetLoadAdt
+                    record.dataType
                 );
             },
         },
@@ -76,65 +64,44 @@ export class LayoutComponent extends Component {
                 );
             },
         },
-        {
-            title: '状态',
-            render: (text, record) => {
-                return (
-                    record.jobState.name
-                );
-            },
-        },
-        {
-            title: '操作',
-            key: 'operator',
-            render: (text, record) => {
-                const items = [
-                    {
-                        label: '开始',
-                        onClick: () => this.startItem(record),
-                    },
-                    {
-                        label: '停止',
-                        onClick: () => this.stopItem(record),
-                    },
-                    {
-                        label: '删除',
-                        onClick: () => this.deleteItem(record),
-                    },
-                    {
-                        label: '查看',
-                        onClick: () => this.handleDetail(record),
-                    },
-                ];
-                return (<Operator items={items}/>);
-            },
-        },
     ];
 
-
     componentDidMount() {
-        this.search();
+        const {form: {getFieldValue}} = this.props;
+        let times = getFieldValue('times');
+        let endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
+        let startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
+        this.setState({
+            startTimeStr,
+            endTimeStr,
+        });
+        const searchData = {
+            beginTime: startTimeStr,
+            endTime: endTimeStr,
+        };
+        this.search(searchData);
     }
 
-    search = () => {
+    search = (args) => {
         const {form: {getFieldValue}} = this.props;
-        let jobName = getFieldValue('jobName');
+        let bankName = getFieldValue('bankName');
         let times = getFieldValue('times');
         let endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
         let startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
         const {pageNum, pageSize} = this.state;
 
         let params = {
-            jobName,
+            bankName,
             pageNo: pageNum,
             pageSize,
             beginTime: startTimeStr,
             endTime: endTimeStr,
+            ...args,
         };
         this.setState({
             tabLoading: true,
         });
-        promiseAjax.get(`/jobtasks`, params).then(rsp => {
+        promiseAjax.get(`/datatable`, params).then(rsp => {
             if (rsp.success && rsp.data != undefined) {
                 this.setState({
                     pageNum: rsp.data.pageNo,
@@ -149,8 +116,6 @@ export class LayoutComponent extends Component {
                     dataSource: [],
                 });
             }
-
-            console.log(rsp.data.result)
         }).finally(() => {
             this.setState({
                 tabLoading: false,
@@ -186,6 +151,16 @@ export class LayoutComponent extends Component {
         this.search(data);
     }
 
+    /**
+     * 设置时间
+     */
+    onOk = (value)=> {
+        this.setState({
+            startTimeStr: moment(value[0]).format('YYYY-MM-DD HH:mm:ss'),
+            endTimeStr: moment(value[1]).format('YYYY-MM-DD HH:mm:ss'),
+        });
+    };
+
     handlePageSizeChange = (pageSize) => {
         this.setState({
             pageNum: 1,
@@ -209,37 +184,31 @@ export class LayoutComponent extends Component {
         this.search(data);
     }
 
-    /**
-     * 设置时间
-     */
-    onOk = (value)=> {
-        this.setState({
-            startTimeStr: moment(value[0]).format('YYYY-MM-DD HH:mm:ss'),
-            endTimeStr: moment(value[1]).format('YYYY-MM-DD HH:mm:ss'),
-        });
-    };
-
-    handleAddTask = () => {
-        browserHistory.push('/synchtask/+add/TaskId');
-    }
-
     render() {
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
-        const {dataSource, total, pageNum, pageSize, tabLoading, visible, startTimeStr, endTimeStr, applicationName} =this.state;
+        const {dataSource, total, pageNum, pageSize, tabLoading} = this.state;
+
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
-                sm: {span: 7},
+                sm: {span: 9},
             },
             wrapperCol: {
                 xs: {span: 24},
-                sm: {span: 17},
+                sm: {span: 15},
             },
         };
         const queryItemLayout = {
             xs: 12,
             md: 8,
             lg: 6,
+        };
+
+        const rowSelection = {
+            type: 'radio',
+            onChange: (selectedRowKeys, selectedRows) => {
+                this.props.changeDataTable(selectedRows);
+            },
         };
         return (
             <PageContent>
@@ -249,9 +218,9 @@ export class LayoutComponent extends Component {
                             <Col {...queryItemLayout}>
                                 <FormItem
                                     {...formItemLayout}
-                                    label="任务名称">
-                                    {getFieldDecorator('jobName')(
-                                        <Input placeholder="请填写任务名称" style={{width: '100%'}}/>
+                                    label="分组名称">
+                                    {getFieldDecorator('bankName')(
+                                        <Input placeholder="请填写分组名称" style={{width: '100%'}}/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -272,12 +241,10 @@ export class LayoutComponent extends Component {
 
                                 </FormItem>
                             </Col>
-                            <Col span={7} style={{textAlign:'right'}}>
+                            <Col span={8} style={{textAlign:'center'}}>
                                 <FormItem
                                     label=""
                                     colon={false}>
-                                    <Button type="primary" onClick={() => this.handleAddTask()}
-                                            style={{marginLeft: 15}}><FontIcon type="plus"/>新增任务</Button>
                                     <Button type="primary" onClick={()=>this.handleQuery(getFieldsValue())}
                                             style={{marginLeft: 15}}><FontIcon type="search"/>查询</Button>
                                     <Button type="ghost" onClick={() => this.handleReset()}
@@ -287,17 +254,15 @@ export class LayoutComponent extends Component {
                         </Row>
                     </Form>
                 </QueryBar>
-
-                <div style={{marginTop: '10px'}}>
-                    <Table
-                        dataSource={dataSource}
-                        loading={tabLoading}
-                        size="middle"
-                        rowKey={(record) => record.id}
-                        columns={this.columns}
-                        pagination={false}
-                    />
-                </div>
+                <Table
+                    rowSelection={rowSelection}
+                    size="middle"
+                    loading={tabLoading}
+                    rowKey={(record) => record.id}
+                    columns={this.columns}
+                    dataSource={dataSource}
+                    pagination={false}
+                />
                 <PaginationComponent
                     pageSize={pageSize}
                     pageNum={pageNum}
@@ -307,13 +272,11 @@ export class LayoutComponent extends Component {
                 />
             </PageContent>
         )
-    }
-    ;
+    };
 }
 export function mapStateToProps(state) {
     return {
         ...state.frame,
     };
 }
-
 export default connectComponent({LayoutComponent, mapStateToProps});
