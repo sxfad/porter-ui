@@ -48,7 +48,7 @@ export class LayoutComponent extends Component {
             title: '来源数据-消费插件',
             render: (text, record) => {
                 return (
-                    record.sourceConsumeAdt
+                    record.sourceConsumeAdt.name
                 );
             },
         },
@@ -56,7 +56,7 @@ export class LayoutComponent extends Component {
             title: '来源数据-消费转换插件',
             render: (text, record) => {
                 return (
-                    record.sourceConvertAdt
+                    record.sourceConvertAdt.name
                 );
             },
         },
@@ -64,7 +64,7 @@ export class LayoutComponent extends Component {
             title: '目标数据-载入插件',
             render: (text, record) => {
                 return (
-                    record.targetLoadAdt
+                    record.targetLoadAdt.name
                 );
             },
         },
