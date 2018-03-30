@@ -10,6 +10,8 @@ import './style.less';
 import SelectDataTable from './SelectDataTable';
 import SelectDataSourceByType from './SelectDataSourceByType';
 import SelectTargetDataTable from './SelectTargetDataTable';
+import DataMap from './DataMap';
+import SynchTaskDetail from './SynchTaskDetail';
 import connectComponent from '../../redux/store/connectComponent';
 
 const FormItem = Form.Item;
@@ -42,6 +44,7 @@ export class LayoutComponent extends Component {
         selectedDataTable: [],
         selectedDataSource: [],
         selectedTargetDataTable: [],
+        tables: [],
         dataTableVisible: false, //选择数据表弹出层显示情况
         dataSourceVisible: false,
         targetDataTableVisible: false,
@@ -56,7 +59,7 @@ export class LayoutComponent extends Component {
 
     next() {
         const {form} = this.props;
-        const {allData, selectedDataTable, selectedDataSource, selectedTargetDataTable} =this.state;
+        const {allData, selectedDataTable, selectedDataSource, selectedTargetDataTable, tables} =this.state;
         const current = this.state.current + 1;
         if (current === 1) { //保存第一步内容
             form.validateFieldsAndScroll((err, values) => {
@@ -101,8 +104,29 @@ export class LayoutComponent extends Component {
                     this.setState({current});
                 }
             })
+        } else if (current === 4) {
+            const params = {
+                ...allData,
+                tables: tables,
+            }
+            this.setState({allData: params});
+            console.log('params', params);
+            this.setState({current});
         }
     }
+
+    /**
+     * 保存
+     */
+    allSubmit = ()=> {
+        const {allData} =this.state;
+        promiseAjax.post(`/jobtasks`, allData).then(rsp => {
+            if (rsp.success) {
+                message.success('添加成功', 3);
+                history.back();
+            }
+        });
+    };
 
     prev() {
         const current = this.state.current - 1;
@@ -278,9 +302,17 @@ export class LayoutComponent extends Component {
         })
     };
 
+    /**
+     * 保存数据映射关系
+     */
+    saveDataMap = (tables)=> {
+        this.setState({tables});
+        console.log(tables);
+    };
+
     render() {
         const {getFieldDecorator} = this.props.form;
-        const {current, users, allData, dataTableVisible, dataSourceVisible, targetDataTableVisible} = this.state;
+        const {current, users, allData, dataTableVisible, dataSourceVisible, targetDataTableVisible, selectedDataTable, selectedTargetDataTable} = this.state;
         const stepsNum = steps[this.state.current].content;
         const formItemLayout = {
             labelCol: {
@@ -290,18 +322,6 @@ export class LayoutComponent extends Component {
             wrapperCol: {
                 xs: {span: 24},
                 sm: {span: 15},
-            },
-        };
-        const tailFormItemLayout = {
-            wrapperCol: {
-                xs: {
-                    span: 24,
-                    offset: 0,
-                },
-                sm: {
-                    span: 14,
-                    offset: 5,
-                },
             },
         };
 
@@ -324,7 +344,7 @@ export class LayoutComponent extends Component {
                     {...formItemLayout}
                     label="告警通知人"
                     hasFeedback>
-                    {getFieldDecorator('userId', {
+                    {getFieldDecorator('userIds', {
                         rules: [{required: true, message: '请选择告警通知人'}],
                         initialValue: users
                     })(
@@ -438,7 +458,10 @@ export class LayoutComponent extends Component {
                 </FormItem>
             </Form>
         } else if (this.state.current === 3) {
-
+            stepsHtml = <DataMap selectedDataTable={selectedDataTable} selectedTargetDataTable={selectedTargetDataTable}
+                                 saveDataMap={this.saveDataMap.bind(this)}/>
+        } else if (this.state.current === 4) {
+            stepsHtml = <SynchTaskDetail taskInfo={allData}/>
         }
 
         return (
@@ -458,7 +481,7 @@ export class LayoutComponent extends Component {
                     {
                         this.state.current === steps.length - 1
                         &&
-                        <Button type="primary" onClick={() => message.success('Processing complete!')}>Done</Button>
+                        <Button type="primary" onClick={() => this.allSubmit()}>提交</Button>
                     }
                     {
                         this.state.current > 0
