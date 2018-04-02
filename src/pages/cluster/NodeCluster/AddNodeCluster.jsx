@@ -43,6 +43,16 @@ export class LayoutComponent extends Component {
         this.props.form.resetFields();
     };
 
+    validateNodeId = (rule, value, callback) => {
+        promiseAjax.get(`/nodes/testNodeId/${value}`).then(rsp => {
+            if (rsp.success && !rsp.data) {
+                callback('节点ID已被使用,请重新输入');
+            } else {
+                callback();
+            }
+        });
+    };
+
     render() {
         const {getFieldDecorator} = this.props.form;
         const formItemLayout = {
@@ -79,7 +89,9 @@ export class LayoutComponent extends Component {
                             hasFeedback
                         >
                             {getFieldDecorator('nodeId', {
-                                rules: [{required: true, message: '请输入节点ID'}],
+                                rules: [{required: true, message: '请输入节点ID'}, {
+                                    validator: this.validateNodeId,
+                                }],
                             })(
                                 <Input placeholder="节点ID"/>
                             )}
@@ -88,9 +100,7 @@ export class LayoutComponent extends Component {
                             {...formItemLayout}
                             label="机器名"
                             hasFeedback>
-                            {getFieldDecorator('machineName', {
-                                rules: [{required: true, message: '请输入机器名'}],
-                            })(
+                            {getFieldDecorator('machineName')(
                                 <Input placeholder="机器名"/>
                             )}
                         </FormItem>
@@ -98,9 +108,7 @@ export class LayoutComponent extends Component {
                             {...formItemLayout}
                             label="IP地址"
                             hasFeedback>
-                            {getFieldDecorator('ipAddress', {
-                                rules: [{required: true, message: '请输入IP地址'}],
-                            })(
+                            {getFieldDecorator('ipAddress')(
                                 <Input placeholder="IP地址"/>
                             )}
                         </FormItem>
@@ -108,9 +116,7 @@ export class LayoutComponent extends Component {
                             {...formItemLayout}
                             label="进程号"
                             hasFeedback>
-                            {getFieldDecorator('pidNumber', {
-                                rules: [{required: true, message: '请输入进程号'}],
-                            })(
+                            {getFieldDecorator('pidNumber')(
                                 <Input placeholder="进程号"/>
                             )}
                         </FormItem>
