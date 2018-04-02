@@ -58,7 +58,7 @@ export class LayoutComponent extends Component {
                                     数据源名称：
                                 </Col>
                                 <Col span={18}>
-                                    {dataTable.sourceId && dataTable.sourceId}
+                                    {dataTable.sourceId && dataTable.sourceName}
                                 </Col>
                             </Row>
                             <Row>
