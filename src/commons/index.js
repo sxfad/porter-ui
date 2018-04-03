@@ -8,15 +8,15 @@ export function getAjaxBaseUrl() {
         return devAjaxBaseUrl;
     }
     if (isPro) {
-        return devAjaxBaseUrl.production;
+        return devAjaxBaseUrl;
     }
 
     if (isTest) {
-        return devAjaxBaseUrl.test;
+        return devAjaxBaseUrl;
     }
 
     if (isRC) {
-        return devAjaxBaseUrl.rc;
+        return devAjaxBaseUrl;
     }
     return '/';
 }
