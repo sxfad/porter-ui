@@ -2,7 +2,7 @@
  * Created by lhyin on 2017/12/5.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Select, Row, Col, DatePicker} from 'antd';
+import {Form, Input, Button, Table, Select, Row, Col, DatePicker, message, Popconfirm} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import moment from 'moment';
 import {promiseAjax} from 'sx-ui';
@@ -86,31 +86,117 @@ export class LayoutComponent extends Component {
         },
         {
             title: '操作',
-            key: 'operator',
             render: (text, record) => {
-                const items = [
-                    {
-                        label: '开始',
-                        onClick: () => this.startItem(record),
-                    },
-                    {
-                        label: '停止',
-                        onClick: () => this.stopItem(record),
-                    },
-                    {
-                        label: '删除',
-                        onClick: () => this.deleteItem(record),
-                    },
-                    {
-                        label: '查看',
-                        onClick: () => this.handleDetail(record),
-                    },
-                ];
-                return (<Operator items={items}/>);
+                if (record.jobState.name === '新建') {
+                    return (
+                        <span>
+                            <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
+                            <span className="ant-divider"/>
+                            <a onClick={() => this.handleStop('WORKING',record.id)}>开始</a>
+                            <span className="ant-divider"/>
+                            <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
+                              <a href="#">删除</a>
+                            </Popconfirm>
+                            <span className="ant-divider"/>
+                            <a onClick={() => this.handleDetail(record.id)}>查看</a>
+                        </span>
+                    )
+                } else if (record.jobState.name === '工作中') {
+                    return (
+                        <span>
+                            <a onClick={() => this.handleStop('STOPPED',record.id)}>停止</a>
+                            <span className="ant-divider"/>
+                            <a onClick={() => this.handleDetail(record.id)}>查看</a>
+                        </span>
+                    )
+                } else if (record.jobState.name === '已停止') {
+                    return (
+                        <span>
+                            <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
+                            <span className="ant-divider"/>
+                            <a onClick={() => this.handleStop('WORKING',record.id)}>开始</a>
+                            <span className="ant-divider"/>
+                            <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
+                              <a href="#">删除</a>
+                            </Popconfirm>
+                            <span className="ant-divider"/>
+                            <a onClick={() => this.handleDetail(record.id)}>查看</a>
+                        </span>
+                    )
+                }
             },
         },
     ];
 
+    /**
+     * 查看元素
+     */
+    handleDetail = (id)=> {
+        console.log(11);
+        browserHistory.push(`/synchtask/+detail/${id}`);
+    };
+
+    /**
+     * 删除
+     * @param id
+     */
+    handleDelete = (id)=> {
+        this.setState({
+            tabLoading: true,
+        });
+        promiseAjax.del(`/jobtasks/${id}`).then(rsp => {
+            if (rsp.success) {
+                const {dataSource, total} = this.state
+                this.setState({
+                    dataSource: dataSource.filter(item => item.id !== id),
+                    total: total - 1
+                });
+                message.success('删除成功', 3);
+            }
+        }).finally(() => {
+            this.setState({
+                tabLoading: false,
+            });
+        });
+    };
+
+    /**
+     * 开始任务
+     * @param id
+     */
+    handleStop = (type, id)=> {
+        this.setState({
+            tabLoading: true,
+        });
+        let typeStr = '';
+        if (type === 'STOPPED') {
+            typeStr = '已停止';
+        } else {
+            typeStr = '工作中';
+        }
+        promiseAjax.put(`/jobtasks/${id}?taskStatusType=${type}`).then(rsp => {
+            if (rsp.success) {
+                console.log(rsp);
+                console.log(dataSource);
+                const {dataSource} = this.state;
+                console.log(dataSource);
+                dataSource.map((key, value)=> {
+                    if (key.id === id) {
+                        dataSource[value].jobState.name = typeStr;
+                        dataSource[value].jobState.code = type;
+                    }
+                });
+                this.setState({
+                    dataSource,
+                });
+                message.success('操作成功', 3);
+            }
+        }).finally(() => {
+            this.setState({
+                tabLoading: false,
+            });
+        });
+    };
 
     componentDidMount() {
         this.search();
