@@ -83,6 +83,7 @@ export class LayoutComponent extends Component {
                         ...values,
                         sourceDataId: selectedDataSource[0].id,
                         sourceDataTablesId: selectedDataTable[0].id,
+                        sourceDataSourceId: selectedDataTable[0].sourceId,
                         jobState: 'NEW',
                     }
                     this.setState({allData: params});
@@ -98,6 +99,7 @@ export class LayoutComponent extends Component {
                         ...allData,
                         ...values,
                         targetDataTablesId: selectedTargetDataTable[0].id,
+                        targetDataSourceId: selectedTargetDataTable[0].sourceId,
                     }
                     this.setState({allData: params});
                     console.log('params', params);
@@ -105,13 +107,19 @@ export class LayoutComponent extends Component {
                 }
             })
         } else if (current === 4) {
-            const params = {
-                ...allData,
-                tables: tables,
+            console.log('tables', tables);
+
+            if (tables.length === 0) {
+                message.warning('映射表信息不能为空', 3);
+            } else {
+                const params = {
+                    ...allData,
+                    tables: tables,
+                }
+                this.setState({allData: params});
+                console.log('params', params);
+                this.setState({current});
             }
-            this.setState({allData: params});
-            console.log('params', params);
-            this.setState({current});
         }
     }
 
@@ -120,12 +128,23 @@ export class LayoutComponent extends Component {
      */
     allSubmit = ()=> {
         const {allData} =this.state;
-        promiseAjax.post(`/jobtasks`, allData).then(rsp => {
-            if (rsp.success) {
-                message.success('添加成功', 3);
-                history.back();
-            }
-        });
+        const {params: {TaskId}} = this.props;
+        if (TaskId != 'TaskId') {
+            promiseAjax.put(`/jobtasks`, allData).then(rsp => {
+                if (rsp.success) {
+                    message.success('修改成功', 3);
+                    history.back();
+                }
+            });
+        } else {
+            promiseAjax.post(`/jobtasks`, allData).then(rsp => {
+                if (rsp.success) {
+                    message.success('添加成功', 3);
+                    history.back();
+                }
+            });
+        }
+
     };
 
     prev() {
@@ -154,6 +173,82 @@ export class LayoutComponent extends Component {
                     session.setItem('dictAll', rsp.data);
                 }
             }).finally(() => {
+            });
+        }
+
+        // 修改任务
+        const {params: {TaskId}} = this.props;
+        if (TaskId !== 'TaskId') {
+            console.log(TaskId);
+            const selectedDataSource = [],
+                selectedDataTable = [],
+                selectedTargetDataTable = [];
+            promiseAjax.get(`/jobtasks/${TaskId}`).then(rsp => {
+                let userStr = [];
+                let allJson = [];
+                let tables = [];
+                if (rsp.success) {
+                    for (let i = 0; i < rsp.data.users.length; i++) {
+                        userStr.push(rsp.data.users[i].id);
+                    }
+                    for (let i = 0; i < rsp.data.tables.length; i++) {
+                        const tableItem = {};
+                        const fields = [];
+                        for (let j = 0; j < rsp.data.tables[i].fields.length; j++) {
+                            const fieldsItem = {};
+                            fieldsItem.sortOrder = rsp.data.tables[i].fields[j].id;
+                            fieldsItem.sourceTableField = rsp.data.tables[i].fields[j].sourceTableField;
+                            fieldsItem.sourceTableName = rsp.data.tables[i].fields[j].sourceTableName;
+                            fieldsItem.targetTableField = rsp.data.tables[i].fields[j].targetTableField;
+                            fieldsItem.targetTableName = rsp.data.tables[i].fields[j].targetTableName;
+                            fields.push(fieldsItem);
+                        }
+                        tableItem.fields = fields;
+                        tableItem.sourceTableName = rsp.data.tables[i].sourceTableName;
+                        tableItem.targetTableName = rsp.data.tables[i].targetTableName;
+                        tables.push(tableItem);
+                    }
+                    allJson.id = rsp.data.id;
+                    allJson.jobState = rsp.data.jobState.code;
+                    allJson.jobName = rsp.data.jobName;
+                    allJson.sourceConsumeAdt = rsp.data.sourceConsumeAdtName;
+                    allJson.sourceConvertAdt = rsp.data.sourceConvertAdtName;
+                    allJson.sourceDataTablesId = rsp.data.sourceDataTablesId;
+                    allJson.sourceDataTablesName = rsp.data.sourceDataTablesName;
+                    allJson.sourceDataId = rsp.data.sourceDataId;
+                    allJson.sourceDataName = rsp.data.sourceDataName;
+                    allJson.sourceDataSourceId = rsp.data.sourceDataSourceId;
+                    allJson.targetDataSourceId = rsp.data.targetDataSourceId;
+                    allJson.targetLoadAdt = rsp.data.targetLoadAdtName;
+                    allJson.targetDataTablesId = rsp.data.targetDataTablesId;
+                    allJson.targetDataTablesName = rsp.data.targetDataTablesName;
+                    allJson.userIds = userStr;
+                    allJson.tables = tables;
+
+                    const selectedDataSourceItem = {},
+                        selectedDataTableItem = {},
+                        selectedTargetDataTableItem = {};
+                    selectedDataSourceItem.id = rsp.data.sourceDataId;
+                    selectedDataSourceItem.name = rsp.data.sourceDataName;
+                    selectedDataSource.push(selectedDataSourceItem);
+                    selectedDataTableItem.id = rsp.data.sourceDataTablesId;
+                    selectedDataTableItem.tableName = rsp.data.sourceDataTablesName;
+                    selectedDataTableItem.sourceId = rsp.data.sourceDataSourceId;
+                    selectedDataTable.push(selectedDataTableItem);
+                    selectedTargetDataTableItem.id = rsp.data.targetDataTablesId;
+                    selectedTargetDataTableItem.tableName = rsp.data.targetDataTablesName;
+                    selectedTargetDataTableItem.sourceId = rsp.data.targetDataSourceId;
+                    selectedTargetDataTable.push(selectedTargetDataTableItem);
+                    console.log(allJson);
+                    this.setState({
+                        allData: allJson,
+                        users: userStr,
+                        selectedDataSource,
+                        selectedDataTable,
+                        selectedTargetDataTable,
+                        tables,
+                    });
+                }
             });
         }
     }
@@ -210,10 +305,26 @@ export class LayoutComponent extends Component {
     };
 
     changeDataTable(dataTable) {
-        this.setState({
-            selectedDataTable: dataTable,
-        });
-        console.log(dataTable);
+        const {selectedDataTable, allData} =this.state;
+        if (selectedDataTable === undefined) {
+            this.setState({
+                selectedDataTable: dataTable,
+            });
+        } else {
+            if (selectedDataTable[0].id != dataTable[0].id) {
+                allData.tables = [];
+                this.setState({
+                    selectedDataTable: dataTable,
+                    allData,
+                    tables: [],
+                });
+            } else {
+                this.setState({
+                    selectedDataTable: dataTable,
+                });
+            }
+        }
+        console.log('dataTable', dataTable);
     }
 
     changeDataSource(dataSource) {
@@ -224,10 +335,26 @@ export class LayoutComponent extends Component {
     }
 
     changeTargetDataTable(targetDataTable) {
-        this.setState({
-            selectedTargetDataTable: targetDataTable,
-        });
-        console.log(targetDataTable);
+        const {selectedTargetDataTable, allData} =this.state;
+        if (selectedTargetDataTable === undefined) {
+            this.setState({
+                selectedTargetDataTable: targetDataTable,
+            });
+        } else {
+            if (selectedTargetDataTable[0].id != targetDataTable[0].id) {
+                allData.tables = [];
+                this.setState({
+                    selectedTargetDataTable: targetDataTable,
+                    allData,
+                    tables: [],
+                });
+            } else {
+                this.setState({
+                    selectedTargetDataTable: targetDataTable,
+                });
+            }
+        }
+
     }
 
     handleOk = (e) => {
@@ -311,6 +438,7 @@ export class LayoutComponent extends Component {
     };
 
     render() {
+        const {params: {TaskId}} = this.props;
         const {getFieldDecorator} = this.props.form;
         const {current, users, allData, dataTableVisible, dataSourceVisible, targetDataTableVisible, selectedDataTable, selectedTargetDataTable} = this.state;
         const stepsNum = steps[this.state.current].content;
@@ -459,7 +587,8 @@ export class LayoutComponent extends Component {
             </Form>
         } else if (this.state.current === 3) {
             stepsHtml = <DataMap selectedDataTable={selectedDataTable} selectedTargetDataTable={selectedTargetDataTable}
-                                 saveDataMap={this.saveDataMap.bind(this)}/>
+                                 saveDataMap={this.saveDataMap.bind(this)} taskId={TaskId}
+                                 parentTables={allData.tables}/>
         } else if (this.state.current === 4) {
             stepsHtml = <SynchTaskDetail taskInfo={allData}/>
         }

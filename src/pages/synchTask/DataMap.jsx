@@ -193,6 +193,23 @@ export class LayoutComponent extends Component {
         this.setState({selectedDataTable, selectedTargetDataTable});
     }
 
+    componentDidMount() {
+        const {TaskId, parentTables} =this.props;
+        console.log(parentTables);
+
+        if (TaskId !== 'TaskId') {
+            const tablesNameList = [];
+            for (let i = 0; i < parentTables.length; i++) {
+                const tablesNameListItem = {};
+                tablesNameListItem.sourceTableName = parentTables[i].sourceTableName;
+                tablesNameListItem.targetTableName = parentTables[i].targetTableName;
+                tablesNameListItem.id = i + 1;
+                tablesNameList.push(tablesNameListItem);
+            }
+            this.setState({tables: parentTables, tablesNameList});
+        }
+    }
+
 
     changeDataSource(dataSource) {
         this.setState({
@@ -285,12 +302,25 @@ export class LayoutComponent extends Component {
     handleSave = () => {
         const {form:{setFieldsValue}} =this.props;
         const {sourceTableName, targetTableName, leftSelectedRow, rightSelectedRow, tables, tablesNameList}= this.state;
+        let flag = true;
+
+        if (tablesNameList.length > 0) {
+            for (let i = 0; i < tablesNameList.length; i++) {
+                if (tablesNameList[i].sourceTableName === sourceTableName && tablesNameList[i].targetTableName === targetTableName) {
+                    flag = false;
+                    break;
+                }
+            }
+        }
+
         if (leftSelectedRow === '' || targetTableName === '') {
             message.warning('请选择源表或目标表', 3);
         } else if (leftSelectedRow.length === 0 || rightSelectedRow.length === 0) {
             message.warning('请选择表字段', 3);
         } else if (leftSelectedRow.length != rightSelectedRow.length) {
             message.warning('映射字段信息有误,请检查', 3);
+        } else if (flag === false) {
+            message.warning('请勿重复添加表映射关系', 3);
         } else {
             const tableItem = {};
             const fields = [];
@@ -316,6 +346,7 @@ export class LayoutComponent extends Component {
             console.log('tablesNameList', tablesNameList);
             this.setState({
                 tables,
+                tablesNameList,
                 sourceTableName: '',
                 leftTableData: [],
                 selectedRowKeys: [],
@@ -398,6 +429,34 @@ export class LayoutComponent extends Component {
             onChange: (selectedRowKeys, selectedRows) => {
                 this.setState({rightSelectedRowKeys: selectedRowKeys});
             }
+        };
+
+        const expandedRowRender = (sourceTableName, targetTableName) => {
+            console.log(sourceTableName, targetTableName);
+
+            let dataColumn = [];
+            for (let i = 0; i < tables.length; i++) {
+                if (tables[i].sourceTableName === sourceTableName && tables[i].targetTableName === targetTableName) {
+                    dataColumn = tables[i].fields;
+                }
+            }
+            // for (let i = 0; i < tables.length; i++) {
+            //     if (tables[i].id === id) {
+            //         dataColumn = tables[i].fields;
+            //     }
+            // }
+            const columns = [
+                {title: '源表列名', dataIndex: 'sourceTableField', key: 'sourceTableField'},
+                {title: '目标表列名', dataIndex: 'targetTableField', key: 'targetTableField'},
+            ];
+            return (
+                <Table
+                    columns={columns}
+                    dataSource={dataColumn}
+                    rowKey={(record) => record.sortOrder}
+                    pagination={false}
+                />
+            );
         };
         return (
             <PageContent>
@@ -519,6 +578,7 @@ export class LayoutComponent extends Component {
                                 rowKey={(record) => record.id}
                                 columns={this.Columns}
                                 dataSource={tablesNameList}
+                                expandedRowRender={(record) => expandedRowRender(record.sourceTableName, record.targetTableName)}
                                 pagination={false}
                             />
                         </Col>

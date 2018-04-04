@@ -129,10 +129,17 @@ export class LayoutComponent extends Component {
     ];
 
     /**
+     * 编辑任务
+     * @param id
+     */
+    handleUpdate = (id) => {
+        browserHistory.push(`/synchtask/+add/${id}`);
+    }
+
+    /**
      * 查看元素
      */
     handleDetail = (id)=> {
-        console.log(11);
         browserHistory.push(`/synchtask/+detail/${id}`);
     };
 
@@ -235,8 +242,6 @@ export class LayoutComponent extends Component {
                     dataSource: [],
                 });
             }
-
-            console.log(rsp.data.result)
         }).finally(() => {
             this.setState({
                 tabLoading: false,
