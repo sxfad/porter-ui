@@ -174,6 +174,7 @@ export class LayoutComponent extends Component {
         // 修改任务
         const {params: {TaskId}} = this.props;
         if (TaskId !== 'TaskId') {
+            console.log(TaskId);
             const selectedDataSource = [],
                 selectedDataTable = [],
                 selectedTargetDataTable = [];
@@ -205,15 +206,18 @@ export class LayoutComponent extends Component {
                     allJson.id = rsp.data.id;
                     allJson.jobState = rsp.data.jobState.code;
                     allJson.jobName = rsp.data.jobName;
-                    allJson.sourceConsumeAdt = rsp.data.sourceConsumeAdtName;
-                    allJson.sourceConvertAdt = rsp.data.sourceConvertAdtName;
+                    allJson.sourceConsumeAdt = rsp.data.sourceConsumeAdt.code;
+                    allJson.sourceConvertAdt = rsp.data.sourceConvertAdt.code;
+                    allJson.sourceConsumeAdtName = rsp.data.sourceConsumeAdtName;
+                    allJson.sourceConvertAdtName = rsp.data.sourceConvertAdtName;
                     allJson.sourceDataTablesId = rsp.data.sourceDataTablesId;
                     allJson.sourceDataTablesName = rsp.data.sourceDataTablesName;
                     allJson.sourceDataId = rsp.data.sourceDataId;
                     allJson.sourceDataName = rsp.data.sourceDataName;
                     allJson.sourceDataSourceId = rsp.data.sourceDataSourceId;
                     allJson.targetDataSourceId = rsp.data.targetDataSourceId;
-                    allJson.targetLoadAdt = rsp.data.targetLoadAdtName;
+                    allJson.targetLoadAdt = rsp.data.targetLoadAdt.code;
+                    allJson.targetLoadAdtName = rsp.data.targetLoadAdtName;
                     allJson.targetDataTablesId = rsp.data.targetDataTablesId;
                     allJson.targetDataTablesName = rsp.data.targetDataTablesName;
                     allJson.userIds = userStr;
@@ -227,11 +231,11 @@ export class LayoutComponent extends Component {
                     selectedDataSource.push(selectedDataSourceItem);
                     selectedDataTableItem.id = rsp.data.sourceDataTablesId;
                     selectedDataTableItem.tableName = rsp.data.sourceDataTablesName;
-                    selectedDataTableItem.sourceId = rsp.data.sourceDataSourceId;
+                    selectedDataTableItem.sourceId =rsp.data.sourceDataSourceId
                     selectedDataTable.push(selectedDataTableItem);
                     selectedTargetDataTableItem.id = rsp.data.targetDataTablesId;
                     selectedTargetDataTableItem.tableName = rsp.data.targetDataTablesName;
-                    selectedTargetDataTableItem.sourceId = rsp.data.targetDataSourceId;
+                    selectedTargetDataTableItem.sourceId =rsp.data.targetDataSourceId;
                     selectedTargetDataTable.push(selectedTargetDataTableItem);
                     console.log(allJson);
                     this.setState({
@@ -449,7 +453,6 @@ export class LayoutComponent extends Component {
         };
 
         var stepsHtml = [];
-
         if (this.state.current === 0) {
             stepsHtml = <Form>
                 <FormItem
@@ -492,7 +495,7 @@ export class LayoutComponent extends Component {
                 >
                     {getFieldDecorator('sourceConsumeAdt', {
                         rules: [{required: true, message: '请选择消费插件'}],
-                        initialValue: allData && allData.sourceConsumeAdt
+                        initialValue: allData && allData.sourceConsumeAdtName
                     })(
                         <Select
                             showSearch
@@ -511,7 +514,7 @@ export class LayoutComponent extends Component {
                 >
                     {getFieldDecorator('sourceConvertAdt', {
                         rules: [{required: true, message: '请输入消费转换插件'}],
-                        initialValue: allData && allData.sourceConvertAdt
+                        initialValue: allData && allData.sourceConvertAdtName
                     })(
                         <Select
                             showSearch
@@ -557,7 +560,7 @@ export class LayoutComponent extends Component {
                 >
                     {getFieldDecorator('targetLoadAdt', {
                         rules: [{required: true, message: '请选择载入插件'}],
-                        initialValue: allData && allData.targetLoadAdt
+                        initialValue: allData && allData.targetLoadAdtName
                     })(
                         <Select
                             showSearch
