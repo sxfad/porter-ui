@@ -37,6 +37,7 @@ const steps = [{
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
+        current: 0,
         userList: [],
         users: [],
         allData: [],
@@ -48,14 +49,8 @@ export class LayoutComponent extends Component {
         dataTableVisible: false, //选择数据表弹出层显示情况
         dataSourceVisible: false,
         targetDataTableVisible: false,
+        isEdit: false,
     };
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            current: 0,
-        };
-    }
 
     next() {
         const {form} = this.props;
@@ -179,7 +174,6 @@ export class LayoutComponent extends Component {
         // 修改任务
         const {params: {TaskId}} = this.props;
         if (TaskId !== 'TaskId') {
-            console.log(TaskId);
             const selectedDataSource = [],
                 selectedDataTable = [],
                 selectedTargetDataTable = [];
@@ -247,6 +241,7 @@ export class LayoutComponent extends Component {
                         selectedDataTable,
                         selectedTargetDataTable,
                         tables,
+                        isEdit: true,
                     });
                 }
             });
@@ -454,6 +449,7 @@ export class LayoutComponent extends Component {
         };
 
         var stepsHtml = [];
+
         if (this.state.current === 0) {
             stepsHtml = <Form>
                 <FormItem
@@ -465,7 +461,7 @@ export class LayoutComponent extends Component {
                         rules: [{required: true, message: '请输入任务名称'}],
                         initialValue: allData && allData.jobName
                     })(
-                        <Input placeholder="请输入任务名称"/>
+                        <Input placeholder="请输入任务名称" disabled={this.state.isEdit}/>
                     )}
                 </FormItem>
                 <FormItem
