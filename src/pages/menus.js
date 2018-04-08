@@ -117,11 +117,11 @@ export default [
         icon: 'fa-user-md',
         path: '/serviceTree',
     },
-    {
-        key: 'sysmenu-setup-iconfont',
-        parentKey: 'sysmenu',
-        text: 'iconfont',
-        icon: 'fa-user-md',
-        path: '/iconfont',
-    }
+    // {
+    //     key: 'sysmenu-setup-iconfont',
+    //     parentKey: 'sysmenu',
+    //     text: 'iconfont',
+    //     icon: 'fa-user-md',
+    //     path: '/iconfont',
+    // }
 ];
