@@ -50,6 +50,15 @@ module.exports = {
         productionGzip: false,
         productionGzipExtensions: ['js', 'css']
     },
+    build: {
+        env: '"dev"',
+        assetsRoot: path.join(__dirname, '../public'), // webpack 构建生成文件存放路径
+        assetsSubDirectory: 'static',
+        assetsPublicPath: '/', // cdn
+        productionSourceMap: false,
+        productionGzip: false,
+        productionGzipExtensions: ['js', 'css']
+    },
     dev: {
         env: '"development"',
         port: 8080,

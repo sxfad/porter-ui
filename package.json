@@ -10,6 +10,7 @@
     "build:prod": "cross-env NODE_ENV=production node ./builder/build.js",
     "build:test": "cross-env NODE_ENV=test node ./builder/build.js",
     "build:rc": "cross-env NODE_ENV=rc node ./builder/build.js",
+    "build:dev": "cross-env NODE_ENV=dev node ./builder/build.js",
     "clear-cache": "rm -rf ./node_modules/.cache"
   },
   "dependencies": {

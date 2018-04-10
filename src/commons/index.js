@@ -3,20 +3,25 @@ import {session} from 'sx-ui/utils/storage';
 import devAjaxBaseUrl from '../../local/local-ajax-base-url';
 import mockUrls from '../mock/url-config';
 
+import deployAjaxBaseUrl from '../../ajax-config.js';
 export function getAjaxBaseUrl() {
     if (isDev) {
         return devAjaxBaseUrl;
     }
     if (isPro) {
-        return devAjaxBaseUrl;
+	return deployAjaxBaseUrl.production;
     }
 
     if (isTest) {
-        return devAjaxBaseUrl;
+	return deployAjaxBaseUrl.test;
     }
 
     if (isRC) {
-        return devAjaxBaseUrl;
+	return deployAjaxBaseUrl.rc;
+    }
+
+    if (process.env.NODE_ENV == "dev") {
+	return deployAjaxBaseUrl.dev;
     }
     return '/';
 }
