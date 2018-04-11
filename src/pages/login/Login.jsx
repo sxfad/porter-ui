@@ -92,7 +92,7 @@ class Login extends Component {
         // Only show error after a field is touched.
         const userNameError = isFieldTouched('username') && getFieldError('username');
         const passwordError = isFieldTouched('password') && getFieldError('password');
-        // 账号/密码：test/111111
+        // 账号/密码：abc/123
         return (
             <div className="login-content">
                 <div className="login">

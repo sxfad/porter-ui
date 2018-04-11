@@ -305,7 +305,7 @@ export class LayoutComponent extends Component {
 
     changeDataTable(dataTable) {
         const {selectedDataTable, allData} =this.state;
-        if (selectedDataTable === undefined) {
+        if (selectedDataTable === undefined || selectedDataTable.length === 0) {
             this.setState({
                 selectedDataTable: dataTable,
             });
@@ -323,7 +323,6 @@ export class LayoutComponent extends Component {
                 });
             }
         }
-        console.log('dataTable', dataTable);
     }
 
     changeDataSource(dataSource) {
@@ -335,7 +334,7 @@ export class LayoutComponent extends Component {
 
     changeTargetDataTable(targetDataTable) {
         const {selectedTargetDataTable, allData} =this.state;
-        if (selectedTargetDataTable === undefined) {
+        if (selectedTargetDataTable === undefined || selectedTargetDataTable.length === 0) {
             this.setState({
                 selectedTargetDataTable: targetDataTable,
             });

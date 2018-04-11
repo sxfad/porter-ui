@@ -67,29 +67,20 @@ export class LayoutComponent extends Component {
     ];
 
     componentDidMount() {
-        const {form: {getFieldValue}} = this.props;
-        let times = getFieldValue('times');
-        let endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
-        let startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
-        this.setState({
-            startTimeStr,
-            endTimeStr,
-        });
-        const searchData = {
-            beginTime: startTimeStr,
-            endTime: endTimeStr,
-        };
-        this.search(searchData);
+        this.search();
     }
 
     search = (args) => {
         const {form: {getFieldValue}} = this.props;
         let bankName = getFieldValue('bankName');
         let times = getFieldValue('times');
-        let endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
-        let startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
+        let endTimeStr = '',
+            startTimeStr = '';
+        if (times != undefined) {
+            endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
+            startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
+        }
         const {pageNum, pageSize} = this.state;
-
         let params = {
             bankName,
             pageNo: pageNum,
