@@ -222,7 +222,6 @@ export class LayoutComponent extends Component {
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
                                     {getFieldDecorator('times', {
-                                        initialValue: [moment().add(-172, 'hour'), moment().add(1, 'hour')]
                                     })(
                                         <RangePicker
                                             showTime
