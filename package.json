@@ -21,6 +21,8 @@
     "browserslist": "^2.2.2",
     "classnames": "^2.2.5",
     "cropperjs": "^1.0.0-rc",
+    "echarts": "^4.0.4",
+    "echarts-for-react": "^2.0.8",
     "flux-standard-action": "^1.2.0",
     "history": "3.2.1",
     "jszip": "^3.1.3",

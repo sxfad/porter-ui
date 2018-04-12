@@ -2,14 +2,15 @@
  * Created by lhyin on 2018/11/4.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Row, Col, Select, message, Popconfirm} from 'antd';
+import {Form, Input, Button, Table, Row, Col, Modal} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import {promiseAjax} from 'sx-ui';
-import {browserHistory} from 'react-router';
+import {formatDefaultTime} from '../common/getTime';
 import connectComponent from '../../redux/store/connectComponent';
+import Echarts from './Echarts';
 
 const FormItem = Form.Item;
-export const PAGE_ROUTE = '/taskMonitor';
+export const PAGE_ROUTE = '/nodeMonitor';
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
@@ -18,6 +19,7 @@ export class LayoutComponent extends Component {
         total: 0,
         application: [],
         dataSource: [],
+        echartsVisible: false,
         tabLoading: false,
     }
 
@@ -54,7 +56,7 @@ export class LayoutComponent extends Component {
             title: '心跳时间',
             render: (text, record) => {
                 return (
-                    record.heartBeatDate
+                    formatDefaultTime(record.heartBeatDate)
                 );
             },
         },
@@ -87,7 +89,7 @@ export class LayoutComponent extends Component {
             render: (text, record) => {
                 return (
                     <span>
-                        <a onClick={() => this.handlePush('WORKING', record.id)}>查看详情</a>
+                        <a onClick={() => this.handleEcharts(record.id)}>查看详情</a>
                     </span>
                 )
             }
@@ -98,83 +100,10 @@ export class LayoutComponent extends Component {
         this.search();
     }
 
-    /**
-     * (停止)接收任务推送
-     * @param dataId
-     */
-    handlePush = (PushState, dataId) => {
+    handleEcharts = (dataId) => {
         this.setState({
-            tabLoading: true,
+            echartsVisible: true,
         });
-        promiseAjax.post(`/nodes/taskpushstate?id=${dataId}&taskPushState=${PushState}`).then(rsp => {
-            if (rsp.success) {
-                console.log(rsp);
-                const {dataSource} = this.state;
-                dataSource.map((key, value)=> {
-                    if (key.id === dataId) {
-                        dataSource[value].taskPushState.name = rsp.data.taskPushState.name;
-                        dataSource[value].taskPushState.code = rsp.data.taskPushState.code;
-                    }
-                });
-                this.setState({
-                    dataSource,
-                });
-                message.success('任务推送状态修改成功', 3);
-            }
-        }).finally(() => {
-            this.setState({
-                tabLoading: false,
-            });
-        });
-    };
-
-    /**
-     * 停止当前任务
-     * @param dataId
-     */
-    handleStopTask = (dataId)=> {
-        this.setState({
-            tabLoading: true,
-        });
-        promiseAjax.post(`/nodes/stoptask?id=${dataId}`).then(rsp => {
-            if (rsp.success) {
-                message.success('操作成功', 3);
-            }
-        }).finally(() => {
-            this.setState({
-                tabLoading: false,
-            });
-        });
-    };
-
-    /**
-     * 删除元素
-     */
-    handleDelete = (sourceid)=> {
-        this.setState({
-            tabLoading: true,
-        });
-        promiseAjax.del(`/nodes/${sourceid}`).then(rsp => {
-            if (rsp.success) {
-                const {dataSource, total} = this.state
-                this.setState({
-                    dataSource: dataSource.filter(item => item.id !== sourceid),
-                    total: total - 1
-                });
-                message.success('删除成功', 3);
-            }
-        }).finally(() => {
-            this.setState({
-                tabLoading: false,
-            });
-        });
-    };
-
-    /**
-     * 查看元素
-     */
-    handleDetail = (sourceid)=> {
-        browserHistory.push(`/dataTable/+detail/${sourceid}`);
     };
 
     search = (args) => {
@@ -265,9 +194,21 @@ export class LayoutComponent extends Component {
         this.search(data);
     }
 
+    handleCancel = (e) => {
+        this.setState({
+            echartsVisible: false,
+        });
+    };
+
+    handleOk = (e) => {
+        this.setState({
+            echartsVisible: false,
+        });
+    };
+
     render() {
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
-        const {dataSource, total, pageNum, pageSize, tabLoading} =this.state;
+        const {dataSource, total, pageNum, pageSize, tabLoading, echartsVisible} =this.state;
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
@@ -338,6 +279,18 @@ export class LayoutComponent extends Component {
                     onPageSizeChange={this.handlePageSizeChange}
 
                 />
+
+                {
+                    echartsVisible ? <Modal
+                        title="泳道实时监控图"
+                        visible={this.state.echartsVisible}
+                        onOk={this.handleOk}
+                        onCancel={this.handleCancel}
+                        width='70%'
+                    >
+                        <Echarts/>
+                    </Modal> : null
+                }
             </PageContent>
         )
     };
