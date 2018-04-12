@@ -153,6 +153,17 @@ export class LayoutComponent extends Component {
                     }
                 }).finally(() => {
                 });
+            } else {
+                promiseAjax.get(`/dicalarmplugin/${alertPluginType}`).then(rsp1 => {
+                    if (rsp1.success) {
+                        const fieldType = rsp1.data;
+                        fieldType.map((key, value) => {
+                            fieldType[value].pluginValue = ''
+                        });
+                        this.setState({fieldType});
+                    }
+                }).finally(() => {
+                });
             }
         }).finally(() => {
         });
@@ -396,7 +407,8 @@ export class LayoutComponent extends Component {
                                         label="告警通知人"
                                         hasFeedback>
                                         {getFieldDecorator('alarmUsers', {
-                                            initialValue: users
+                                            initialValue: users,
+                                            rules: [{required: true, message: '请选择告警通知人'}],
                                         })(
                                             <Select
                                                 multiple
