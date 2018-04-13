@@ -71,7 +71,7 @@ export class LayoutComponent extends Component {
             },
         },
         {
-            title: '任务',
+            title: '任务—{任务名[泳道...]}',
             render: (text, record) => {
                 return (
                     record.jobNameJson
