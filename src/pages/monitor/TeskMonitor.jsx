@@ -5,6 +5,7 @@ import React, {Component} from 'react';
 import {Form, Input, Button, Table, Row, Col, Modal, message, DatePicker} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import {promiseAjax} from 'sx-ui';
+import moment from 'moment';
 import {formatDefaultTime} from '../common/getTime';
 import connectComponent from '../../redux/store/connectComponent';
 import SelectTask from './SelectTask';
@@ -22,6 +23,7 @@ export class LayoutComponent extends Component {
         tabLoading: false,
         selectedTask: [],
         selectTaskVisible: false,
+        jobmonitor: [],
     }
 
     columns = [
@@ -146,7 +148,7 @@ export class LayoutComponent extends Component {
             render: (text, record) => {
                 return (
                     <span>
-                        <a onClick={() => this.handleEcharts(record.id)}>查看详情</a>
+                        <a onClick={() => this.handleEcharts(record)}>查看详情</a>
                     </span>
                 )
             }
@@ -154,7 +156,6 @@ export class LayoutComponent extends Component {
     ];
 
     renderNumber = (record)=> {
-        console.log(record);
         return (
             <div className="monitor-data">
                 <span>处理进度: <a className="text-gray">{record.disposeSchedule}</a></span>
@@ -179,8 +180,13 @@ export class LayoutComponent extends Component {
         this.search();
     }
 
-    handleEcharts = (dataId) => {
+    /**
+     *  查看泳道详情
+     * @param data
+     */
+    handleEcharts = (data) => {
         this.setState({
+            jobmonitor: data,
             echartsVisible: true,
         });
     };
@@ -287,7 +293,7 @@ export class LayoutComponent extends Component {
 
     render() {
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
-        const {dataSource, tabLoading, echartsVisible, selectTaskVisible} =this.state;
+        const {dataSource, tabLoading, echartsVisible, selectTaskVisible, jobmonitor} =this.state;
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
@@ -374,7 +380,7 @@ export class LayoutComponent extends Component {
                         onCancel={this.handleCancel}
                         width='70%'
                     >
-                        <Echarts/>
+                        <Echarts jobmonitor={jobmonitor}/>
                     </Modal> : null
                 }
                 {

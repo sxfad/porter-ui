@@ -74,6 +74,17 @@ export function formatdetailTime(time) {
     return timeStr;
 }
 
+/**
+ * 得到 HH:mm 格式的字符串
+ * @param time
+ * @returns {string}
+ */
+export function formatdetailTime1(time) {
+    var d = (new Date(time));
+    var timeStr = fillDateStr(d.getHours()).toString() + ':' + fillDateStr(d.getMinutes()).toString();
+    return timeStr;
+}
+
 function fillDateStr(n) {
     return n < 10 ? '0' + n : n
 }

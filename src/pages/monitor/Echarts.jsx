@@ -2,18 +2,27 @@
  * Created by lhyin on 2018/11/4.
  */
 import React, {Component} from 'react';
-import {Form} from 'antd';
+import {Form, Radio} from 'antd';
+import {promiseAjax} from 'sx-ui';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import connectComponent from '../../redux/store/connectComponent';
 import ReactEcharts from 'echarts-for-react';
+import {formatdetailTime1} from '../common/getTime';
 
-const FormItem = Form.Item;
+const RadioButton = Radio.Button;
+const RadioGroup = Radio.Group;
 export const PAGE_ROUTE = '/echarts';
 @Form.create()
 export class LayoutComponent extends Component {
-    state = {}
+    state = {
+        dataSource: [],
+    }
 
     getOption = () => {
+        const {dataSource} =this.state;
+        for (let key in dataSource.xAxisData) {
+            dataSource.xAxisData[key] = formatdetailTime1(dataSource.xAxisData[key]);
+        }
         return {
             title: {
                 text: '堆叠区域图'
@@ -22,7 +31,7 @@ export class LayoutComponent extends Component {
                 trigger: 'axis'
             },
             legend: {
-                data: ['邮件营销', '联盟广告', '视频广告']
+                data: ['告警次数', '插入成功', '插入失败', '更新成功', '更新失败', '删除成功', '删除失败']
             },
             toolbox: {
                 feature: {
@@ -39,7 +48,7 @@ export class LayoutComponent extends Component {
                 {
                     type: 'category',
                     boundaryGap: false,
-                    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+                    data: dataSource.xAxisData,
                 }
             ],
             yAxis: [
@@ -49,32 +58,86 @@ export class LayoutComponent extends Component {
             ],
             series: [
                 {
-                    name: '邮件营销',
+                    name: '告警次数',
                     type: 'line',
                     stack: '总量',
                     areaStyle: {normal: {}},
-                    data: [120, 132, 101, 134, 90, 230, 210]
+                    data: dataSource.alarmNumber,
                 },
                 {
-                    name: '联盟广告',
+                    name: '插入成功',
                     type: 'line',
                     stack: '总量',
                     areaStyle: {normal: {}},
-                    data: [220, 182, 191, 234, 290, 330, 310]
+                    data: dataSource.insertSucces,
                 },
                 {
-                    name: '视频广告',
+                    name: '插入失败',
                     type: 'line',
                     stack: '总量',
                     areaStyle: {normal: {}},
-                    data: [150, 232, 201, 154, 190, 330, 410]
+                    data: dataSource.insertFailure
                 },
+                {
+                    name: '更新成功',
+                    type: 'line',
+                    stack: '总量',
+                    areaStyle: {normal: {}},
+                    data: dataSource.updateSucces
+                },
+                {
+                    name: '更新失败',
+                    type: 'line',
+                    stack: '总量',
+                    areaStyle: {normal: {}},
+                    data: dataSource.updateFailure
+                },
+                {
+                    name: '删除成功',
+                    type: 'line',
+                    stack: '总量',
+                    areaStyle: {normal: {}},
+                    data: dataSource.deleteSucces
+                },
+                {
+                    name: '删除失败',
+                    type: 'line',
+                    stack: '总量',
+                    areaStyle: {normal: {}},
+                    data: dataSource.deleteFailure
+                }
             ]
         };
     };
 
     componentDidMount() {
+        this.getMonitorDetail(10);
     }
+
+    getMonitorDetail = (timeNumber)=> {
+        const {jobmonitor} = this.props;
+        const params = {
+            jobId: jobmonitor.jobId,
+            swimlaneId: jobmonitor.swimlaneId,
+            intervalTime: timeNumber,
+            intervalCount: 0
+        }
+        promiseAjax.get(`/mrjobtasksmonitor/jobmonitor`, params).then(rsp => {
+            if (rsp.success && rsp.data != undefined) {
+                this.setState({
+                    dataSource: rsp.data,
+                });
+            }
+        }).finally(() => {
+        });
+    };
+
+    /**
+     * 修改查看条件
+     */
+    searchChange = (e)=> {
+        this.getMonitorDetail(e.target.value);
+    };
 
     render() {
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
@@ -95,6 +158,13 @@ export class LayoutComponent extends Component {
         };
         return (
             <PageContent>
+                <div className="search-monitor">
+                    <RadioGroup defaultValue="10" onChange={this.searchChange}>
+                        <RadioButton value="10">10分钟</RadioButton>
+                        <RadioButton value="30">半个小时</RadioButton>
+                        <RadioButton value="60">1个小时</RadioButton>
+                    </RadioGroup>
+                </div>
                 <ReactEcharts
                     option={this.getOption()}
                     style={{height: '350px', width: '100%'}}
