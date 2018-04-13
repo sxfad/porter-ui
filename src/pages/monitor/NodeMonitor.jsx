@@ -7,7 +7,8 @@ import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx
 import {promiseAjax} from 'sx-ui';
 import {formatDefaultTime} from '../common/getTime';
 import connectComponent from '../../redux/store/connectComponent';
-import Echarts from './Echarts';
+import NodeEcharts from './NodeEcharts';
+import './style.less';
 
 const FormItem = Form.Item;
 export const PAGE_ROUTE = '/nodeMonitor';
@@ -21,6 +22,7 @@ export class LayoutComponent extends Component {
         dataSource: [],
         echartsVisible: false,
         tabLoading: false,
+        jobmonitor: [],
     }
 
     columns = [
@@ -89,7 +91,7 @@ export class LayoutComponent extends Component {
             render: (text, record) => {
                 return (
                     <span>
-                        <a onClick={() => this.handleEcharts(record.id)}>查看详情</a>
+                        <a onClick={() => this.handleEcharts(record)}>查看详情</a>
                     </span>
                 )
             }
@@ -100,9 +102,10 @@ export class LayoutComponent extends Component {
         this.search();
     }
 
-    handleEcharts = (dataId) => {
+    handleEcharts = (data) => {
         this.setState({
             echartsVisible: true,
+            jobmonitor: data,
         });
     };
 
@@ -208,7 +211,7 @@ export class LayoutComponent extends Component {
 
     render() {
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
-        const {dataSource, total, pageNum, pageSize, tabLoading, echartsVisible} =this.state;
+        const {dataSource, total, pageNum, pageSize, tabLoading, echartsVisible, jobmonitor} =this.state;
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
@@ -279,16 +282,15 @@ export class LayoutComponent extends Component {
                     onPageSizeChange={this.handlePageSizeChange}
 
                 />
-
                 {
                     echartsVisible ? <Modal
-                        title="泳道实时监控图"
+                        title="节点实时监控图"
                         visible={this.state.echartsVisible}
                         onOk={this.handleOk}
                         onCancel={this.handleCancel}
                         width='70%'
                     >
-                        <Echarts/>
+                        <NodeEcharts jobmonitor={jobmonitor} />
                     </Modal> : null
                 }
             </PageContent>
