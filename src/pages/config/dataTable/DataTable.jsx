@@ -131,8 +131,10 @@ export class LayoutComponent extends Component {
         let endTimeStr = '',
             startTimeStr = '';
         if (times != undefined) {
-            endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
-            startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
+            if (times.length > 0) {
+                endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
+                startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
+            }
         }
         const {pageNum, pageSize} = this.state;
         let params = {
@@ -268,8 +270,7 @@ export class LayoutComponent extends Component {
                             <Col span={8}>
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
-                                    {getFieldDecorator('times', {
-                                    })(
+                                    {getFieldDecorator('times', {})(
                                         <RangePicker
                                             showTime
                                             style={{width: '100%'}}

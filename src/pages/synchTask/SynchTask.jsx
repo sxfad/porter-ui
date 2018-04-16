@@ -213,11 +213,14 @@ export class LayoutComponent extends Component {
         const {form: {getFieldValue}} = this.props;
         let jobName = getFieldValue('jobName');
         let times = getFieldValue('times');
+
         let endTimeStr = '',
             startTimeStr = '';
         if (times != undefined) {
-            endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
-            startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
+            if (times.length > 0) {
+                endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
+                startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
+            }
         }
         const {pageNum, pageSize} = this.state;
 
@@ -308,6 +311,7 @@ export class LayoutComponent extends Component {
      * 设置时间
      */
     onOk = (value)=> {
+        console.log(value);
         this.setState({
             startTimeStr: moment(value[0]).format('YYYY-MM-DD HH:mm:ss'),
             endTimeStr: moment(value[1]).format('YYYY-MM-DD HH:mm:ss'),
@@ -316,7 +320,7 @@ export class LayoutComponent extends Component {
 
     handleAddTask = () => {
         browserHistory.push('/synchtask/+add/TaskId');
-    }
+    };
 
     render() {
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
@@ -353,8 +357,7 @@ export class LayoutComponent extends Component {
                             <Col span={8}>
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
-                                    {getFieldDecorator('times', {
-                                    })(
+                                    {getFieldDecorator('times', {})(
                                         <RangePicker
                                             showTime
                                             style={{width: '100%'}}

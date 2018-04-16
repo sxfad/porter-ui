@@ -103,8 +103,10 @@ export class LayoutComponent extends Component {
         let endTimeStr = '',
             startTimeStr = '';
         if (times != undefined) {
-            endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
-            startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
+            if (times.length > 0) {
+                endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
+                startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
+            }
         }
         form.validateFieldsAndScroll((err, values) => {
             let params = {
@@ -247,7 +249,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col {...queryItemLayout}>
+                            <Col span={8}>
                                 <FormItem
                                     {...formItemLayout} label="日志记录时间">
                                     {getFieldDecorator('times', {})(
