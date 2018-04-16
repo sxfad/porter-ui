@@ -176,7 +176,9 @@ export class LayoutComponent extends Component {
                         key={fieldType[index].fieldCode}
                         hasFeedback
                     >
-                        {getFieldDecorator(`${fieldType[index].fieldCode}--${fieldType[index].fieldName}`)(
+                        {getFieldDecorator(`${fieldType[index].fieldCode}--${fieldType[index].fieldName}`,{
+                            rules: [{required: true, message: '请选择' + fieldType[index].fieldName}],
+                        })(
                             <RadioGroup>
                                 {radioTypeHtml}
                             </RadioGroup>
