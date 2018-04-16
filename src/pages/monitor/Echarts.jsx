@@ -2,7 +2,7 @@
  * Created by lhyin on 2018/11/4.
  */
 import React, {Component} from 'react';
-import {Form, Radio} from 'antd';
+import {Form, Radio, Button, Spin} from 'antd';
 import {promiseAjax} from 'sx-ui';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import connectComponent from '../../redux/store/connectComponent';
@@ -16,13 +16,13 @@ export const PAGE_ROUTE = '/echarts';
 export class LayoutComponent extends Component {
     state = {
         dataSource: [],
+        timeNumber: 10,
+        spinLoading: false,
     }
 
     getOption = () => {
         const {dataSource} =this.state;
-        for (let key in dataSource.xAxisData) {
-            dataSource.xAxisData[key] = formatdetailTime1(dataSource.xAxisData[key]);
-        }
+
         return {
             title: {
                 text: '堆叠区域图'
@@ -115,6 +115,7 @@ export class LayoutComponent extends Component {
     }
 
     getMonitorDetail = (timeNumber)=> {
+        this.setState({ spinLoading: true });
         const {jobmonitor} = this.props;
         const params = {
             jobId: jobmonitor.jobId,
@@ -124,8 +125,13 @@ export class LayoutComponent extends Component {
         }
         promiseAjax.get(`/mrjobtasksmonitor/jobmonitor`, params).then(rsp => {
             if (rsp.success && rsp.data != undefined) {
+                for (let key in rsp.data.xAxisData) {
+                    rsp.data.xAxisData[key] = formatdetailTime1(rsp.data.xAxisData[key]);
+                }
                 this.setState({
                     dataSource: rsp.data,
+                    timeNumber,
+                    spinLoading: false
                 });
             }
         }).finally(() => {
@@ -137,6 +143,14 @@ export class LayoutComponent extends Component {
      */
     searchChange = (e)=> {
         this.getMonitorDetail(e.target.value);
+    };
+
+    /**
+     * 刷新
+     */
+    handleRefresh = () => {
+        const {timeNumber} = this.state;
+        this.getMonitorDetail(timeNumber);
     };
 
     render() {
@@ -164,11 +178,15 @@ export class LayoutComponent extends Component {
                         <RadioButton value="30">半个小时</RadioButton>
                         <RadioButton value="60">1个小时</RadioButton>
                     </RadioGroup>
+                    <Button type="primary" onClick={()=>this.handleRefresh()} style={{marginLeft: 15}}><FontIcon
+                        type="fa-refresh"/> 刷新</Button>
                 </div>
-                <ReactEcharts
-                    option={this.getOption()}
-                    style={{height: '350px', width: '100%'}}
-                    className='react_for_echarts'/>
+                <Spin spinning={this.state.spinLoading}>
+                    <ReactEcharts
+                        option={this.getOption()}
+                        style={{height: '350px', width: '100%'}}
+                        className='react_for_echarts'/>
+                </Spin>
             </PageContent>
         )
     };

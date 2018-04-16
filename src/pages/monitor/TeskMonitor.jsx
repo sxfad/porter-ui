@@ -194,17 +194,17 @@ export class LayoutComponent extends Component {
     search = (args) => {
         const {form: {getFieldValue}} = this.props;
         let jobId = getFieldValue('jobId');
-        let times = getFieldValue('times');
-        let endTimeStr = '',
-            startTimeStr = '';
-        if (times != undefined) {
-            endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
-            startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
-        }
+        // let times = getFieldValue('times');
+        // let endTimeStr = '',
+        //     startTimeStr = '';
+        // if (times != undefined) {
+        //     endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
+        //     startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
+        // }
         let params = {
             jobId,
-            heartBeatBeginDate: startTimeStr,
-            heartBeatEndDate: endTimeStr,
+            // heartBeatBeginDate: startTimeStr,
+            // heartBeatEndDate: endTimeStr,
             ...args,
         };
         this.setState({
@@ -234,18 +234,6 @@ export class LayoutComponent extends Component {
         this.search();
     };
 
-    /**
-     * 重置
-     * @param data
-     */
-    handleReset = ()=> {
-        this.props.form.resetFields();
-        this.setState({
-            selectedTask: [],
-        });
-        this.search();
-    }
-
     handleCancel = (e) => {
         this.setState({
             echartsVisible: false,
@@ -265,6 +253,7 @@ export class LayoutComponent extends Component {
         this.setState({
             selectTaskVisible: false,
         });
+        this.search();
     }
 
     handleSelectTaskCancel = () => {
@@ -324,29 +313,10 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col {...queryItemLayout}>
-                                <FormItem
-                                    {...formItemLayout} label="心跳时间">
-                                    {getFieldDecorator('times', {})(
-                                        <RangePicker
-                                            showTime
-                                            style={{width: '100%'}}
-                                            format="YYYY-MM-DD HH:mm"
-                                            placeholder={['Start Time', 'End Time']}
-                                            onOk={this.onOk}
-                                        />
-                                    )}
-
-                                </FormItem>
-                            </Col>
-                            <Col span={5} style={{textAlign:'right'}}>
-                                <FormItem
-                                    label=""
-                                    colon={false}>
+                            <Col span={3} style={{textAlign:'right'}}>
+                                <FormItem label="" colon={false}>
                                     <Button type="primary" onClick={()=>this.handleQuery(getFieldsValue())}
-                                            style={{marginLeft: 15}}><FontIcon type="search"/>查询</Button>
-                                    <Button type="ghost" onClick={() => this.handleReset()}
-                                            style={{marginLeft: 15}}>重置</Button>
+                                            style={{marginLeft: 15}}><FontIcon type="fa-refresh"/> 刷新</Button>
                                 </FormItem>
                             </Col>
                             <Col span={1}>
