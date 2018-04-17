@@ -103,19 +103,19 @@ export default [
         icon: 'setting',
         path: '/serviceTree',
     },
-    {
-        key: 'sysmenu-setup-permis',
-        parentKey: 'sysmenu-setup',
-        text: '权限管理',
-        icon: 'key',
-        path: '/serviceTree',
-    },
+    // {
+    //     key: 'sysmenu-setup-permis',
+    //     parentKey: 'sysmenu-setup',
+    //     text: '权限管理',
+    //     icon: 'key',
+    //     path: '/serviceTree',
+    // },
     {
         key: 'sysmenu-setup-person',
         parentKey: 'sysmenu-setup',
-        text: '个人设置',
+        text: '用户管理',
         icon: 'fa-user-md',
-        path: '/serviceTree',
+        path: '/user',
     },
     // {
     //     key: 'sysmenu-setup-iconfont',

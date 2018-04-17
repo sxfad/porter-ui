@@ -73,9 +73,46 @@ class Login extends Component {
                         session.setItem('authToken', res.data.token);
 
                         setCurrentLoginUser(currentLoginUser);
-                        const menuTreeData = convertToTree(menuTree);
-                        setMenuTreeData(menuTreeData);
-                        window.location.href = '/';
+
+                        // 设置菜单
+                        promiseAjax.get(`/getuserinfo`).then(rsp => {
+                            if (rsp.success) {
+                                const newMenus = [];
+                                const menusItemGlobal = {
+                                    key: '-1',
+                                    text: '全部菜单',
+                                    icon: 'global',
+                                    path: '',
+                                };
+                                newMenus.push(menusItemGlobal);
+                                const menusList = rsp.data.CMenu.menus;
+                                for (let i = 0; i < menusList.length; i++) {
+                                    const menusItem = {};
+                                    menusItem.key = menusList[i].code;
+                                    menusItem.parentKey = menusList[i].fathercode;
+                                    menusItem.text = menusList[i].name;
+                                    menusItem.icon = menusList[i].menuImage;
+                                    menusItem.path = menusList[i].menuUrl;
+                                    newMenus.push(menusItem);
+
+                                    console.log(menusList.menus);
+                                    for (let j = 0; j < menusList[i].menus.length; j++) {
+                                        const childMenusItem = {};
+                                        childMenusItem.key = menusList[i].menus[j].code;
+                                        childMenusItem.parentKey = menusList[i].menus[j].fathercode;
+                                        childMenusItem.text = menusList[i].menus[j].name;
+                                        childMenusItem.icon = menusList[i].menus[j].menuImage;
+                                        childMenusItem.path = menusList[i].menus[j].menuUrl;
+                                        newMenus.push(childMenusItem);
+                                    }
+                                }
+
+                                const menuTreeData = convertToTree(newMenus);
+                                setMenuTreeData(menuTreeData);
+                                window.location.href = '/synchTask';
+                            }
+                        }).finally(() => {
+                        });
                     } else {
                         this.setState({loading: false, errorMessage: '账号或密码错误'});
                     }

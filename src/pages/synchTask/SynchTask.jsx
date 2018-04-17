@@ -40,7 +40,7 @@ export class LayoutComponent extends Component {
             title: '任务ID',
             render: (text, record) => {
                 return (
-                    record.id
+                    record.job
                 );
             },
         },
@@ -327,7 +327,7 @@ export class LayoutComponent extends Component {
     };
 
     handleAddTask = () => {
-        browserHistory.push('/synchTask/+add/TaskId');
+        browserHistory.push('/synchTask+add/TaskId');
     };
 
     render() {

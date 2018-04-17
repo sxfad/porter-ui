@@ -81,6 +81,7 @@ export class LayoutComponent extends Component {
             beginTime: startTimeStr,
             endTime: endTimeStr,
             ...args,
+            dataType: 'JDBC',
         };
         this.setState({
             tabLoading: true,
