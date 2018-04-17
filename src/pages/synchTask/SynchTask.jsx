@@ -327,7 +327,7 @@ export class LayoutComponent extends Component {
     };
 
     handleAddTask = () => {
-        browserHistory.push('/synchTask+add/TaskId');
+        browserHistory.push('/synchTask/+add/TaskId');
     };
 
     render() {
