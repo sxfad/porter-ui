@@ -82,9 +82,19 @@ export class LayoutComponent extends Component {
         {
             title: '节点健康级别',
             render: (text, record) => {
-                return (
-                    record.healthLevel.name
-                );
+                if (record.healthLevel.code === 'GREEN') {
+                    return (
+                        <span className="text-green">{record.healthLevel.name}</span>
+                    );
+                } else if (record.healthLevel.code === 'YELLOW') {
+                    return (
+                        <span className="text-warning">{record.healthLevel.name}</span>
+                    );
+                } else {
+                    return (
+                        <span className="text-error">{record.healthLevel.name}</span>
+                    );
+                }
             },
         },
         {
@@ -291,7 +301,7 @@ export class LayoutComponent extends Component {
                         onCancel={this.handleCancel}
                         width='70%'
                     >
-                        <NodeEcharts jobmonitor={jobmonitor} />
+                        <NodeEcharts jobmonitor={jobmonitor}/>
                     </Modal> : null
                 }
             </PageContent>
