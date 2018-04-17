@@ -1,17 +1,19 @@
 /**
- * Created by lhyin on 2018/11/4.
+ * Created by lhyin on 2018/20/3.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Row, Col, Modal} from 'antd';
+import {Form, Input, Button, Table, Row, Col, DatePicker, Select, Popconfirm} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import {promiseAjax} from 'sx-ui';
-import {formatDefaultTime} from '../common/getTime';
-import connectComponent from '../../redux/store/connectComponent';
-import NodeEcharts from './NodeEcharts';
+import {getBeforeHoursTime, formatDefaultTime} from '../common/getTime';
+import moment from 'moment';
 import './style.less';
+import connectComponent from '../../redux/store/connectComponent';
 
+export const PAGE_ROUTE = '/selectNode';
+const {RangePicker} = DatePicker;
 const FormItem = Form.Item;
-export const PAGE_ROUTE = '/nodeMonitor';
+const Option = Select.Option;
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
@@ -19,10 +21,11 @@ export class LayoutComponent extends Component {
         pageSize: 10,
         total: 0,
         application: [],
+        startTimeStr: '', //开始时间
+        endTimeStr: '',   //结束时间(默认当前时间)
+        endTime: Date(),
         dataSource: [],
-        echartsVisible: false,
         tabLoading: false,
-        jobmonitor: [],
     }
 
     columns = [
@@ -39,10 +42,10 @@ export class LayoutComponent extends Component {
             },
         },
         {
-            title: '机器名',
+            title: '机器名称',
             render: (text, record) => {
                 return (
-                    record.computerName
+                    record.machineName
                 );
             },
         },
@@ -58,7 +61,7 @@ export class LayoutComponent extends Component {
             title: '心跳时间',
             render: (text, record) => {
                 return (
-                    formatDefaultTime(record.heartBeatDate)
+                    record.heartBeatTime
                 );
             },
         },
@@ -66,49 +69,38 @@ export class LayoutComponent extends Component {
             title: '进程号',
             render: (text, record) => {
                 return (
-                    record.processNumber
+                    record.pidNumber
                 );
             },
         },
         {
-            title: '任务—{任务名[泳道...]}',
-            width: '380px',
+            title: '状态',
             render: (text, record) => {
-                return (
-                    record.jobNameJson
-                );
+                if (record.state === -1) {
+                    return (
+                        <span className="gray-text">离线</span>
+                    );
+                } else if (record.state === 1) {
+                    return (
+                        <span className="green-text">在线</span>
+                    );
+                }
+
             },
         },
         {
-            title: '节点健康级别',
+            title: '任务推送状态',
             render: (text, record) => {
                 return (
-                    record.healthLevel.name
+                    record.taskPushState && record.taskPushState.name
                 );
             },
-        },
-        {
-            title: '操作',
-            render: (text, record) => {
-                return (
-                    <span>
-                        <a onClick={() => this.handleEcharts(record)}>查看详情</a>
-                    </span>
-                )
-            }
         },
     ];
 
     componentDidMount() {
         this.search();
     }
-
-    handleEcharts = (data) => {
-        this.setState({
-            echartsVisible: true,
-            jobmonitor: data,
-        });
-    };
 
     search = (args) => {
         const {form} = this.props;
@@ -123,7 +115,7 @@ export class LayoutComponent extends Component {
             this.setState({
                 tabLoading: true,
             });
-            promiseAjax.get(`/mrnodesschedule`, params).then(rsp => {
+            promiseAjax.get(`/nodes`, params).then(rsp => {
                 if (rsp.success && rsp.data != undefined) {
                     this.setState({
                         pageNum: rsp.data.pageNo,
@@ -172,8 +164,17 @@ export class LayoutComponent extends Component {
         this.search(data);
     }
 
+    /**
+     * 设置时间
+     */
+    onOk = (value)=> {
+        this.setState({
+            startTimeStr: moment(value[0]).format('YYYY-MM-DD HH:mm:ss'),
+            endTimeStr: moment(value[1]).format('YYYY-MM-DD HH:mm:ss'),
+        });
+    };
+
     handlePageSizeChange = (pageSize) => {
-        console.log('value', pageSize);
         this.setState({
             pageNum: 1,
         });
@@ -185,8 +186,6 @@ export class LayoutComponent extends Component {
     }
 
     handlePageNumChange = (value) => {
-        console.log('value', value);
-
         const {pageSize} = this.state;
         this.setState({
             pageNum: value,
@@ -198,21 +197,9 @@ export class LayoutComponent extends Component {
         this.search(data);
     }
 
-    handleCancel = (e) => {
-        this.setState({
-            echartsVisible: false,
-        });
-    };
-
-    handleOk = (e) => {
-        this.setState({
-            echartsVisible: false,
-        });
-    };
-
     render() {
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
-        const {dataSource, total, pageNum, pageSize, tabLoading, echartsVisible, jobmonitor} =this.state;
+        const {dataSource, total, pageNum, pageSize, tabLoading} =this.state;
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
@@ -227,6 +214,11 @@ export class LayoutComponent extends Component {
             xs: 12,
             md: 8,
             lg: 6,
+        };
+        const rowSelection = {
+            onChange: (selectedRowKeys, selectedRows) => {
+                this.props.changeNode(selectedRows);
+            },
         };
         return (
             <PageContent>
@@ -246,12 +238,25 @@ export class LayoutComponent extends Component {
                                 <FormItem
                                     {...formItemLayout}
                                     label="机器名称">
-                                    {getFieldDecorator('computerName')(
+                                    {getFieldDecorator('machineName')(
                                         <Input placeholder="请填写机器名" style={{width: '100%'}}/>
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={5} style={{textAlign:'right'}}>
+                            <Col span={6}>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label="当前状态">
+                                    {getFieldDecorator('state')(
+                                        <Select placeholder="请选择状态" style={{ width: '100%' }}>
+                                            <Option key="1" value="1">在线</Option>
+                                            <Option key="-1" value="-1">离线</Option>
+                                        </Select>
+                                    )}
+                                </FormItem>
+                            </Col>
+
+                            <Col span={6} style={{textAlign:'right'}}>
                                 <FormItem
                                     label=""
                                     colon={false}>
@@ -267,12 +272,14 @@ export class LayoutComponent extends Component {
 
                 <div style={{marginTop: '10px'}}>
                     <Table
+                        rowSelection={rowSelection}
                         dataSource={dataSource}
                         loading={tabLoading}
                         size="middle"
                         rowKey={(record) => record.id}
                         columns={this.columns}
                         pagination={false}
+
                     />
                 </div>
                 <PaginationComponent
@@ -283,17 +290,6 @@ export class LayoutComponent extends Component {
                     onPageSizeChange={this.handlePageSizeChange}
 
                 />
-                {
-                    echartsVisible ? <Modal
-                        title="节点实时监控图"
-                        visible={this.state.echartsVisible}
-                        onOk={this.handleOk}
-                        onCancel={this.handleCancel}
-                        width='70%'
-                    >
-                        <NodeEcharts jobmonitor={jobmonitor} />
-                    </Modal> : null
-                }
             </PageContent>
         )
     };
@@ -303,5 +299,4 @@ export function mapStateToProps(state) {
         ...state.frame,
     };
 }
-
 export default connectComponent({LayoutComponent, mapStateToProps});

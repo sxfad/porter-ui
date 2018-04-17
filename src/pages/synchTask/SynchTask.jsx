@@ -14,7 +14,7 @@ import connectComponent from '../../redux/store/connectComponent';
 const {RangePicker} = DatePicker;
 const FormItem = Form.Item;
 const Option = Select.Option;
-export const PAGE_ROUTE = '/synchtask';
+export const PAGE_ROUTE = '/synchTask';
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
@@ -33,8 +33,16 @@ export class LayoutComponent extends Component {
 
     columns = [
         {
-            title: '编号',
+            title: '序号',
             render: (text, record, index) => (index + 1) + ((this.state.pageNum - 1) * this.state.pageSize),
+        },
+        {
+            title: '任务ID',
+            render: (text, record) => {
+                return (
+                    record.id
+                );
+            },
         },
         {
             title: '任务名称',

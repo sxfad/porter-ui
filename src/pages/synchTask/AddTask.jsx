@@ -12,11 +12,12 @@ import SelectDataSourceByType from './SelectDataSourceByType';
 import SelectTargetDataTable from './SelectTargetDataTable';
 import DataMap from './DataMap';
 import SynchTaskDetail from './SynchTaskDetail';
+import SelectNode from './SelectNode';
 import connectComponent from '../../redux/store/connectComponent';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
-export const PAGE_ROUTE = '/synchtask/+add/:TaskId';
+export const PAGE_ROUTE = '/synchTask/+add/:TaskId';
 const Step = Steps.Step;
 const steps = [{
     title: '填写任务基本信息',
@@ -50,19 +51,26 @@ export class LayoutComponent extends Component {
         dataSourceVisible: false,
         targetDataTableVisible: false,
         isEdit: false,
+        nodeVisible: false,
+        selectedNodes: [],
     };
 
     next() {
         const {form} = this.props;
-        const {allData, selectedDataTable, selectedDataSource, selectedTargetDataTable, tables} =this.state;
+        const {allData, selectedDataTable, selectedDataSource, selectedTargetDataTable, tables, selectedNodes} =this.state;
         const current = this.state.current + 1;
         if (current === 1) { //保存第一步内容
             form.validateFieldsAndScroll((err, values) => {
                 if (!err) {
                     console.log('values', values);
+                    var nodeIds = [];
+                    for (let i = 0; i < selectedNodes.length; i++) {
+                        nodeIds.push(selectedNodes[i].nodeId);
+                    }
                     const params = {
                         ...allData,
                         ...values,
+                        nodeIds,
                     }
                     this.setState({allData: params});
                     console.log('params', params);
@@ -177,7 +185,8 @@ export class LayoutComponent extends Component {
             console.log(TaskId);
             const selectedDataSource = [],
                 selectedDataTable = [],
-                selectedTargetDataTable = [];
+                selectedTargetDataTable = [],
+                selectedNodes = [];
             promiseAjax.get(`/jobtasks/${TaskId}`).then(rsp => {
                 let userStr = [];
                 let allJson = [];
@@ -205,6 +214,7 @@ export class LayoutComponent extends Component {
                     }
                     allJson.id = rsp.data.id;
                     allJson.jobState = rsp.data.jobState.code;
+                    allJson.nodeIds = rsp.data.nodeIds;
                     allJson.jobName = rsp.data.jobName;
                     allJson.sourceConsumeAdt = rsp.data.sourceConsumeAdtName;
                     allJson.sourceConvertAdt = rsp.data.sourceConvertAdtName;
@@ -237,6 +247,11 @@ export class LayoutComponent extends Component {
                     selectedTargetDataTableItem.tableName = rsp.data.targetDataTablesName;
                     selectedTargetDataTableItem.sourceId = rsp.data.targetDataSourceId;
                     selectedTargetDataTable.push(selectedTargetDataTableItem);
+                    for (let i = 0; i < rsp.data.nodeIds.length; i++) {
+                        const selectedNodeItem = {};
+                        selectedNodeItem.nodeId = rsp.data.nodeIds[i];
+                        selectedNodes.push(selectedNodeItem);
+                    }
                     console.log(allJson);
                     this.setState({
                         allData: allJson,
@@ -244,6 +259,7 @@ export class LayoutComponent extends Component {
                         selectedDataSource,
                         selectedDataTable,
                         selectedTargetDataTable,
+                        selectedNodes,
                         tables,
                         isEdit: true,
                     });
@@ -355,6 +371,13 @@ export class LayoutComponent extends Component {
 
     }
 
+    changeNode(dataSource) {
+        console.log(dataSource);
+        this.setState({
+            selectedNodes: dataSource,
+        });
+    }
+
     handleOk = (e) => {
         const {selectedDataTable} =this.state;
         const {setFieldsValue} = this.props.form;
@@ -400,6 +423,34 @@ export class LayoutComponent extends Component {
         });
     };
 
+    handleNodeOk = (e) => {
+        const {selectedNodes} =this.state;
+        const {setFieldsValue} = this.props.form;
+        var nodeIdsStr = '';
+        for (let i = 0; i < selectedNodes.length; i++) {
+            nodeIdsStr = nodeIdsStr + selectedNodes[i].nodeId + ',';
+        }
+        setFieldsValue({nodeIds: nodeIdsStr.substring(0, nodeIdsStr.length - 1)});
+        this.setState({
+            nodeVisible: false,
+        });
+    };
+
+    handleNodeCancel = (e) => {
+        this.setState({
+            nodeVisible: false,
+        });
+    };
+
+    /**
+     * 点击 input 选择节点
+     */
+    selectNode = () => {
+        this.setState({
+            nodeVisible: true,
+        })
+    };
+
     /**
      * 点击 input 选择元数据表组
      */
@@ -438,7 +489,7 @@ export class LayoutComponent extends Component {
     render() {
         const {params: {TaskId}} = this.props;
         const {getFieldDecorator} = this.props.form;
-        const {current, users, allData, dataTableVisible, dataSourceVisible, targetDataTableVisible, selectedDataTable, selectedTargetDataTable} = this.state;
+        const {current, users, allData, dataTableVisible, dataSourceVisible, targetDataTableVisible, selectedDataTable, selectedTargetDataTable, nodeVisible} = this.state;
         const stepsNum = steps[this.state.current].content;
         const formItemLayout = {
             labelCol: {
@@ -464,6 +515,18 @@ export class LayoutComponent extends Component {
                         initialValue: allData && allData.jobName
                     })(
                         <Input placeholder="请输入任务名称" disabled={this.state.isEdit}/>
+                    )}
+                </FormItem>
+                <FormItem
+                    {...formItemLayout}
+                    label="分发节点"
+                    hasFeedback
+                >
+                    {getFieldDecorator('nodeIds', {
+                        rules: [{required: true, message: '请选择分发节点'}],
+                        initialValue: allData && allData.nodeIds
+                    })(
+                        <Input onClick={() => this.selectNode()} placeholder="请选择分发节点"/>
                     )}
                 </FormItem>
                 <FormItem
@@ -652,6 +715,18 @@ export class LayoutComponent extends Component {
                         style={{ top: 30 }}
                     >
                         <SelectTargetDataTable changeTargetDataTable={this.changeTargetDataTable.bind(this)}/>
+                    </Modal> : null
+                }
+                {
+                    nodeVisible ? <Modal
+                        title="选择分发节点"
+                        visible={this.state.nodeVisible}
+                        onOk={this.handleNodeOk}
+                        onCancel={this.handleNodeCancel}
+                        width='70%'
+                        style={{ top: 30 }}
+                    >
+                        <SelectNode changeNode={this.changeNode.bind(this)}/>
                     </Modal> : null
                 }
             </PageContent>

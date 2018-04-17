@@ -24,7 +24,7 @@ export default [
         parentKey: 'sysmenu-synch',
         text: '任务管理',
         icon: 'fa-tasks',
-        path: '/synchtask',
+        path: '/synchTask',
     },
     {
         key: 'sysmenu-cluster',

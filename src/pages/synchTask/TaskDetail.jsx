@@ -9,7 +9,7 @@ import {formatDefaultTime} from '../common/getTime';
 import './style.less';
 import connectComponent from '../../redux/store/connectComponent';
 
-export const PAGE_ROUTE = '/synchtask/+detail/:TaskId';
+export const PAGE_ROUTE = '/synchTask/+detail/:TaskId';
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
