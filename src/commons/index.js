@@ -5,6 +5,7 @@ import mockUrls from '../mock/url-config';
 
 import deployAjaxBaseUrl from '../../ajax-config';
 export function getAjaxBaseUrl() {
+    console.log('isDev, isPro, isTest, isRC',isDev, isPro, isTest, isRC);
     if (isDev) {
         return devAjaxBaseUrl;
     }
