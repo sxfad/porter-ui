@@ -50,7 +50,7 @@ export class LayoutComponent extends Component {
                 values.loginpw = md5(values.loginpw);
                 const {params: {UserId}} = this.props;
                 if (UserId !== 'UserId') {
-                    promiseAjax.post(`cuser/${UserId}`, values).then(rsp => {
+                    promiseAjax.put(`cuser/${UserId}`, values).then(rsp => {
                         if (rsp.success) {
                             message.success('修改成功', 3);
                             history.back();
@@ -86,6 +86,26 @@ export class LayoutComponent extends Component {
                                       value={codeList[key].roleCode}>{codeList[key].roleName}</Option>);
         }
         return userRoleHtml;
+    };
+
+    validateName = (rule, value, callback) => {
+        promiseAjax.get(`/cuser/findByNameOrEmail`, {loginname: value}).then(rsp => {
+            if (rsp.success && !rsp.data) {
+                callback('该用户名已经被使用,请重新输入');
+            } else {
+                callback();
+            }
+        });
+    };
+
+    validateEmail = (rule, value, callback) => {
+        promiseAjax.get(`/cuser/findByNameOrEmail`, {email: value}).then(rsp => {
+            if (rsp.success && !rsp.data) {
+                callback('该邮箱已经被使用,请重新输入');
+            } else {
+                callback();
+            }
+        });
     };
 
     render() {
@@ -127,7 +147,9 @@ export class LayoutComponent extends Component {
                             hasFeedback
                         >
                             {getFieldDecorator('loginname', {
-                                rules: [{required: true, message: '请输入登录名'}],
+                                rules: [{required: true, message: '请输入登录名'}, {
+                                    validator: this.validateName,
+                                }],
                                 initialValue: userInfo.loginname === undefined ? '' : userInfo.loginname
                             })(
                                 <Input placeholder="请输入登录名"/>
@@ -160,7 +182,10 @@ export class LayoutComponent extends Component {
                             label="邮箱"
                             hasFeedback>
                             {getFieldDecorator('email', {
-                                rules: [{required: true, message: '请输入邮箱'}],
+                                rules: [{required: true, message: '请输入邮箱'}, {
+                                    type: 'email', message: '请输入正确格式的邮箱'},{
+                                    validator: this.validateEmail,
+                                }],
                                 initialValue: userInfo.email === undefined ? '' : userInfo.email
                             })(
                                 <Input placeholder="请输入邮箱"/>
