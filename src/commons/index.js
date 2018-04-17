@@ -3,7 +3,7 @@ import {session} from 'sx-ui/utils/storage';
 import devAjaxBaseUrl from '../../local/local-ajax-base-url';
 import mockUrls from '../mock/url-config';
 
-import deployAjaxBaseUrl from '../../ajax-config.js';
+import deployAjaxBaseUrl from '../../ajax-config';
 export function getAjaxBaseUrl() {
     if (isDev) {
         return devAjaxBaseUrl;
