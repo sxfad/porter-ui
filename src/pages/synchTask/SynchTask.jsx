@@ -141,14 +141,14 @@ export class LayoutComponent extends Component {
      * @param id
      */
     handleUpdate = (id) => {
-        browserHistory.push(`/synchtask/+add/${id}`);
+        browserHistory.push(`/synchTask/+add/${id}`);
     }
 
     /**
      * 查看元素
      */
     handleDetail = (id)=> {
-        browserHistory.push(`/synchtask/+detail/${id}`);
+        browserHistory.push(`/synchTask/+detail/${id}`);
     };
 
     /**
@@ -327,7 +327,7 @@ export class LayoutComponent extends Component {
     };
 
     handleAddTask = () => {
-        browserHistory.push('/synchtask/+add/TaskId');
+        browserHistory.push('/synchTask/+add/TaskId');
     };
 
     render() {
