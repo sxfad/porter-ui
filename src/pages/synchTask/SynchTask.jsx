@@ -191,10 +191,7 @@ export class LayoutComponent extends Component {
         }
         promiseAjax.put(`/jobtasks/${id}?taskStatusType=${type}`).then(rsp => {
             if (rsp.success) {
-                console.log(rsp);
-                console.log(dataSource);
                 const {dataSource} = this.state;
-                console.log(dataSource);
                 dataSource.map((key, value)=> {
                     if (key.id === id) {
                         dataSource[value].jobState.name = typeStr;

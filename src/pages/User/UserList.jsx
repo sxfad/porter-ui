@@ -74,22 +74,54 @@ export class LayoutComponent extends Component {
             title: '角色',
             render: (text, record) => {
                 return (
-                    record.roleCode === null ? '--' : record.roleCode
+                    record.cRole.roleName === null ? '--' : record.cRole.roleName
                 );
+            },
+        },
+        {
+            title: '状态',
+            render: (text, record) => {
+                if (record.state === 1) {
+                    return (
+                        <span className="green-text">正常</span>
+                    );
+                } else {
+                    return (
+                        <span className="gray-text">禁用</span>
+                    )
+                }
+
             },
         },
         {
             title: '操作',
             render: (text, record) => {
-                return (
-                    <span>
-                        <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
-                        <span className="ant-divider"/>
-                        <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
-                          <a href="#">删除</a>
-                        </Popconfirm>
-                    </span>
-                )
+                if (record.state === 1) {
+                    return (
+                        <span>
+                            <a className="font-weight" onClick={() => this.handleUpdateState(record.id, 0)}>禁用</a>
+                            <span className="ant-divider"/>
+                            <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
+                            <span className="ant-divider"/>
+                            <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
+                                <a href="#">删除</a>
+                            </Popconfirm>
+                        </span>
+                    )
+                } else {
+                    return (
+                        <span>
+                            <a className="font-weight" onClick={() => this.handleUpdateState(record.id, 1)}>启用</a>
+                            <span className="ant-divider"/>
+                            <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
+                            <span className="ant-divider"/>
+                            <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
+                                <a href="#">删除</a>
+                            </Popconfirm>
+                        </span>
+                    )
+                }
+
 
             }
         },
@@ -108,6 +140,35 @@ export class LayoutComponent extends Component {
      */
     handleDetail = (id)=> {
         browserHistory.push(`/user/+detail/${id}`);
+    };
+
+    /**
+     * 修改用户状态
+     * @param state
+     * @param id
+     */
+    handleUpdateState = (id, state)=> {
+        this.setState({
+            tabLoading: true,
+        });
+        promiseAjax.put(`cuser/state/${id}?state=${state}`).then(rsp => {
+            if (rsp.success) {
+                const {dataSource} = this.state;
+                dataSource.map((key, value)=> {
+                    if (key.id === id) {
+                        dataSource[value].state = state;
+                    }
+                });
+                this.setState({
+                    dataSource,
+                });
+                message.success('修改成功', 3);
+            }
+        }).finally(() => {
+            this.setState({
+                tabLoading: false,
+            });
+        });
     };
 
     componentDidMount() {

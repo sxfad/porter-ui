@@ -114,7 +114,11 @@ class Login extends Component {
                         }).finally(() => {
                         });
                     } else {
-                        this.setState({loading: false, errorMessage: '账号或密码错误'});
+                        let errorMessage = '账号或密码错误';
+                        if (res.message != 'Login error') {
+                            errorMessage = res.message;
+                        }
+                        this.setState({loading: false, errorMessage});
                     }
                 }).catch(error => {
                     this.setState({loading: false, errorMessage: error.message});
