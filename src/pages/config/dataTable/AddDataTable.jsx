@@ -93,21 +93,25 @@ export class LayoutComponent extends Component {
         let bankName = getFieldValue('bankName');
         form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-                var plugins = {};
-                plugins.bankName = bankName;
-                plugins.dataType = selectedDataSource[0].dataType.code;
-                plugins.sourceId = parseInt(selectedDataSource[0].id);
-                let tabName = '';
-                for (let key in rightTableDataSource) {
-                    tabName += rightTableDataSource[key].allName + ',';
-                }
-                plugins.tableName = tabName.substring(0, tabName.length - 1);
-                promiseAjax.post(`/datatable`, plugins).then(rsp => {
-                    if (rsp.success) {
-                        message.success('添加成功', 3);
-                        history.back();
+                if (rightTableDataSource.length > 0) {
+                    var plugins = {};
+                    plugins.bankName = bankName;
+                    plugins.dataType = selectedDataSource[0].dataType.code;
+                    plugins.sourceId = parseInt(selectedDataSource[0].id);
+                    let tabName = '';
+                    for (let key in rightTableDataSource) {
+                        tabName += rightTableDataSource[key].allName + ',';
                     }
-                });
+                    plugins.tableName = tabName.substring(0, tabName.length - 1);
+                    promiseAjax.post(`/datatable`, plugins).then(rsp => {
+                        if (rsp.success) {
+                            message.success('添加成功', 3);
+                            history.back();
+                        }
+                    });
+                } else {
+                    message.warning('请选择表', 3);
+                }
             }
         })
     };
@@ -117,6 +121,10 @@ export class LayoutComponent extends Component {
      */
     resetFieldsForm = () => {
         this.props.form.resetFields();
+        this.setState({
+            leftTableDataSource: [],
+            rightTableDataSource: [],
+        });
     };
 
     /**
@@ -164,14 +172,20 @@ export class LayoutComponent extends Component {
     };
 
     changeDataSource(dataSource) {
+        const {setFieldsValue} = this.props.form;
+        setFieldsValue({prefixs: undefined});
         this.setState({
             selectedDataSource: dataSource,
+            leftTableDataSource: [],
+            rightTableDataSource: [],
         });
-        console.log(dataSource);
     }
 
     handleChangePrefixs = (value) => {
-        const {selectedDataSource, leftPageNum, pageSize, total} = this.state;
+        if (this.state.prefixName !== value) {
+            this.setState({rightTableDataSource: []});
+        }
+        const {selectedDataSource, prefixName} = this.state;
         let params = {
             pageNo: 1,
             pageSize: 10,
@@ -283,6 +297,27 @@ export class LayoutComponent extends Component {
                     for (let key in rightTableDataSource) {
                         if (rightTableDataSource[key]['allName'] === record['allName']) {
                             rightTableDataSource.splice(key, 1);
+                        }
+                    }
+                }
+                this.setState({
+                    rightTableDataSource,
+                });
+            },
+
+            onSelectAll: (selected, selectedRows, changeRows) => {
+                console.log(selected, selectedRows, changeRows);
+                if (selected) {
+                    for (let i = 0; i < changeRows.length; i++) {
+                        rightTableDataSource.push(changeRows[i]);
+                    }
+                } else {
+                    const newRightData = this.state.rightTableDataSource;
+                    for (let i = 0; i < changeRows.length; i++) {
+                        for (let j = 0; j < newRightData.length; j++) {
+                            if (newRightData[j].allName === changeRows[i].allName) {
+                                rightTableDataSource.splice(j, 1);
+                            }
                         }
                     }
                 }
