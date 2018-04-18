@@ -21,7 +21,7 @@ export function getAjaxBaseUrl() {
 	return deployAjaxBaseUrl.rc;
     }
 
-    if (process.env.NODE_ENV === "dev") {
+    if (process.env.NODE_ENV == "dev") {
 	return deployAjaxBaseUrl.dev;
     }
     return '/';
