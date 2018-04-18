@@ -84,15 +84,7 @@ class Login extends Component {
                                     icon: 'global',
                                     path: '',
                                 };
-                                const menusItemHome = {
-                                    key: 'home',
-                                    parentKey: '-1',
-                                    text: '首页',
-                                    icon: 'home',
-                                    path: '/',
-                                };
                                 newMenus.push(menusItemGlobal);
-                                newMenus.push(menusItemHome);
                                 const menusList = rsp.data.CMenu.menus;
                                 for (let i = 0; i < menusList.length; i++) {
                                     const menusItem = {};
