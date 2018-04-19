@@ -146,7 +146,7 @@ export class LayoutComponent extends Component {
         return (
             <PageContent>
                 <div id="adduserform">
-                    <div className="sub-title">新增同步节点</div>
+                    <div className="sub-title">新增用户信息</div>
                     <Form id="adduser">
                         <FormItem
                             {...formItemLayout}
@@ -223,11 +223,11 @@ export class LayoutComponent extends Component {
                         </FormItem>
                         <FormItem
                             {...formItemLayout}
-                            label="角色"
+                            label="角色组"
                             hasFeedback>
                             {getFieldDecorator('roleCode', {
                                 rules: [{required: true, message: '请选择角色'}],
-                                initialValue: userInfo.roleCode === undefined ? '' : userInfo.roleCode
+                                initialValue: userInfo.roleCode === undefined ? undefined : userInfo.roleCode
                             })(
                                 <Select
                                     placeholder="请选择角色"
