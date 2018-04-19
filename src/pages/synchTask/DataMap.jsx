@@ -195,7 +195,10 @@ export class LayoutComponent extends Component {
 
     componentDidMount() {
         const {taskId, parentTables} =this.props;
-        if (taskId != 'TaskId') {
+
+        console.log('parentTables', parentTables);
+
+        if (taskId != 'TaskId' || parentTables !== undefined) {
             const tablesNameList = [];
             for (let i = 0; i < parentTables.length; i++) {
                 const tablesNameListItem = {};

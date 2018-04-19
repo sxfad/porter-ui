@@ -208,7 +208,9 @@ export class LayoutComponent extends Component {
                             {...formItemLayout}
                             label="数据源类型"
                             hasFeedback>
-                            {getFieldDecorator('dataType')(
+                            {getFieldDecorator('dataType', {
+                                rules: [{required: true, message: '请选择数据源类型'}],
+                            })(
                                 <RadioGroup onChange={this.selectSourceType}>
                                     {this.renderSourceType()}
                                 </RadioGroup>
