@@ -73,7 +73,7 @@ export class LayoutComponent extends Component {
                 <Table
                     columns={columns}
                     dataSource={dataColumn}
-                    rowKey={(record) => record.sortOrder}
+                    rowKey={(record) => record.id}
                     pagination={false}
                 />
             );
