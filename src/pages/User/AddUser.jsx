@@ -32,10 +32,10 @@ export class LayoutComponent extends Component {
         const {params: {UserId}} = this.props;
         if (UserId != 'UserId') {
             promiseAjax.get(`/cuser/${UserId}`).then(rsp => {
-                if (UserId.roleCode === 'A0001') {
-                    this.setState({userInfo: rsp.data, isAdmin: true})
-                } else {
+                if (rsp.data.roleCode === 'A0001') {
                     this.setState({userInfo: rsp.data})
+                } else {
+                    this.setState({userInfo: rsp.data, isAdmin: true})
                 }
 
             })
