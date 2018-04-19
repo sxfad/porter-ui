@@ -38,6 +38,13 @@ export class LayoutComponent extends Component {
 
     componentDidMount() {
         document.getElementById('adduserform').getElementsByTagName('form')[0].setAttribute('autocomplete', 'off');
+        if(navigator.userAgent.toLowerCase().indexOf("chrome") != -1){
+            const {setFieldsValue} = this.props.form;
+            setFieldsValue({loginname: ' '});
+            setTimeout(function(){
+                setFieldsValue({loginname: ''});
+            },500)
+        }
     }
 
     /**
@@ -140,7 +147,7 @@ export class LayoutComponent extends Component {
             <PageContent>
                 <div id="adduserform">
                     <div className="sub-title">新增同步节点</div>
-                    <Form>
+                    <Form id="adduser">
                         <FormItem
                             {...formItemLayout}
                             label="登录名"
@@ -152,7 +159,7 @@ export class LayoutComponent extends Component {
                                 }],
                                 initialValue: userInfo.loginname === undefined ? '' : userInfo.loginname
                             })(
-                                <Input placeholder="请输入登录名"/>
+                                <Input autocomplete="off" placeholder="请输入登录名"/>
                             )}
                         </FormItem>
                         <FormItem
