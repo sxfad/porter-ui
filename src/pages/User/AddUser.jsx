@@ -18,7 +18,7 @@ export class LayoutComponent extends Component {
     state = {
         codeList: [],
         userInfo: {},
-        isAdmin: false,
+        isAdmin: true,
     };
 
     componentWillMount() {
@@ -33,9 +33,9 @@ export class LayoutComponent extends Component {
         if (UserId != 'UserId') {
             promiseAjax.get(`/cuser/${UserId}`).then(rsp => {
                 if (rsp.data.roleCode === 'A0001') {
-                    this.setState({userInfo: rsp.data})
+                    this.setState({userInfo: rsp.data, isAdmin: false})
                 } else {
-                    this.setState({userInfo: rsp.data, isAdmin: true})
+                    this.setState({userInfo: rsp.data})
                 }
 
             })
