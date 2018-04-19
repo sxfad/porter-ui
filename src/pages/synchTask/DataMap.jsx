@@ -397,7 +397,27 @@ export class LayoutComponent extends Component {
                 this.setState({
                     leftSelectedRow,
                 });
-                console.log(leftSelectedRow);
+            },
+
+            onSelectAll: (selected, selectedRows, changeRows) => {
+                console.log(selected, selectedRows, changeRows);
+                if (selected) {
+                    for (let i = 0; i < changeRows.length; i++) {
+                        leftSelectedRow.push(changeRows[i]);
+                    }
+                } else {
+                    const newRightData = this.state.leftSelectedRow;
+                    for (let i = 0; i < changeRows.length; i++) {
+                        for (let j = 0; j < newRightData.length; j++) {
+                            if (newRightData[j].name === changeRows[i].name) {
+                                leftSelectedRow.splice(j, 1);
+                            }
+                        }
+                    }
+                }
+                this.setState({
+                    leftSelectedRow,
+                });
             },
 
             onChange: (selectedRowKeys, selectedRows) => {
@@ -425,6 +445,27 @@ export class LayoutComponent extends Component {
                     rightSelectedRow,
                 });
                 console.log(rightSelectedRow);
+            },
+
+            onSelectAll: (selected, selectedRows, changeRows) => {
+                console.log(selected, selectedRows, changeRows);
+                if (selected) {
+                    for (let i = 0; i < changeRows.length; i++) {
+                        rightSelectedRow.push(changeRows[i]);
+                    }
+                } else {
+                    const newRightData = this.state.rightSelectedRow;
+                    for (let i = 0; i < changeRows.length; i++) {
+                        for (let j = 0; j < newRightData.length; j++) {
+                            if (newRightData[j].name === changeRows[i].name) {
+                                rightSelectedRow.splice(j, 1);
+                            }
+                        }
+                    }
+                }
+                this.setState({
+                    rightSelectedRow,
+                });
             },
 
             onChange: (selectedRowKeys, selectedRows) => {
