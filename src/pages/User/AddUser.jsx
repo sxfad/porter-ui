@@ -159,7 +159,7 @@ export class LayoutComponent extends Component {
                                 }],
                                 initialValue: userInfo.loginname === undefined ? '' : userInfo.loginname
                             })(
-                                <Input autocomplete="off" placeholder="请输入登录名"/>
+                                <Input placeholder="请输入登录名"/>
                             )}
                         </FormItem>
                         <FormItem
