@@ -18,6 +18,7 @@ export class LayoutComponent extends Component {
     state = {
         codeList: [],
         userInfo: {},
+        isAdmin: false,
     };
 
     componentWillMount() {
@@ -31,19 +32,25 @@ export class LayoutComponent extends Component {
         const {params: {UserId}} = this.props;
         if (UserId != 'UserId') {
             promiseAjax.get(`/cuser/${UserId}`).then(rsp => {
-                this.setState({userInfo: rsp.data})
+                if (UserId.roleCode === 'A0001') {
+                    this.setState({userInfo: rsp.data, isAdmin: true})
+                } else {
+                    this.setState({userInfo: rsp.data})
+                }
+
             })
         }
     }
 
     componentDidMount() {
+        const {params: {UserId}} = this.props;
         document.getElementById('adduserform').getElementsByTagName('form')[0].setAttribute('autocomplete', 'off');
-        if(navigator.userAgent.toLowerCase().indexOf("chrome") != -1){
+        if (navigator.userAgent.toLowerCase().indexOf("chrome") != -1 && UserId === 'UserId') {
             const {setFieldsValue} = this.props.form;
             setFieldsValue({loginname: ' '});
-            setTimeout(function(){
+            setTimeout(function () {
                 setFieldsValue({loginname: ''});
-            },500)
+            }, 500)
         }
     }
 
@@ -190,7 +197,8 @@ export class LayoutComponent extends Component {
                             hasFeedback>
                             {getFieldDecorator('email', {
                                 rules: [{required: true, message: '请输入邮箱'}, {
-                                    type: 'email', message: '请输入正确格式的邮箱'},{
+                                    type: 'email', message: '请输入正确格式的邮箱'
+                                }, {
                                     validator: this.validateEmail,
                                 }],
                                 initialValue: userInfo.email === undefined ? '' : userInfo.email
@@ -221,21 +229,23 @@ export class LayoutComponent extends Component {
                                 <Input placeholder="departMent"/>
                             )}
                         </FormItem>
-                        <FormItem
-                            {...formItemLayout}
-                            label="角色组"
-                            hasFeedback>
-                            {getFieldDecorator('roleCode', {
-                                rules: [{required: true, message: '请选择角色'}],
-                                initialValue: userInfo.roleCode === undefined ? undefined : userInfo.roleCode
-                            })(
-                                <Select
-                                    placeholder="请选择角色"
-                                >
-                                    {this.renderRoleCodeOptions()}
-                                </Select>
-                            )}
-                        </FormItem>
+                        {
+                           this.state.isAdmin ? <FormItem
+                                {...formItemLayout}
+                                label="角色组"
+                                hasFeedback>
+                                {getFieldDecorator('roleCode', {
+                                    rules: [{required: true, message: '请选择角色'}],
+                                    initialValue: userInfo.roleCode === undefined ? undefined : userInfo.roleCode
+                                })(
+                                    <Select
+                                        placeholder="请选择角色"
+                                    >
+                                        {this.renderRoleCodeOptions()}
+                                    </Select>
+                                )}
+                            </FormItem> : null
+                        }
                         <FormItem {...tailFormItemLayout}>
                             <Button type="primary" onClick={() => this.handleSubmit()} style={{marginRight: 16}}
                                     size="large">提交</Button>

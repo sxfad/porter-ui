@@ -13,7 +13,7 @@ export const PAGE_ROUTE = '/synchTask/+detail/:TaskId';
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
-        taskData: [],
+        taskData: {},
         userStr: '',
     };
 
@@ -78,13 +78,37 @@ export class LayoutComponent extends Component {
                 />
             );
         };
-
-
         const labelStyle = {
             textAlign: 'right',
             marginBottom: 18,
             fontWeight: 'bold',
         };
+        const labelStyle1 = {
+            textAlign: 'right',
+            marginBottom: 10,
+            fontWeight: 'bold',
+        };
+
+        var formItemsHtml = [];
+        console.log('taskData', taskData.id);
+        if (taskData.id !== undefined) {
+            var plugins = taskData.sourceDataEntity.plugins;
+            if (plugins != undefined) {
+                plugins.map((k, index) => {
+                    formItemsHtml.push(
+                        <Row key={plugins[index].fieldCode}>
+                            <Col span={3} style={labelStyle1}>
+                                {plugins[index].fieldName}：
+                            </Col>
+                            <Col span={18}>
+                                {plugins[index].fieldValue}
+                            </Col>
+                        </Row>
+                    )
+                });
+            }
+        }
+
         return (
             <PageContent>
                 <div>
@@ -137,6 +161,14 @@ export class LayoutComponent extends Component {
                                 </Col>
                                 <Col span={9}>
                                     {taskData.sourceDataName && taskData.sourceDataName}
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={3} style={labelStyle}>
+                                    数据源详情：
+                                </Col>
+                                <Col span={9}>
+                                    {formItemsHtml}
                                 </Col>
                             </Row>
 

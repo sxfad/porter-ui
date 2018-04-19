@@ -96,7 +96,7 @@ export class LayoutComponent extends Component {
         {
             title: '操作',
             render: (text, record) => {
-                if (record.state === 1) {
+                if (record.state === 1 && record.roleCode !== 'A0001') {
                     return (
                         <span>
                             <a className="font-weight" onClick={() => this.handleUpdateState(record.id, 0)}>禁用</a>
@@ -108,11 +108,21 @@ export class LayoutComponent extends Component {
                             </Popconfirm>
                         </span>
                     )
-                } else {
+                } else if (record.roleCode !== 'A0001') {
                     return (
                         <span>
                             <a className="font-weight" onClick={() => this.handleUpdateState(record.id, 1)}>启用</a>
                             <span className="ant-divider"/>
+                            <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
+                            <span className="ant-divider"/>
+                            <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
+                                <a href="#">删除</a>
+                            </Popconfirm>
+                        </span>
+                    )
+                } else {
+                    return (
+                        <span>
                             <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
                             <span className="ant-divider"/>
                             <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
