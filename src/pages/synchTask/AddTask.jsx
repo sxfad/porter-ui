@@ -523,7 +523,6 @@ export class LayoutComponent extends Component {
                     hasFeedback
                 >
                     {getFieldDecorator('nodeIds', {
-                        rules: [{required: true, message: '请选择分发节点'}],
                         initialValue: allData && allData.nodeIds
                     })(
                         <Input onClick={() => this.selectNode()} placeholder="请选择分发节点"/>
