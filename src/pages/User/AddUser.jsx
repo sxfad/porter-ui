@@ -103,23 +103,33 @@ export class LayoutComponent extends Component {
     };
 
     validateName = (rule, value, callback) => {
-        promiseAjax.get(`/cuser/findByNameOrEmail`, {loginname: value}).then(rsp => {
-            if (rsp.success && !rsp.data) {
-                callback('该用户名已经被使用,请重新输入');
-            } else {
-                callback();
-            }
-        });
+        const {params: {UserId}} = this.props;
+        if (UserId === 'UserId') {
+            promiseAjax.get(`/cuser/findByNameOrEmail`, {loginname: value}).then(rsp => {
+                if (rsp.success && !rsp.data) {
+                    callback('该用户名已经被使用,请重新输入');
+                } else {
+                    callback();
+                }
+            });
+        } else {
+            callback();
+        }
     };
 
     validateEmail = (rule, value, callback) => {
-        promiseAjax.get(`/cuser/findByNameOrEmail`, {email: value}).then(rsp => {
-            if (rsp.success && !rsp.data) {
-                callback('该邮箱已经被使用,请重新输入');
-            } else {
-                callback();
-            }
-        });
+        const {params: {UserId}} = this.props;
+        if (UserId === 'UserId') {
+            promiseAjax.get(`/cuser/findByNameOrEmail`, {email: value}).then(rsp => {
+                if (rsp.success && !rsp.data) {
+                    callback('该邮箱已经被使用,请重新输入');
+                } else {
+                    callback();
+                }
+            });
+        } else {
+            callback();
+        }
     };
 
     render() {

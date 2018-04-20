@@ -71,7 +71,6 @@ class Login extends Component {
                             keyPrefix: currentLoginUser.id,
                         });
                         session.setItem('authToken', res.data.token);
-
                         setCurrentLoginUser(currentLoginUser);
 
                         // 设置菜单

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Menu, Popconfirm, Popover, Badge} from 'antd';
+import {Menu, Popconfirm, Popover, Badge, Modal, Form} from 'antd';
 import {Link} from 'react-router';
 import classNames from 'classnames';
 import {FontIcon, UserAvatar} from 'sx-ui/antd';
@@ -7,8 +7,14 @@ import {getFirstValue} from 'sx-ui/utils/tree-utils';
 import {session} from 'sx-ui/utils/storage';
 import {toLogin, getCurrentLoginUser} from '../commons';
 import connectComponent from '../redux/store/connectComponent';
+import ResetPasswor from '../pages/User/ResetPasswor';
 
+const FormItem = Form.Item;
 class LayoutComponent extends Component {
+    state = {
+        passwordVisible: false,
+    }
+
     componentDidMount() {
 
     }
@@ -46,17 +52,22 @@ class LayoutComponent extends Component {
         });
     }
 
-    renderNoticeContent() {
-        return (
-            <div>
-                <p>消息1消息1消息1消息1消息1消息1</p>
-                <p>消息2</p>
-                <p>消息3</p>
-                <p>消息4</p>
-                <p>消息5</p>
-                <p>消息6</p>
-            </div>
-        );
+    handlePasswordOk = () => {
+        this.setState({passwordVisible: false});
+    }
+
+    handlePasswordCancel = () => {
+        this.setState({passwordVisible: false});
+    }
+
+    rePassword = () => {
+        this.setState({passwordVisible: true});
+    }
+
+    closeModal() {
+        this.setState({
+            passwordVisible: false,
+        });
     }
 
     render() {
@@ -72,6 +83,16 @@ class LayoutComponent extends Component {
                 loginName: 'no name',
                 avatar: '',
             };
+        const formItemLayout = {
+            labelCol: {
+                xs: {span: 24},
+                sm: {span: 5},
+            },
+            wrapperCol: {
+                xs: {span: 24},
+                sm: {span: 15},
+            },
+        };
         return (
             <div className={`frame-header ${frameHeaderClass}`}>
                 <div className={`left-menu ${frameHeaderClass}`} style={{display: frameHeaderMenu}}>
@@ -83,17 +104,7 @@ class LayoutComponent extends Component {
                     </Menu>
                 </div>
                 <div className="right-menu">
-                    <Popover
-                        content={this.renderNoticeContent()}
-                    >
-                        <div className="right-menu-item">
-                            <Badge count={100}>
-                                <FontIcon type="message"/>
-                                <span className="notice-label">通知</span>
-                            </Badge>
-                        </div>
-                    </Popover>
-                    <div className="right-menu-item">
+                    <div className="right-menu-item" onClick={() => this.rePassword()}>
                         <UserAvatar user={user}/>
                         <span>{user.name}</span>
                     </div>
@@ -107,6 +118,19 @@ class LayoutComponent extends Component {
                             <FontIcon type="logout" size="lg"/>
                         </div>
                     </Popconfirm>
+
+                    {
+                        this.state.passwordVisible ? <Modal
+                            title="修改密码"
+                            visible={this.state.passwordVisible}
+                            onOk={this.handlePasswordOk}
+                            onCancel={this.handlePasswordCancel}
+                            width='50%'
+                            footer={[]}
+                        >
+                            <ResetPasswor closeModal={this.closeModal.bind(this)}/>
+                        </Modal> : null
+                    }
                 </div>
             </div>
         );
