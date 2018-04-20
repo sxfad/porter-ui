@@ -125,6 +125,14 @@ export class LayoutComponent extends Component {
                             </Row>
                             <Row>
                                 <Col span={3} style={labelStyle}>
+                                    分发节点ID：
+                                </Col>
+                                <Col span={9}>
+                                    {taskData.nodesString && taskData.nodesString}
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={3} style={labelStyle}>
                                     告警通知人：
                                 </Col>
                                 <Col span={9}>
