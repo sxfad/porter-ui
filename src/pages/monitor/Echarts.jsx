@@ -115,11 +115,12 @@ export class LayoutComponent extends Component {
     }
 
     getMonitorDetail = (timeNumber)=> {
-        this.setState({ spinLoading: true });
+        this.setState({spinLoading: true});
         const {jobmonitor} = this.props;
         const params = {
             jobId: jobmonitor.jobId,
             swimlaneId: jobmonitor.swimlaneId,
+            schemaTable: jobmonitor.schemaTable,
             intervalTime: timeNumber,
             intervalCount: 0
         }
