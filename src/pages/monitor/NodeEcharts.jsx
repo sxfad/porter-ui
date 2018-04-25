@@ -139,6 +139,8 @@ export class LayoutComponent extends Component {
                         <RadioButton value="10">10分钟</RadioButton>
                         <RadioButton value="30">半个小时</RadioButton>
                         <RadioButton value="60">1个小时</RadioButton>
+                        <RadioButton value="480">8个小时</RadioButton>
+                        <RadioButton value="1440">24个小时</RadioButton>
                     </RadioGroup>
                     <Button type="primary" onClick={()=>this.handleRefresh()} style={{marginLeft: 15}}><FontIcon
                         type="fa-refresh"/> 刷新</Button>

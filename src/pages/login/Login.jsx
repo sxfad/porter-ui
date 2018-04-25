@@ -71,7 +71,6 @@ class Login extends Component {
                             keyPrefix: currentLoginUser.id,
                         });
                         session.setItem('authToken', res.data.token);
-                        setCurrentLoginUser(currentLoginUser);
 
                         // 设置菜单
                         promiseAjax.get(`/getuserinfo`).then(rsp => {
@@ -105,6 +104,8 @@ class Login extends Component {
                                         newMenus.push(childMenusItem);
                                     }
                                 }
+                                currentLoginUser.nickName = rsp.data.nickName;
+                                setCurrentLoginUser(currentLoginUser);
 
                                 const menuTreeData = convertToTree(newMenus);
                                 setMenuTreeData(menuTreeData);

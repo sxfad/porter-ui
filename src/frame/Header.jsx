@@ -8,11 +8,14 @@ import {session} from 'sx-ui/utils/storage';
 import {toLogin, getCurrentLoginUser} from '../commons';
 import connectComponent from '../redux/store/connectComponent';
 import ResetPasswor from '../pages/User/ResetPasswor';
+import ResetSetUp from '../pages/User/ResetSetUp';
 
 const FormItem = Form.Item;
+const SubMenu = Menu.SubMenu;
 class LayoutComponent extends Component {
     state = {
         passwordVisible: false,
+        setUpVisible: false,
     }
 
     componentDidMount() {
@@ -60,14 +63,32 @@ class LayoutComponent extends Component {
         this.setState({passwordVisible: false});
     }
 
-    rePassword = () => {
-        this.setState({passwordVisible: true});
+    handleSetUpOk = () => {
+        this.setState({setUpVisible: false});
+    }
+
+    handleSetUpCancel = () => {
+        this.setState({setUpVisible: false});
     }
 
     closeModal() {
         this.setState({
             passwordVisible: false,
         });
+    }
+
+    closeSetUpModal() {
+        this.setState({
+            setUpVisible: false,
+        });
+    }
+
+    handleClick = (e) => {
+        if (e.key === '1') {
+            this.setState({passwordVisible: true});
+        } else {
+            this.setState({setUpVisible: true});
+        }
     }
 
     render() {
@@ -104,9 +125,17 @@ class LayoutComponent extends Component {
                     </Menu>
                 </div>
                 <div className="right-menu">
-                    <div className="right-menu-item" onClick={() => this.rePassword()}>
-                        <UserAvatar user={user}/>
-                        <span>{user.name}</span>
+                    <div className="right-menu-item">
+                        <Menu mode="horizontal" onClick={this.handleClick}>
+                            <SubMenu title={<div className="right-menu-item">
+                            <UserAvatar user={user}/>
+                            <span style={{fontWeight: 'bolder'}}>{user.name}</span>
+                            <span style={{paddingLeft: 10}}>{user.nickName}</span>
+                        </div>}>
+                                <Menu.Item key="1">修改密码</Menu.Item>
+                                <Menu.Item key="2">修改个人信息</Menu.Item>
+                            </SubMenu>
+                        </Menu>
                     </div>
                     <Popconfirm
                         onVisibleChange={this.handleLogoutPopVisibleChange}
@@ -118,7 +147,6 @@ class LayoutComponent extends Component {
                             <FontIcon type="logout" size="lg"/>
                         </div>
                     </Popconfirm>
-
                     {
                         this.state.passwordVisible ? <Modal
                             title="修改密码"
@@ -129,6 +157,18 @@ class LayoutComponent extends Component {
                             footer={[]}
                         >
                             <ResetPasswor closeModal={this.closeModal.bind(this)}/>
+                        </Modal> : null
+                    }
+                    {
+                        this.state.setUpVisible ? <Modal
+                            title="修改个人信息"
+                            visible={this.state.setUpVisible}
+                            onOk={this.handleSetUpOk}
+                            onCancel={this.handleSetUpCancel}
+                            width='50%'
+                            footer={[]}
+                        >
+                            <ResetSetUp closeSetUpModal={this.closeSetUpModal.bind(this)}/>
                         </Modal> : null
                     }
                 </div>

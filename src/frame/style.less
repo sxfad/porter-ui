@@ -27,6 +27,7 @@
     top: 0;
     right: 0;
     height: 100%;
+    display: inline-flex;
     .right-menu-item {
       display: inline-block;
       line-height: @headerHeight;
@@ -62,7 +63,7 @@
     }
   }
   .ant-menu-horizontal {
-    padding-top: 6px;
+    padding-top: 0px;
     border-bottom: 0;
     background: none;
   }
@@ -223,10 +224,22 @@
   border-left-color: #fff;
 }
 
-.ant-menu-submenu-title, .ant-menu-item{
+.right-menu .ant-menu-submenu-title{
+  padding: 0 0px!important;
+}
+
+.right-menu .ant-menu-submenu-title, .ant-menu-item{
   font-size: 13px!important;
 }
 
 .ant-form-item-label label{
   font-size: 13px;
+}
+
+.right-menu .ant-menu-item-selected{
+  color: #ffffff!important;
+}
+
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected{
+  color: #ffffff!important;
 }
