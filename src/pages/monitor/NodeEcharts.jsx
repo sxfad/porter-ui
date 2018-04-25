@@ -59,15 +59,17 @@ export class LayoutComponent extends Component {
                     name: '告警次数',
                     type: 'line',
                     stack: '总量',
-                    areaStyle: {normal: {}},
+                    // areaStyle: {normal: {}},
                     data: dataSource.alarmNumber,
+                    smooth: true
                 },
                 {
                     name: 'TPS',
                     type: 'line',
                     stack: '总量',
-                    areaStyle: {normal: {}},
+                    // areaStyle: {normal: {}},
                     data: dataSource.tps,
+                    smooth: true
                 },
             ]
         };

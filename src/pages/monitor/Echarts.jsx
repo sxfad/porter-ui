@@ -61,50 +61,57 @@ export class LayoutComponent extends Component {
                     name: '告警次数',
                     type: 'line',
                     stack: '总量',
-                    areaStyle: {normal: {}},
+                    // areaStyle: {normal: {}},
                     data: dataSource.alarmNumber,
+                    smooth: true
                 },
                 {
                     name: '插入成功',
                     type: 'line',
                     stack: '总量',
-                    areaStyle: {normal: {}},
+                    // areaStyle: {normal: {}},
                     data: dataSource.insertSucces,
+                    smooth: true
                 },
                 {
                     name: '插入失败',
                     type: 'line',
                     stack: '总量',
-                    areaStyle: {normal: {}},
-                    data: dataSource.insertFailure
+                    // areaStyle: {normal: {}},
+                    data: dataSource.insertFailure,
+                    smooth: true
                 },
                 {
                     name: '更新成功',
                     type: 'line',
                     stack: '总量',
-                    areaStyle: {normal: {}},
-                    data: dataSource.updateSucces
+                    // areaStyle: {normal: {}},
+                    data: dataSource.updateSucces,
+                    smooth: true
                 },
                 {
                     name: '更新失败',
                     type: 'line',
                     stack: '总量',
-                    areaStyle: {normal: {}},
-                    data: dataSource.updateFailure
+                    // areaStyle: {normal: {}},
+                    data: dataSource.updateFailure,
+                    smooth: true
                 },
                 {
                     name: '删除成功',
                     type: 'line',
                     stack: '总量',
-                    areaStyle: {normal: {}},
-                    data: dataSource.deleteSucces
+                    // areaStyle: {normal: {}},
+                    data: dataSource.deleteSucces,
+                    smooth: true
                 },
                 {
                     name: '删除失败',
                     type: 'line',
                     stack: '总量',
-                    areaStyle: {normal: {}},
-                    data: dataSource.deleteFailure
+                    // areaStyle: {normal: {}},
+                    data: dataSource.deleteFailure,
+                    smooth: true
                 }
             ]
         };
