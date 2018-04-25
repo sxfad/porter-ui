@@ -129,8 +129,7 @@ class LayoutComponent extends Component {
                         <Menu mode="horizontal" onClick={this.handleClick}>
                             <SubMenu title={<div className="right-menu-item">
                             <UserAvatar user={user}/>
-                            <span style={{fontWeight: 'bolder'}}>{user.name}</span>
-                            <span style={{paddingLeft: 10}}>{user.nickName}</span>
+                            <span>{user.nickName}</span>
                         </div>}>
                                 <Menu.Item key="1">修改密码</Menu.Item>
                                 <Menu.Item key="2">修改个人信息</Menu.Item>
