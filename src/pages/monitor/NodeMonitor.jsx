@@ -72,7 +72,7 @@ export class LayoutComponent extends Component {
         },
         {
             title: '任务—{任务名[泳道...]}',
-            width: '380px',
+            width: '300px',
             render: (text, record) => {
                 return (
                     record.jobNameJson
