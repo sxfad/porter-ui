@@ -33,7 +33,7 @@ export class LayoutComponent extends Component {
         const {actions} = this.props;
         // actions.hidePageHeader();
         // actions.hideSideBar();
-        actions.setPageTitle('Home');
+        actions.setPageTitle('首页');
         actions.setPageBreadcrumbs([
             {
                 key: 'home',
