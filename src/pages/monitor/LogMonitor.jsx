@@ -41,10 +41,10 @@ export class LayoutComponent extends Component {
             },
         },
         {
-            title: '任务名称',
+            title: '任务id',
             render: (text, record) => {
                 return (
-                    record.jobName
+                    record.jobId
                 );
             },
         },
