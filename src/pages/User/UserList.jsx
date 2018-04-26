@@ -104,7 +104,7 @@ export class LayoutComponent extends Component {
                             <span className="ant-divider"/>
                             <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
                             <span className="ant-divider"/>
-                            <Popconfirm title="是否重置?" onConfirm={() => this.resetPwd(record.id)}>
+                            <Popconfirm title="是否重置?重置后密码为:123456" onConfirm={() => this.resetPwd(record.id)}>
                                 <a href="#">重置密码</a>
                             </Popconfirm>
                             <span className="ant-divider"/>
@@ -120,7 +120,7 @@ export class LayoutComponent extends Component {
                             <span className="ant-divider"/>
                             <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
                             <span className="ant-divider"/>
-                            <Popconfirm title="是否重置?" onConfirm={() => this.resetPwd(record.id)}>
+                            <Popconfirm title="是否重置?重置后密码为:123456" onConfirm={() => this.resetPwd(record.id)}>
                                 <a href="#">重置密码</a>
                             </Popconfirm>
                             <span className="ant-divider"/>
