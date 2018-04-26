@@ -129,9 +129,8 @@ export class LayoutComponent extends Component {
 
     content = (healthLevelDescStr) => {
         return (
-            <div>
+            <div style={{width: 550}}>
                 {healthLevelDescStr}
-                "等待批次ad169cd8-4427-4845-bc2e-43e6d0f846411524728884734SET完成超时(5m)，任务退出。"
             </div>
         );
     }
