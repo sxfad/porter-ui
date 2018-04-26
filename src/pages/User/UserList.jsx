@@ -9,6 +9,7 @@ import './style.less';
 import {browserHistory} from 'react-router';
 import connectComponent from '../../redux/store/connectComponent';
 
+const md5 = require('../common/md5');
 const FormItem = Form.Item;
 export const PAGE_ROUTE = '/user';
 @Form.create()
@@ -103,6 +104,10 @@ export class LayoutComponent extends Component {
                             <span className="ant-divider"/>
                             <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
                             <span className="ant-divider"/>
+                            <Popconfirm title="是否重置?" onConfirm={() => this.resetPwd(record.id)}>
+                                <a href="#">重置密码</a>
+                            </Popconfirm>
+                            <span className="ant-divider"/>
                             <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
                                 <a href="#">删除</a>
                             </Popconfirm>
@@ -114,6 +119,10 @@ export class LayoutComponent extends Component {
                             <a className="font-weight" onClick={() => this.handleUpdateState(record.id, 1)}>启用</a>
                             <span className="ant-divider"/>
                             <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
+                            <span className="ant-divider"/>
+                            <Popconfirm title="是否重置?" onConfirm={() => this.resetPwd(record.id)}>
+                                <a href="#">重置密码</a>
+                            </Popconfirm>
                             <span className="ant-divider"/>
                             <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
                                 <a href="#">删除</a>
@@ -136,6 +145,19 @@ export class LayoutComponent extends Component {
             }
         },
     ];
+
+    /**
+     * 重置密码
+     * @param id
+     */
+    resetPwd = (id)=> {
+        const loginpw = md5('123456');
+        promiseAjax.put(`cuser/${id}`, {loginpw}).then(rsp => {
+            if (rsp.success) {
+                message.success('重置成功', 3);
+            }
+        });
+    }
 
     /**
      * 编辑任务

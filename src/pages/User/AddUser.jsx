@@ -19,6 +19,7 @@ export class LayoutComponent extends Component {
         codeList: [],
         userInfo: {},
         isAdmin: true,
+        isUpdate: false,
     };
 
     componentWillMount() {
@@ -33,9 +34,9 @@ export class LayoutComponent extends Component {
         if (UserId != 'UserId') {
             promiseAjax.get(`/cuser/${UserId}`).then(rsp => {
                 if (rsp.data.roleCode === 'A0001') {
-                    this.setState({userInfo: rsp.data, isAdmin: false})
+                    this.setState({userInfo: rsp.data, isAdmin: false, isUpdate: true})
                 } else {
-                    this.setState({userInfo: rsp.data})
+                    this.setState({userInfo: rsp.data, isUpdate: true})
                 }
 
             })
@@ -61,7 +62,6 @@ export class LayoutComponent extends Component {
         const {form, form: {getFieldValue}} = this.props;
         form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-                values.loginpw = md5(values.loginpw);
                 const {params: {UserId}} = this.props;
                 if (UserId !== 'UserId') {
                     promiseAjax.put(`cuser/${UserId}`, values).then(rsp => {
@@ -71,6 +71,7 @@ export class LayoutComponent extends Component {
                         }
                     });
                 } else {
+                    values.loginpw = md5(values.loginpw);
                     promiseAjax.post(`cuser`, values).then(rsp => {
                         if (rsp.success) {
                             message.success('添加成功', 3);
@@ -134,7 +135,7 @@ export class LayoutComponent extends Component {
 
     render() {
         const {getFieldDecorator} = this.props.form;
-        const {userInfo} = this.state;
+        const {userInfo, isUpdate} = this.state;
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
@@ -179,7 +180,7 @@ export class LayoutComponent extends Component {
                                 <Input placeholder="请输入登录名"/>
                             )}
                         </FormItem>
-                        <FormItem
+                        {isUpdate ? null : <FormItem
                             {...formItemLayout}
                             label="登录密码"
                             hasFeedback>
@@ -189,7 +190,7 @@ export class LayoutComponent extends Component {
                             })(
                                 <Input type="password" placeholder="请输入登录密码"/>
                             )}
-                        </FormItem>
+                        </FormItem>}
                         <FormItem
                             {...formItemLayout}
                             label="昵称"
@@ -240,7 +241,7 @@ export class LayoutComponent extends Component {
                             )}
                         </FormItem>
                         {
-                           this.state.isAdmin ? <FormItem
+                            this.state.isAdmin ? <FormItem
                                 {...formItemLayout}
                                 label="角色组"
                                 hasFeedback>
