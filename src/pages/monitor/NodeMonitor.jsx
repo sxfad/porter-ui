@@ -2,7 +2,7 @@
  * Created by lhyin on 2018/11/4.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Row, Col, Modal} from 'antd';
+import {Form, Input, Button, Table, Row, Col, Modal, Popover} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import {promiseAjax} from 'sx-ui';
 import {formatDefaultTime} from '../common/getTime';
@@ -98,6 +98,23 @@ export class LayoutComponent extends Component {
             },
         },
         {
+            title: '异常信息',
+            render: (text, record) => {
+                if (record.healthLevelDesc === '' || record.healthLevelDesc === null) {
+                    return (
+                        <span className="text-gray">无</span>
+                    )
+                } else {
+                    return (
+                        <Popover content={this.content(record.healthLevelDesc)} title="异常详细信息" trigger="hover">
+                            <Button type="danger">查看异常</Button>
+                        </Popover>
+                    )
+                }
+
+            }
+        },
+        {
             title: '操作',
             render: (text, record) => {
                 return (
@@ -108,6 +125,16 @@ export class LayoutComponent extends Component {
             }
         },
     ];
+
+
+    content = (healthLevelDescStr) => {
+        return (
+            <div>
+                {healthLevelDescStr}
+                "等待批次ad169cd8-4427-4845-bc2e-43e6d0f846411524728884734SET完成超时(5m)，任务退出。"
+            </div>
+        );
+    }
 
     componentDidMount() {
         this.search();
