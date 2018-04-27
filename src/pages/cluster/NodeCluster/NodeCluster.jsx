@@ -96,7 +96,15 @@ export class LayoutComponent extends Component {
         {
             title: '操作',
             render: (text, record) => {
-                if (record.taskPushState.code === 'SUSPEND') {
+                if (record.state === -1) {
+                    return (
+                        <span>
+                            <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
+                              <a href="#">删除</a>
+                            </Popconfirm>
+                        </span>
+                    )
+                } else if (record.taskPushState.code === 'SUSPEND' && record.state === 1) {
                     return (
                         <span>
                             <a onClick={() => this.handlePush('WORKING', record.id)}>接收任务推送</a>
@@ -273,7 +281,7 @@ export class LayoutComponent extends Component {
     }
 
     handlePageSizeChange = (pageSize) => {
-        console.log('value',pageSize);
+        console.log('value', pageSize);
         this.setState({
             pageNum: 1,
         });
@@ -285,7 +293,7 @@ export class LayoutComponent extends Component {
     }
 
     handlePageNumChange = (value) => {
-        console.log('value',value);
+        console.log('value', value);
 
         const {pageSize} = this.state;
         this.setState({

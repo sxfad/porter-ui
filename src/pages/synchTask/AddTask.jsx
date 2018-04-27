@@ -2,7 +2,7 @@
  * Created by lhyin on 2018/13/3.
  */
 import React, {Component} from 'react';
-import {Form, Input, Steps, Select, Button, message, Modal, Col} from 'antd';
+import {Form, Input, Steps, Select, Button, message, Modal, Col, Row} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import * as promiseAjax from 'sx-ui/utils/promise-ajax';
 import {session} from 'sx-ui/utils/storage';
@@ -632,7 +632,6 @@ export class LayoutComponent extends Component {
                         </Select>
                     )}
                 </FormItem>
-
                 <FormItem
                     {...formItemLayout}
                     label="目标数据表组"
@@ -662,23 +661,28 @@ export class LayoutComponent extends Component {
                     {stepsHtml}
                 </div>
                 <div className="steps-action">
-                    {
-                        this.state.current < steps.length - 1
-                        &&
-                        <Button type="primary" onClick={() => this.next()}>Next</Button>
-                    }
-                    {
-                        this.state.current === steps.length - 1
-                        &&
-                        <Button type="primary" onClick={() => this.allSubmit()}>提交</Button>
-                    }
-                    {
-                        this.state.current > 0
-                        &&
-                        <Button style={{ marginLeft: 8 }} onClick={() => this.prev()}>
-                            Previous
-                        </Button>
-                    }
+                    <Row>
+                        <Col span={5}></Col>
+                        <Col span={15}>
+                            {
+                                this.state.current < steps.length - 1
+                                &&
+                                <Button type="primary" onClick={() => this.next()}>下一步</Button>
+                            }
+                            {
+                                this.state.current === steps.length - 1
+                                &&
+                                <Button type="primary" onClick={() => this.allSubmit()}>提交</Button>
+                            }
+                            {
+                                this.state.current > 0
+                                &&
+                                <Button style={{ marginLeft: 8 }} onClick={() => this.prev()}>
+                                    上一步
+                                </Button>
+                            }
+                        </Col>
+                    </Row>
                 </div>
                 {
                     dataTableVisible ? <Modal
