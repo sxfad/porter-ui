@@ -17,7 +17,7 @@ const FormItem = Form.Item;
 export class LayoutComponent extends Component {
     state = {
         pageNum: 1,
-        pageSize: 8,
+        pageSize: 10,
         total: 0,
         startTimeStr: '', //开始时间
         endTimeStr: '',   //结束时间(默认当前时间)
@@ -86,7 +86,7 @@ export class LayoutComponent extends Component {
         this.search();
     }
 
-    search = () => {
+    search = (args) => {
         const {form: {getFieldValue}} = this.props;
         let jobName = getFieldValue('jobName');
         let times = getFieldValue('times');
@@ -104,7 +104,8 @@ export class LayoutComponent extends Component {
             pageSize,
             beginTime: startTimeStr,
             endTime: endTimeStr,
-            jobState: 'WORKING'
+            jobState: 'WORKING',
+            ...args,
         };
         this.setState({
             tabLoading: true,

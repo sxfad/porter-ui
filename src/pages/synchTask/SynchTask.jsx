@@ -214,7 +214,7 @@ export class LayoutComponent extends Component {
         this.search();
     }
 
-    search = () => {
+    search = (args) => {
         const {form: {getFieldValue}} = this.props;
         let jobName = getFieldValue('jobName');
         let times = getFieldValue('times');
@@ -235,6 +235,7 @@ export class LayoutComponent extends Component {
             pageSize,
             beginTime: startTimeStr,
             endTime: endTimeStr,
+            ...args,
         };
         this.setState({
             tabLoading: true,
