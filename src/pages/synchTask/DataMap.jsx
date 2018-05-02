@@ -31,15 +31,6 @@ export class LayoutComponent extends Component {
 
     Columns = [
         {
-            title: '序号',
-            render: (text, record) => {
-                return (
-                    record.id + 1
-                );
-            },
-
-        },
-        {
             title: '源表名',
             render: (text, record) => {
                 return (
