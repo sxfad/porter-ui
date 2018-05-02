@@ -1,7 +1,7 @@
 export default  {
-	'production': '/api',
+	'production': '/api/manager',
 	'test': 'http://172.16.154.5:8080/api/manager',
-	'rc': '/api',
+	'rc': '/api/manager',
 	'dev': 'http://172.16.135.30:8080/api/manager'
 }
 
