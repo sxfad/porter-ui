@@ -50,7 +50,7 @@ class Login extends Component {
             if (!err) {
                 const {username, password} = values;
                 this.setState({loading: true, errorMessage: ''});
-                promiseAjax.post('/login?LoginName=' + username + '&passwd=' + md5(password)).then(res => {
+                promiseAjax.post('/login?loginName=' + username + '&passwd=' + md5(password)).then(res => {
                     console.log('登录了');
                     if (res.success) {
                         promiseAjax.init({
