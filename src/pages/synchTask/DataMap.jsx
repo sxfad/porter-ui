@@ -340,7 +340,8 @@ export class LayoutComponent extends Component {
             tableItem.targetTableName = targetTableName;
             tablesName.sourceTableName = sourceTableName;
             tablesName.targetTableName = targetTableName;
-            tablesName.id = tablesNameList.length;
+            // tablesName.id = tablesNameList.length;
+            tablesName.id = sourceTableName + '_' + targetTableName;
             tables.push(tableItem);
             tablesNameList.push(tablesName);
             console.log('tables', tables);
