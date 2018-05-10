@@ -97,7 +97,7 @@ export class LayoutComponent extends Component {
                 plugins.map((k, index) => {
                     formItemsHtml.push(
                         <Row key={plugins[index].fieldCode}>
-                            <Col span={3} style={labelStyle1}>
+                            <Col span={5} style={labelStyle1}>
                                 {plugins[index].fieldName}：
                             </Col>
                             <Col span={18}>
@@ -117,7 +117,7 @@ export class LayoutComponent extends Component {
                 plugins2.map((k, index) => {
                     sourceDbaHtml.push(
                         <Row key={plugins2[index].fieldCode}>
-                            <Col span={3} style={labelStyle1}>
+                            <Col span={5} style={labelStyle1}>
                                 {plugins2[index].fieldName}：
                             </Col>
                             <Col span={18}>
@@ -137,7 +137,7 @@ export class LayoutComponent extends Component {
                 plugins3.map((k, index) => {
                     targetDbaHtml.push(
                         <Row key={plugins3[index].fieldCode}>
-                            <Col span={3} style={labelStyle1}>
+                            <Col span={5} style={labelStyle1}>
                                 {plugins3[index].fieldName}：
                             </Col>
                             <Col span={18}>
@@ -200,12 +200,19 @@ export class LayoutComponent extends Component {
                                     元数据源名称：
                                 </Col>
                                 <Col span={9}>
-                                    {taskData.sourceDataSourceDba.name && taskData.sourceDataSourceDba.name}
+                                    {taskData.sourceDataSourceDba && taskData.sourceDataSourceDba.name}
                                 </Col>
                             </Row>
                             <Row>
                                 <Col span={3} style={labelStyle}>
                                     元数据源详情：
+                                </Col>
+                                <Col span={9}>
+
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={3} style={labelStyle}>
                                 </Col>
                                 <Col span={9}>
                                     {sourceDbaHtml}
@@ -232,10 +239,15 @@ export class LayoutComponent extends Component {
                                     同步数据源详情：
                                 </Col>
                                 <Col span={9}>
-                                    {formItemsHtml}
                                 </Col>
                             </Row>
-
+                            <Row>
+                                <Col span={3} style={labelStyle}>
+                                </Col>
+                                <Col span={9}>
+                                    {sourceDbaHtml}
+                                </Col>
+                            </Row>
                             <Row>
                                 <Col span={3} style={labelStyle}>
                                     载入插件：
@@ -249,12 +261,18 @@ export class LayoutComponent extends Component {
                                     目标数据源名称：
                                 </Col>
                                 <Col span={9}>
-                                    {taskData.targetDataSourceDba.name && taskData.targetDataSourceDba.name}
+                                    {taskData.targetDataSourceDba && taskData.targetDataSourceDba.name}
                                 </Col>
                             </Row>
                             <Row>
                                 <Col span={3} style={labelStyle}>
                                     目标数据源详情：
+                                </Col>
+                                <Col span={9}>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={3} style={labelStyle}>
                                 </Col>
                                 <Col span={9}>
                                     {targetDbaHtml}
