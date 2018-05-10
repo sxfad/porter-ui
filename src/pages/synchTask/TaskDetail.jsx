@@ -104,10 +104,50 @@ export class LayoutComponent extends Component {
                                 {plugins[index].fieldValue}
                             </Col>
                         </Row>
-                    )
+                    );
                 });
             }
-        }
+        };
+
+        var sourceDbaHtml = [];
+        console.log('taskData', taskData.id);
+        if (taskData.id !== undefined) {
+            var plugins2 = taskData.sourceDataSourceDba.plugins;
+            if (plugins2 != undefined) {
+                plugins2.map((k, index) => {
+                    sourceDbaHtml.push(
+                        <Row key={plugins2[index].fieldCode}>
+                            <Col span={3} style={labelStyle1}>
+                                {plugins2[index].fieldName}：
+                            </Col>
+                            <Col span={18}>
+                                {plugins2[index].fieldValue}
+                            </Col>
+                        </Row>
+                    );
+                });
+            }
+        };
+
+        var targetDbaHtml = [];
+        console.log('taskData', taskData.id);
+        if (taskData.id !== undefined) {
+            var plugins3 = taskData.targetDataSourceDba.plugins;
+            if (plugins3 != undefined) {
+                plugins3.map((k, index) => {
+                    targetDbaHtml.push(
+                        <Row key={plugins3[index].fieldCode}>
+                            <Col span={3} style={labelStyle1}>
+                                {plugins3[index].fieldName}：
+                            </Col>
+                            <Col span={18}>
+                                {plugins3[index].fieldValue}
+                            </Col>
+                        </Row>
+                    );
+                });
+            }
+        };
 
         return (
             <PageContent>
@@ -157,6 +197,22 @@ export class LayoutComponent extends Component {
                             </Row>
                             <Row>
                                 <Col span={3} style={labelStyle}>
+                                    元数据源名称：
+                                </Col>
+                                <Col span={9}>
+                                    {taskData.sourceDataSourceDba.name && taskData.sourceDataSourceDba.name}
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={3} style={labelStyle}>
+                                    元数据源详情：
+                                </Col>
+                                <Col span={9}>
+                                    {sourceDbaHtml}
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={3} style={labelStyle}>
                                     元数据表组：
                                 </Col>
                                 <Col span={9}>
@@ -165,7 +221,7 @@ export class LayoutComponent extends Component {
                             </Row>
                             <Row>
                                 <Col span={3} style={labelStyle}>
-                                    同步数据来源：
+                                    同步数据来源名称：
                                 </Col>
                                 <Col span={9}>
                                     {taskData.sourceDataName && taskData.sourceDataName}
@@ -173,7 +229,7 @@ export class LayoutComponent extends Component {
                             </Row>
                             <Row>
                                 <Col span={3} style={labelStyle}>
-                                    数据源详情：
+                                    同步数据源详情：
                                 </Col>
                                 <Col span={9}>
                                     {formItemsHtml}
@@ -186,6 +242,22 @@ export class LayoutComponent extends Component {
                                 </Col>
                                 <Col span={9}>
                                     {taskData.targetLoadAdt && taskData.targetLoadAdt.name}
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={3} style={labelStyle}>
+                                    目标数据源名称：
+                                </Col>
+                                <Col span={9}>
+                                    {taskData.targetDataSourceDba.name && taskData.targetDataSourceDba.name}
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={3} style={labelStyle}>
+                                    目标数据源详情：
+                                </Col>
+                                <Col span={9}>
+                                    {targetDbaHtml}
                                 </Col>
                             </Row>
                             <Row>
