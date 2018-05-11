@@ -157,7 +157,7 @@ export class LayoutComponent extends Component {
                         hasFeedback
                     >
                         {getFieldDecorator(`${fieldType[index].fieldCode}--${fieldType[index].fieldName}`, {
-                            rules: [{required: true, message: '请输入' + fieldType[index].fieldName}],
+                            rules: [{required: true, message: '请输入' + fieldType[index].fieldName+' '+ fieldType[index].fieldExplain }],
                         })(
                             <Input style={{ width: '60%', marginRight: 8 }}/>
                         )}
