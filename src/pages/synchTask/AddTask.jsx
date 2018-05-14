@@ -216,6 +216,8 @@ export class LayoutComponent extends Component {
                     allJson.jobState = rsp.data.jobState.code;
                     allJson.nodeIds = rsp.data.nodeIds;
                     allJson.jobName = rsp.data.jobName;
+                    allJson.javaClassName = rsp.data.javaClassName;
+                    allJson.javaClassContent = rsp.data.javaClassContent;
                     allJson.sourceConsumeAdt = rsp.data.sourceConsumeAdtName;
                     allJson.sourceConvertAdt = rsp.data.sourceConvertAdtName;
                     // allJson.sourceConsumeAdtName = rsp.data.sourceConsumeAdtName;
@@ -544,6 +546,28 @@ export class LayoutComponent extends Component {
                         >
                             {this.renderUserList()}
                         </Select>
+                    )}
+                </FormItem>
+                <FormItem
+                    {...formItemLayout}
+                    label="自定义处理类全名"
+                    hasFeedback
+                >
+                    {getFieldDecorator('javaClassName', {
+                        initialValue: allData && allData.javaClassName
+                    })(
+                        <Input placeholder="自定义处理类全名" />
+                    )}
+                </FormItem>
+                <FormItem
+                    {...formItemLayout}
+                    label="自定义处理类文件路径"
+                    hasFeedback
+                >
+                    {getFieldDecorator('javaClassContent', {
+                        initialValue: allData && allData.javaClassContent
+                    })(
+                        <Input placeholder="请输入自定义处理类文件路径" />
                     )}
                 </FormItem>
             </Form>
