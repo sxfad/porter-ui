@@ -245,7 +245,7 @@ export class LayoutComponent extends Component {
                                 <Col span={3} style={labelStyle}>
                                 </Col>
                                 <Col span={9}>
-                                    {sourceDbaHtml}
+                                    {formItemsHtml}
                                 </Col>
                             </Row>
                             <Row>
