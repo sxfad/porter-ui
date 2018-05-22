@@ -32,6 +32,14 @@ export class LayoutComponent extends Component {
             render: (text, record, index) => (index + 1) + ((this.state.pageNum - 1) * this.state.pageSize),
         },
         {
+            title: '任务ID',
+            render: (text, record) => {
+                return (
+                    record.id
+                );
+            },
+        },
+        {
             title: '任务名称',
             render: (text, record) => {
                 return (
