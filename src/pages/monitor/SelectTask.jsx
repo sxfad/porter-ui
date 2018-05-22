@@ -50,25 +50,43 @@ export class LayoutComponent extends Component {
         {
             title: '来源数据-消费插件',
             render: (text, record) => {
-                return (
-                    record.sourceConsumeAdt.name
-                );
+                if(record.jobType === 2){
+                    return (
+                        '(空)'
+                    );
+                }else{
+                    return (
+                        record.sourceConsumeAdt.name
+                    );
+                }
             },
         },
         {
             title: '来源数据-消费转换插件',
             render: (text, record) => {
-                return (
-                    record.sourceConvertAdt.name
-                );
+                if(record.jobType === 2){
+                    return (
+                        '(空)'
+                    );
+                }else{
+                    return (
+                        record.sourceConvertAdt.name
+                    );
+                }
             },
         },
         {
             title: '目标数据-载入插件',
             render: (text, record) => {
-                return (
-                    record.targetLoadAdt.name
-                );
+                if(record.jobType === 2){
+                    return (
+                        '(空)'
+                    );
+                }else{
+                    return (
+                        record.targetLoadAdt.name
+                    );
+                }
             },
         },
         {
