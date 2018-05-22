@@ -110,7 +110,7 @@ export class LayoutComponent extends Component {
         this.setState({
             tabLoading: true,
         });
-        promiseAjax.get(`/jobtasks`, params).then(rsp => {
+        promiseAjax.get(`/jobtasks/page`, params).then(rsp => {
             if (rsp.success && rsp.data != undefined) {
                 this.setState({
                     pageNum: rsp.data.pageNo,
