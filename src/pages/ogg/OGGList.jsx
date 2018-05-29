@@ -44,7 +44,7 @@ export class LayoutComponent extends Component {
             title: '表名称',
             render: (text, record) => {
                 return (
-                    record.tableName
+                    record.tableValue
                 );
             },
         },
