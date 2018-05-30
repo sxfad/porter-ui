@@ -47,10 +47,10 @@ export class LayoutComponent extends Component {
             fontWeight: 'bold',
         };
 
-        const expandedRowRender = (id) => {
+        const expandedRowRender = (sourceTableName, targetTableName) => {
             let dataColumn = [];
             for (let i = 0; i < taskInfo.tables.length; i++) {
-                if (taskInfo.tables[i].id === id) {
+                if (taskInfo.tables[i].sourceTableName === sourceTableName && taskInfo.tables[i].targetTableName === targetTableName) {
                     dataColumn = taskInfo.tables[i].fields;
                 }
             }
@@ -137,7 +137,7 @@ export class LayoutComponent extends Component {
                             rowKey={(record) => record.sourceTableName}
                             columns={this.Columns}
                             dataSource={taskInfo.tables}
-                            expandedRowRender={(record) => expandedRowRender(record.id)}
+                            expandedRowRender={(record) => expandedRowRender(record.sourceTableName, record.targetTableName)}
                             pagination={false}
                         />
                     </Col>

@@ -2,7 +2,7 @@
  * Created by lhyin on 2018/14/3.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Radio, Select, message, Modal, Row, Col, Table} from 'antd';
+import {Form, Button, Radio, Select, message, Row, Col, Table, Checkbox} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import * as promiseAjax from 'sx-ui/utils/promise-ajax';
 import {session} from 'sx-ui/utils/storage';
@@ -26,7 +26,10 @@ export class LayoutComponent extends Component {
         tables: [],
         tablesNameList: [],
         selectedDataTable: [],
-        selectedTargetDataTable: []
+        selectedTargetDataTable: [],
+        ignoreTargetCase: false,
+        forceMatched: false,
+        directMapTable: false,
     };
 
     Columns = [
@@ -45,6 +48,51 @@ export class LayoutComponent extends Component {
                 return (
                     record.targetTableName
                 );
+            },
+
+        },
+        {
+            title: '忽略目标端大小写',
+            render: (text, record) => {
+                if (record.ignoreTargetCase) {
+                    return (
+                        '是'
+                    );
+                } else {
+                    return (
+                        '否'
+                    )
+                }
+            },
+
+        },
+        {
+            title: '目标端字段和源端字段一致',
+            render: (text, record) => {
+                if (record.forceMatched) {
+                    return (
+                        '是'
+                    );
+                } else {
+                    return (
+                        '否'
+                    )
+                }
+            },
+
+        },
+        {
+            title: '直接映射表',
+            render: (text, record) => {
+                if (record.directMapTable) {
+                    return (
+                        '是'
+                    );
+                } else {
+                    return (
+                        '否'
+                    )
+                }
             },
 
         },
@@ -195,6 +243,9 @@ export class LayoutComponent extends Component {
                 const tablesNameListItem = {};
                 tablesNameListItem.sourceTableName = parentTables[i].sourceTableName;
                 tablesNameListItem.targetTableName = parentTables[i].targetTableName;
+                tablesNameListItem.ignoreTargetCase = parentTables[i].ignoreTargetCase;
+                tablesNameListItem.forceMatched = parentTables[i].forceMatched;
+                tablesNameListItem.directMapTable = parentTables[i].directMapTable;
                 tablesNameListItem.id = i + 1;
                 tablesNameList.push(tablesNameListItem);
             }
@@ -293,7 +344,7 @@ export class LayoutComponent extends Component {
      */
     handleSave = () => {
         const {form:{setFieldsValue}} =this.props;
-        const {sourceTableName, targetTableName, leftSelectedRow, rightSelectedRow, tables, tablesNameList}= this.state;
+        const {sourceTableName, targetTableName, leftSelectedRow, rightSelectedRow, tables, tablesNameList, directMapTable}= this.state;
         let flag = true;
 
         if (tablesNameList.length > 0) {
@@ -307,7 +358,7 @@ export class LayoutComponent extends Component {
 
         if (leftSelectedRow === '' || targetTableName === '') {
             message.warning('请选择源表或目标表', 3);
-        } else if (leftSelectedRow.length === 0 || rightSelectedRow.length === 0) {
+        } else if ((leftSelectedRow.length === 0 || rightSelectedRow.length === 0) && !this.state.directMapTable) {
             message.warning('请选择表字段', 3);
         } else if (leftSelectedRow.length != rightSelectedRow.length) {
             message.warning('映射字段信息有误,请检查', 3);
@@ -326,11 +377,17 @@ export class LayoutComponent extends Component {
                 fieldsItem.targetTableField = rightSelectedRow[i].name;
                 fields.push(fieldsItem);
             }
-            tableItem.fields = fields;
+            tableItem.fields = directMapTable ? [] : fields;
             tableItem.sourceTableName = sourceTableName;
             tableItem.targetTableName = targetTableName;
+            tableItem.ignoreTargetCase = this.state.ignoreTargetCase;
+            tableItem.forceMatched = this.state.forceMatched;
+            tableItem.directMapTable = this.state.directMapTable;
             tablesName.sourceTableName = sourceTableName;
             tablesName.targetTableName = targetTableName;
+            tablesName.ignoreTargetCase = this.state.ignoreTargetCase;
+            tablesName.forceMatched = this.state.forceMatched;
+            tablesName.directMapTable = this.state.directMapTable;
             // tablesName.id = tablesNameList.length;
             tablesName.id = sourceTableName + '_' + targetTableName;
             tables.push(tableItem);
@@ -356,6 +413,42 @@ export class LayoutComponent extends Component {
             this.props.saveDataMap(tables);
         }
     };
+
+    /**
+     * 忽略目标端大小写
+     * @param e
+     */
+    onIgnoreChange = (e) => {
+        if (e.target.checked) {
+            this.setState({ignoreTargetCase: true});
+        } else {
+            this.setState({ignoreTargetCase: false});
+        }
+    }
+
+    /**
+     * 强制目标端字段和源端字段一致(针对目标表来说)
+     * @param e
+     */
+    onMatchedChange = (e) => {
+        if (e.target.checked) {
+            this.setState({forceMatched: true});
+        } else {
+            this.setState({forceMatched: false});
+        }
+    }
+
+    /**
+     * 直接映射表，不进行表字段映射配置 默认false
+     * @param e
+     */
+    onDirectMapChange = (e) => {
+        if (e.target.checked) {
+            this.setState({directMapTable: true});
+        } else {
+            this.setState({directMapTable: false});
+        }
+    }
 
     render() {
         const {getFieldDecorator} = this.props.form;
@@ -515,22 +608,26 @@ export class LayoutComponent extends Component {
                                         )}
                                     </FormItem>
                                 </Col>
-                                <Col span={24} className="table-height">
-                                    <Table
-                                        rowSelection={rowSelectionLeft}
-                                        size="middle"
-                                        rowKey={(record) => record.name}
-                                        columns={this.TableDataColumns}
-                                        dataSource={leftTableData}
-                                        pagination={false}
-                                    />
-                                </Col>
+                                {
+                                    !this.state.directMapTable ? <Col span={24} className="table-height">
+                                        <Table
+                                            rowSelection={rowSelectionLeft}
+                                            size="middle"
+                                            rowKey={(record) => record.name}
+                                            columns={this.TableDataColumns}
+                                            dataSource={leftTableData}
+                                            pagination={false}
+                                        />
+                                    </Col> : null
+                                }
                             </Row>
-                            <Row>
-                                <Col span={24} className="fa-down">
-                                    <FontIcon type="fa-arrow-down"/>
-                                </Col>
-                            </Row>
+                            {
+                                !this.state.directMapTable ? <Row>
+                                    <Col span={24} className="fa-down">
+                                        <FontIcon type="fa-arrow-down"/>
+                                    </Col>
+                                </Row> : null
+                            }
                         </Col>
                         <Col span={12} className="table-item">
                             <Row>
@@ -551,50 +648,66 @@ export class LayoutComponent extends Component {
                                         )}
                                     </FormItem>
                                 </Col>
-                                <Col span={24} className="table-height">
-                                    <Table
-                                        rowSelection={rowSelectionRight}
-                                        size="middle"
-                                        rowKey={(record) => record.name}
-                                        columns={this.TableDataColumns}
-                                        dataSource={rightTableData}
-                                        pagination={false}
-                                    />
-                                </Col>
+                                {
+                                    !this.state.directMapTable ? <Col span={24} className="table-height">
+                                        <Table
+                                            rowSelection={rowSelectionRight}
+                                            size="middle"
+                                            rowKey={(record) => record.name}
+                                            columns={this.TableDataColumns}
+                                            dataSource={rightTableData}
+                                            pagination={false}
+                                        />
+                                    </Col> : null
+                                }
+
                             </Row>
-                            <Row>
-                                <Col span={24} className="fa-down">
-                                    <FontIcon type="fa-arrow-down"/>
-                                </Col>
-                            </Row>
+                            {
+                                !this.state.directMapTable ? <Row>
+                                    <Col span={24} className="fa-down">
+                                        <FontIcon type="fa-arrow-down"/>
+                                    </Col>
+                                </Row> : null
+                            }
                         </Col>
                     </Row>
+                    {
+                        !this.state.directMapTable ? <Row>
+                            <Col span={12} className="table-item">
+                                <Row>
+                                    <Col span={24} className="table-height">
+                                        <Table
+                                            size="middle"
+                                            rowKey={(record) => record.name}
+                                            columns={this.LeftSelectedTableDataColumns}
+                                            dataSource={leftSelectedRow}
+                                            pagination={false}
+                                        />
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col span={12} className="table-item">
+                                <Row>
+                                    <Col span={24} className="table-height">
+                                        <Table
+                                            size="middle"
+                                            rowKey={(record) => record.name}
+                                            columns={this.RightSelectedTableDataColumns}
+                                            dataSource={rightSelectedRow}
+                                            pagination={false}
+                                        />
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row> : null
+                    }
                     <Row>
-                        <Col span={12} className="table-item">
-                            <Row>
-                                <Col span={24} className="table-height">
-                                    <Table
-                                        size="middle"
-                                        rowKey={(record) => record.name}
-                                        columns={this.LeftSelectedTableDataColumns}
-                                        dataSource={leftSelectedRow}
-                                        pagination={false}
-                                    />
-                                </Col>
-                            </Row>
-                        </Col>
-                        <Col span={12} className="table-item">
-                            <Row>
-                                <Col span={24} className="table-height">
-                                    <Table
-                                        size="middle"
-                                        rowKey={(record) => record.name}
-                                        columns={this.RightSelectedTableDataColumns}
-                                        dataSource={rightSelectedRow}
-                                        pagination={false}
-                                    />
-                                </Col>
-                            </Row>
+                        <Col span={24} style={{padding: 15}}>
+                            <Checkbox style={{marginRight: 20}} defaultChecked={this.state.ignoreTargetCase}
+                                      onChange={this.onIgnoreChange}>忽略目标端大小写</Checkbox>
+                            <Checkbox style={{marginRight: 20}} defaultChecked={this.state.forceMatched}
+                                      onChange={this.onMatchedChange}>强制目标端字段和源端字段一致</Checkbox>
+                            <Checkbox defaultChecked={this.state.directMapTable} onChange={this.onDirectMapChange}>直接映射表，不进行表字段映射配置</Checkbox>
                         </Col>
                     </Row>
                     <Row>

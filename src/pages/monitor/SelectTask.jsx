@@ -2,7 +2,7 @@
  * Created by lhyin on 2018/20/3.
  */
 import React, {Component} from 'react';
-import {Form, Table, Row, Col, Input, Button, DatePicker} from 'antd';
+import {Form, Table, Row, Col, Input, Button, DatePicker, Select} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import {promiseAjax} from 'sx-ui';
 import {formatDefaultTime} from '../common/getTime';
@@ -115,6 +115,7 @@ export class LayoutComponent extends Component {
     search = (args) => {
         const {form: {getFieldValue}} = this.props;
         let jobName = getFieldValue('jobName');
+        let jobType = getFieldValue('jobType');
         let times = getFieldValue('times');
         let endTimeStr = '',
             startTimeStr = '';
@@ -126,6 +127,7 @@ export class LayoutComponent extends Component {
 
         let params = {
             jobName,
+            jobType,
             pageNo: pageNum,
             pageSize,
             beginTime: startTimeStr,
@@ -259,7 +261,20 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
+                            <Col {...queryItemLayout}>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label="任务类型">
+                                    {getFieldDecorator('jobType')(
+                                        <Select placeholder="请选择任务类型">
+                                            <Select.Option key="0" value="">全部</Select.Option>
+                                            <Select.Option key="1" value="1">正常任务</Select.Option>
+                                            <Select.Option key="2" value="2">抓取任务</Select.Option>
+                                        </Select>
+                                    )}
+                                </FormItem>
+                            </Col>
+                            <Col span={7}>
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
                                     {getFieldDecorator('times', {
@@ -275,7 +290,7 @@ export class LayoutComponent extends Component {
 
                                 </FormItem>
                             </Col>
-                            <Col span={7} style={{textAlign:'right'}}>
+                            <Col span={5} style={{textAlign:'right'}}>
                                 <FormItem
                                     label=""
                                     colon={false}>

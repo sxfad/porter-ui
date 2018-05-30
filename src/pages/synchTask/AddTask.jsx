@@ -210,6 +210,9 @@ export class LayoutComponent extends Component {
                         tableItem.fields = fields;
                         tableItem.sourceTableName = rsp.data.tables[i].sourceTableName;
                         tableItem.targetTableName = rsp.data.tables[i].targetTableName;
+                        tableItem.ignoreTargetCase = rsp.data.tables[i].ignoreTargetCase;
+                        tableItem.forceMatched = rsp.data.tables[i].forceMatched;
+                        tableItem.directMapTable = rsp.data.tables[i].directMapTable;
                         tables.push(tableItem);
                     }
                     allJson.id = rsp.data.id;
