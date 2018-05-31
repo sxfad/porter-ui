@@ -608,6 +608,43 @@ export class LayoutComponent extends Component {
                                         )}
                                     </FormItem>
                                 </Col>
+                            </Row>
+                        </Col>
+                        <Col span={12} className="table-item">
+                            <Row>
+                                <Col span={24}>
+                                    <FormItem
+                                        {...formItemLayout}
+                                        label="目标表"
+                                        hasFeedback
+                                    >
+                                        {getFieldDecorator('targetTableName')(
+                                            <Select
+                                                style={{ width: '100%' }}
+                                                placeholder="请选择目标表"
+                                                onChange={this.handleTargetTableChange}
+                                            >
+                                                {this.renderTargetTableList()}
+                                            </Select>
+                                        )}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col span={24} style={{padding: 15, paddingTop: 0}}>
+                            <Checkbox style={{marginRight: 20}} defaultChecked={this.state.ignoreTargetCase}
+                                      onChange={this.onIgnoreChange}>忽略目标端大小写</Checkbox>
+                            <Checkbox style={{marginRight: 20}} defaultChecked={this.state.forceMatched}
+                                      onChange={this.onMatchedChange}>强制目标端字段和源端字段一致</Checkbox>
+                            <Checkbox defaultChecked={this.state.directMapTable} onChange={this.onDirectMapChange}>直接映射表，不进行表字段映射配置</Checkbox>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col span={12} className="table-item">
+                            <Row>
                                 {
                                     !this.state.directMapTable ? <Col span={24} className="table-height">
                                         <Table
@@ -631,23 +668,6 @@ export class LayoutComponent extends Component {
                         </Col>
                         <Col span={12} className="table-item">
                             <Row>
-                                <Col span={24}>
-                                    <FormItem
-                                        {...formItemLayout}
-                                        label="目标表"
-                                        hasFeedback
-                                    >
-                                        {getFieldDecorator('targetTableName')(
-                                            <Select
-                                                style={{ width: '100%' }}
-                                                placeholder="请选择目标表"
-                                                onChange={this.handleTargetTableChange}
-                                            >
-                                                {this.renderTargetTableList()}
-                                            </Select>
-                                        )}
-                                    </FormItem>
-                                </Col>
                                 {
                                     !this.state.directMapTable ? <Col span={24} className="table-height">
                                         <Table
@@ -701,15 +721,6 @@ export class LayoutComponent extends Component {
                             </Col>
                         </Row> : null
                     }
-                    <Row>
-                        <Col span={24} style={{padding: 15}}>
-                            <Checkbox style={{marginRight: 20}} defaultChecked={this.state.ignoreTargetCase}
-                                      onChange={this.onIgnoreChange}>忽略目标端大小写</Checkbox>
-                            <Checkbox style={{marginRight: 20}} defaultChecked={this.state.forceMatched}
-                                      onChange={this.onMatchedChange}>强制目标端字段和源端字段一致</Checkbox>
-                            <Checkbox defaultChecked={this.state.directMapTable} onChange={this.onDirectMapChange}>直接映射表，不进行表字段映射配置</Checkbox>
-                        </Col>
-                    </Row>
                     <Row>
                         <Col span={24}>
                             <Button type="primary" onClick={() => this.handleSave()}
