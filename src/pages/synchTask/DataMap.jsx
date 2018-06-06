@@ -30,6 +30,8 @@ export class LayoutComponent extends Component {
         ignoreTargetCase: false,
         forceMatched: false,
         directMapTable: false,
+        forceMatchedDisabled: false,
+        directMapTableDisabled: false,
     };
 
     Columns = [
@@ -304,6 +306,11 @@ export class LayoutComponent extends Component {
                 this.setState({
                     leftTableData: newData,
                     sourceTableName: value,
+                    ignoreTargetCase: false,
+                    forceMatched: false,
+                    directMapTable: false,
+                    forceMatchedDisabled: false,
+                    directMapTableDisabled: false,
                 });
             }
         }).finally(() => {
@@ -333,6 +340,11 @@ export class LayoutComponent extends Component {
                 this.setState({
                     rightTableData: newData,
                     targetTableName: value,
+                    ignoreTargetCase: false,
+                    forceMatched: false,
+                    directMapTable: false,
+                    forceMatchedDisabled: false,
+                    directMapTableDisabled: false,
                 });
             }
         }).finally(() => {
@@ -344,8 +356,9 @@ export class LayoutComponent extends Component {
      */
     handleSave = () => {
         const {form:{setFieldsValue}} =this.props;
-        const {sourceTableName, targetTableName, leftSelectedRow, rightSelectedRow, tables, tablesNameList, directMapTable}= this.state;
+        const {sourceTableName, targetTableName, leftSelectedRow, rightSelectedRow, tables, tablesNameList, directMapTable, forceMatched, leftTableData, rightTableData}= this.state;
         let flag = true;
+        let forceFlag = true;
 
         if (tablesNameList.length > 0) {
             for (let i = 0; i < tablesNameList.length; i++) {
@@ -353,6 +366,12 @@ export class LayoutComponent extends Component {
                     flag = false;
                     break;
                 }
+            }
+        }
+
+        if (forceMatched) {
+            if (leftSelectedRow.length != leftTableData.length || rightSelectedRow.length != rightTableData.length) {
+                forceFlag = false;
             }
         }
 
@@ -364,6 +383,8 @@ export class LayoutComponent extends Component {
             message.warning('映射字段信息有误,请检查', 3);
         } else if (flag === false) {
             message.warning('请勿重复添加表映射关系', 3);
+        } else if (forceFlag === false) {
+            message.warning('强制目标端字段和源端字段一致时,需要全选表字段', 3);
         } else {
             const tableItem = {};
             const fields = [];
@@ -405,6 +426,11 @@ export class LayoutComponent extends Component {
                 rightTableData: [],
                 rightSelectedRowKeys: [],
                 rightSelectedRow: [],
+                ignoreTargetCase: false,
+                forceMatched: false,
+                directMapTable: false,
+                forceMatchedDisabled: false,
+                directMapTableDisabled: false,
             });
             setFieldsValue({sourceTableName: ''});
             setFieldsValue({targetTableName: ''});
@@ -431,10 +457,40 @@ export class LayoutComponent extends Component {
      * @param e
      */
     onMatchedChange = (e) => {
+        const {leftTableData, rightTableData} = this.state;
+        let newLeftTableData = [...leftTableData];
+        let newRightTableData = [...rightTableData];
         if (e.target.checked) {
-            this.setState({forceMatched: true});
+            let leftCheckedList = [],
+                rightCheckedList = [];
+            if (newLeftTableData.length > 0) {
+                newLeftTableData.map(item => {
+                    leftCheckedList.push(item.name);
+                });
+            }
+            if (newRightTableData.length > 0) {
+                newRightTableData.map(item => {
+                    rightCheckedList.push(item.name);
+                });
+            }
+            this.setState({
+                forceMatched: true,
+                directMapTable: false,
+                directMapTableDisabled: true,
+                selectedRowKeys: leftCheckedList,
+                rightSelectedRowKeys: rightCheckedList,
+                leftSelectedRow: newLeftTableData,
+                rightSelectedRow: newRightTableData,
+            });
         } else {
-            this.setState({forceMatched: false});
+            this.setState({
+                forceMatched: false,
+                directMapTableDisabled: false,
+                selectedRowKeys: [],
+                rightSelectedRowKeys: [],
+                leftSelectedRow: [],
+                rightSelectedRow: [],
+            });
         }
     }
 
@@ -444,9 +500,9 @@ export class LayoutComponent extends Component {
      */
     onDirectMapChange = (e) => {
         if (e.target.checked) {
-            this.setState({directMapTable: true});
+            this.setState({directMapTable: true, forceMatched: false, forceMatchedDisabled: true});
         } else {
-            this.setState({directMapTable: false});
+            this.setState({directMapTable: false, forceMatchedDisabled: false});
         }
     }
 
@@ -463,6 +519,9 @@ export class LayoutComponent extends Component {
                 sm: {span: 15},
             },
         };
+
+        console.log('leftTableData', leftTableData);
+
         const rowSelectionLeft = {
             selectedRowKeys,
             onSelect: (record, selected, selectedRows) => {
@@ -635,11 +694,15 @@ export class LayoutComponent extends Component {
                     </Row>
                     <Row>
                         <Col span={24} style={{padding: 15, paddingTop: 0}}>
-                            <Checkbox style={{marginRight: 20}} defaultChecked={this.state.ignoreTargetCase}
+                            <Checkbox style={{marginRight: 20}} checked={this.state.ignoreTargetCase}
+                                      defaultChecked={this.state.ignoreTargetCase}
                                       onChange={this.onIgnoreChange}>忽略目标端大小写</Checkbox>
-                            <Checkbox style={{marginRight: 20}} defaultChecked={this.state.forceMatched}
-                                      onChange={this.onMatchedChange}>强制目标端字段和源端字段一致</Checkbox>
-                            <Checkbox defaultChecked={this.state.directMapTable} onChange={this.onDirectMapChange}>直接映射表，不进行表字段映射配置</Checkbox>
+                            <Checkbox style={{marginRight: 20}} checked={this.state.forceMatched}
+                                      defaultChecked={this.state.forceMatched}
+                                      onChange={this.onMatchedChange}
+                                      disabled={this.state.forceMatchedDisabled}>强制目标端字段和源端字段一致</Checkbox>
+                            <Checkbox defaultChecked={this.state.directMapTable} checked={this.state.directMapTable}
+                                      onChange={this.onDirectMapChange} disabled={this.state.directMapTableDisabled}>直接映射表，不进行表字段映射配置</Checkbox>
                         </Col>
                     </Row>
                     <Row>
