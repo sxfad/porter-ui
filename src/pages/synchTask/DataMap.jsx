@@ -33,6 +33,8 @@ export class LayoutComponent extends Component {
         ignoreTargetCaseDisabled: true,
         forceMatchedDisabled: true,
         directMapTableDisabled: true,
+        sourceFieldLength: 0,
+        targetFieldLength: 0,
     };
 
     Columns = [
@@ -303,6 +305,7 @@ export class LayoutComponent extends Component {
                     dataItem.name = data[k];
                     newData.push(dataItem);
                 }
+                this.setState({sourceFieldLength: newData.length});
                 console.log(newData);
                 if (targetTableName === '') {
                     this.setState({
@@ -318,18 +321,34 @@ export class LayoutComponent extends Component {
                         directMapTableDisabled: true,
                     });
                 } else {
-                    this.setState({
-                        leftTableData: newData,
-                        sourceTableName: value,
-                        leftSelectedRow: [],
-                        selectedRowKeys: [],
-                        ignoreTargetCase: false,
-                        forceMatched: false,
-                        directMapTable: false,
-                        ignoreTargetCaseDisabled: false,
-                        forceMatchedDisabled: false,
-                        directMapTableDisabled: false,
-                    });
+                    if(this.state.sourceFieldLength === this.state.targetFieldLength){
+                        this.setState({
+                            leftTableData: newData,
+                            sourceTableName: value,
+                            leftSelectedRow: [],
+                            selectedRowKeys: [],
+                            ignoreTargetCase: false,
+                            forceMatched: false,
+                            directMapTable: false,
+                            ignoreTargetCaseDisabled: false,
+                            forceMatchedDisabled: false,
+                            directMapTableDisabled: false,
+                        });
+                    }else{
+                        this.setState({
+                            leftTableData: newData,
+                            sourceTableName: value,
+                            leftSelectedRow: [],
+                            selectedRowKeys: [],
+                            ignoreTargetCase: false,
+                            forceMatched: false,
+                            directMapTable: false,
+                            ignoreTargetCaseDisabled: false,
+                            forceMatchedDisabled: true,
+                            directMapTableDisabled: false,
+                        });
+                    }
+
                 }
 
             }
@@ -356,6 +375,7 @@ export class LayoutComponent extends Component {
                     dataItem.name = data[k];
                     newData.push(dataItem);
                 }
+                this.setState({targetFieldLength: newData.length});
                 console.log(newData);
                 if (sourceTableName === '') {
                     this.setState({
@@ -371,20 +391,34 @@ export class LayoutComponent extends Component {
                         directMapTableDisabled: true,
                     });
                 } else {
-                    this.setState({
-                        rightTableData: newData,
-                        targetTableName: value,
-                        rightSelectedRow: [],
-                        rightSelectedRowKeys: [],
-                        ignoreTargetCase: false,
-                        forceMatched: false,
-                        directMapTable: false,
-                        ignoreTargetCaseDisabled: false,
-                        forceMatchedDisabled: false,
-                        directMapTableDisabled: false,
-                    });
+                    if(this.state.sourceFieldLength === this.state.targetFieldLength){
+                        this.setState({
+                            rightTableData: newData,
+                            targetTableName: value,
+                            rightSelectedRow: [],
+                            rightSelectedRowKeys: [],
+                            ignoreTargetCase: false,
+                            forceMatched: false,
+                            directMapTable: false,
+                            ignoreTargetCaseDisabled: false,
+                            forceMatchedDisabled: false,
+                            directMapTableDisabled: false,
+                        });
+                    }else{
+                        this.setState({
+                            rightTableData: newData,
+                            targetTableName: value,
+                            rightSelectedRow: [],
+                            rightSelectedRowKeys: [],
+                            ignoreTargetCase: false,
+                            forceMatched: false,
+                            directMapTable: false,
+                            ignoreTargetCaseDisabled: false,
+                            forceMatchedDisabled: true,
+                            directMapTableDisabled: false,
+                        });
+                    }
                 }
-
             }
         }).finally(() => {
         });
