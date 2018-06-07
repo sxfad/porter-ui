@@ -30,8 +30,9 @@ export class LayoutComponent extends Component {
         ignoreTargetCase: false,
         forceMatched: false,
         directMapTable: false,
-        forceMatchedDisabled: false,
-        directMapTableDisabled: false,
+        ignoreTargetCaseDisabled: true,
+        forceMatchedDisabled: true,
+        directMapTableDisabled: true,
     };
 
     Columns = [
@@ -287,7 +288,7 @@ export class LayoutComponent extends Component {
      * 选择源表
      */
     handleTableChange = (value)=> {
-        const {selectedDataTable} =this.state;
+        const {selectedDataTable, targetTableName} =this.state;
         const params = {
             sourceId: selectedDataTable[0].sourceId,
             tablesId: selectedDataTable[0].id,
@@ -303,15 +304,34 @@ export class LayoutComponent extends Component {
                     newData.push(dataItem);
                 }
                 console.log(newData);
-                this.setState({
-                    leftTableData: newData,
-                    sourceTableName: value,
-                    ignoreTargetCase: false,
-                    forceMatched: false,
-                    directMapTable: false,
-                    forceMatchedDisabled: false,
-                    directMapTableDisabled: false,
-                });
+                if (targetTableName === '') {
+                    this.setState({
+                        leftTableData: newData,
+                        sourceTableName: value,
+                        leftSelectedRow: [],
+                        selectedRowKeys: [],
+                        ignoreTargetCase: false,
+                        forceMatched: false,
+                        directMapTable: false,
+                        ignoreTargetCaseDisabled: true,
+                        forceMatchedDisabled: true,
+                        directMapTableDisabled: true,
+                    });
+                } else {
+                    this.setState({
+                        leftTableData: newData,
+                        sourceTableName: value,
+                        leftSelectedRow: [],
+                        selectedRowKeys: [],
+                        ignoreTargetCase: false,
+                        forceMatched: false,
+                        directMapTable: false,
+                        ignoreTargetCaseDisabled: false,
+                        forceMatchedDisabled: false,
+                        directMapTableDisabled: false,
+                    });
+                }
+
             }
         }).finally(() => {
         });
@@ -321,7 +341,7 @@ export class LayoutComponent extends Component {
      * 选择目标表
      */
     handleTargetTableChange = (value)=> {
-        const {selectedTargetDataTable} =this.state;
+        const {selectedTargetDataTable, sourceTableName} =this.state;
         const params = {
             sourceId: selectedTargetDataTable[0].sourceId,
             tablesId: selectedTargetDataTable[0].id,
@@ -337,15 +357,34 @@ export class LayoutComponent extends Component {
                     newData.push(dataItem);
                 }
                 console.log(newData);
-                this.setState({
-                    rightTableData: newData,
-                    targetTableName: value,
-                    ignoreTargetCase: false,
-                    forceMatched: false,
-                    directMapTable: false,
-                    forceMatchedDisabled: false,
-                    directMapTableDisabled: false,
-                });
+                if (sourceTableName === '') {
+                    this.setState({
+                        rightTableData: newData,
+                        targetTableName: value,
+                        rightSelectedRow: [],
+                        rightSelectedRowKeys: [],
+                        ignoreTargetCase: false,
+                        forceMatched: false,
+                        directMapTable: false,
+                        ignoreTargetCaseDisabled: true,
+                        forceMatchedDisabled: true,
+                        directMapTableDisabled: true,
+                    });
+                } else {
+                    this.setState({
+                        rightTableData: newData,
+                        targetTableName: value,
+                        rightSelectedRow: [],
+                        rightSelectedRowKeys: [],
+                        ignoreTargetCase: false,
+                        forceMatched: false,
+                        directMapTable: false,
+                        ignoreTargetCaseDisabled: false,
+                        forceMatchedDisabled: false,
+                        directMapTableDisabled: false,
+                    });
+                }
+
             }
         }).finally(() => {
         });
@@ -429,8 +468,9 @@ export class LayoutComponent extends Component {
                 ignoreTargetCase: false,
                 forceMatched: false,
                 directMapTable: false,
-                forceMatchedDisabled: false,
-                directMapTableDisabled: false,
+                ignoreTargetCaseDisabled: true,
+                forceMatchedDisabled: true,
+                directMapTableDisabled: true,
             });
             setFieldsValue({sourceTableName: ''});
             setFieldsValue({targetTableName: ''});
@@ -501,6 +541,9 @@ export class LayoutComponent extends Component {
     onDirectMapChange = (e) => {
         if (e.target.checked) {
             this.setState({directMapTable: true, forceMatched: false, forceMatchedDisabled: true});
+            setTimeout(()=> {
+                this.handleSave();
+            }, 500);
         } else {
             this.setState({directMapTable: false, forceMatchedDisabled: false});
         }
@@ -696,6 +739,7 @@ export class LayoutComponent extends Component {
                         <Col span={24} style={{padding: 15, paddingTop: 0}}>
                             <Checkbox style={{marginRight: 20}} checked={this.state.ignoreTargetCase}
                                       defaultChecked={this.state.ignoreTargetCase}
+                                      disabled={this.state.ignoreTargetCaseDisabled}
                                       onChange={this.onIgnoreChange}>忽略目标端大小写</Checkbox>
                             <Checkbox style={{marginRight: 20}} checked={this.state.forceMatched}
                                       defaultChecked={this.state.forceMatched}
