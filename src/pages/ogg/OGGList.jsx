@@ -57,10 +57,10 @@ export class LayoutComponent extends Component {
             },
         },
         {
-            title: '首次注册时间',
+            title: '任务关联',
             render: (text, record) => {
                 return (
-                    formatDefaultTime(record.createTime)
+                    formatDefaultTime(record.relatedTaskInfo)
                 );
             },
         },
