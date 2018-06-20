@@ -60,7 +60,7 @@ export class LayoutComponent extends Component {
             title: '任务关联',
             render: (text, record) => {
                 return (
-                    formatDefaultTime(record.relatedTaskInfo)
+                    record.relatedTaskInfo
                 );
             },
         },
