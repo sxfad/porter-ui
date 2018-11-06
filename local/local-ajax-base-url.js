@@ -7,7 +7,7 @@
 // export default 'http://172.16.136.37:8080/';
 
 //export default 'http://172.16.135.30:8080/api/manager'; //开发
-export default 'http://172.16.154.5:8080/api/manager'; //測試
+export default 'http://172.16.154.162:8080/api/manager'; //測試
 // export default 'http://172.16.41.168:8080'; //郭洪健
 // export default 'http://172.16.42.107:8080/api/manager'; //付紫钲
 
