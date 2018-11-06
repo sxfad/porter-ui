@@ -48,6 +48,21 @@ export class LayoutComponent extends Component {
             key: 'jobName',
         },
         {
+            title: '来源数据-消费插件',
+            dataIndex: 'sourceConsumeAdt.name',
+            key: 'sourceConsumeAdt.name',
+        },
+        {
+            title: '来源数据-消费转换插件',
+            dataIndex: 'sourceConvertAdt.name',
+            key: 'sourceConvertAdt.name',
+        },
+        {
+            title: '目标数据-载入插件',
+            dataIndex: 'targetLoadAdt.name',
+            key: 'targetLoadAdt.name',
+        },
+        {
             title: '创建时间',
             dataIndex: 'createTime',
             key: 'createTime',
@@ -119,7 +134,7 @@ export class LayoutComponent extends Component {
      * 查看元素
      */
     handleDetail = (id) => {
-        browserHistory.push(`/synchTask/+detail/${id}`);
+        browserHistory.push(`/specialTask/+detail/${id}`);
     };
 
     /**
@@ -319,7 +334,7 @@ export class LayoutComponent extends Component {
             lg: 6,
         };
         return (
-            <PageContent class="special-task">
+            <PageContent className="special-task">
                 <QueryBar>
                     <Form>
                         <Row>

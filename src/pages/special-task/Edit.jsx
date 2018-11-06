@@ -25,6 +25,7 @@ export default class Edit extends Component {
         isEdit: false,
         gettingJob: false,
         editId: '',
+        disableXML: false,
     };
 
     componentWillMount() {
@@ -55,8 +56,14 @@ export default class Edit extends Component {
                         this.props.form.setFieldsValue({jobName});
                         this.setState({xml, editId: json.taskId});
                         this.jsonEditor.set(json);
+                        this.jsonEditor.expandAll();
+
+                        if(xml === null || xml === 'null') {
+                            this.setState({toJsonClicked: true, disableXML: true});
+                        }
+
                     } else {
-                        message.error('获取数据失败！')
+                        message.error('获取数据失败！');
                     }
                 }).finally(() => this.setState({gettingJob: false}));
         } else {
@@ -70,9 +77,9 @@ export default class Edit extends Component {
     /* eslint-enable */
 
     componentWillUnmount() {
+        this.jsonEditor.destroy();
         window.removeEventListener('resize', this.setEditorHeight);
     }
-
 
     setEditorHeight = () => {
         const wHeight = window.innerHeight;
@@ -95,6 +102,7 @@ export default class Edit extends Component {
                 res.data.status = 'NEW';
                 this.setState({json: res.data, toJsonClicked: true});
                 this.jsonEditor.set(res.data);
+                this.jsonEditor.expandAll();
             } else {
                 message.error('转换失败！');
                 this.setState({json: ''});
@@ -137,11 +145,10 @@ export default class Edit extends Component {
                 message.success('保存成功！', 1, () => browserHistory.goBack());
             }).finally(() => this.setState({saving: false}));
         }
-
     };
 
     render() {
-        const {xml, editorHeight, toJsonClicked, isEdit} = this.state;
+        const {xml, editorHeight, toJsonClicked, isEdit, disableXML} = this.state;
         const {form: {getFieldDecorator}} = this.props;
         return (
             <PageContent className="special-task">
@@ -166,6 +173,7 @@ export default class Edit extends Component {
                     <Col span={12} style={{paddingRight: 8}}>
                         <div className="xml-editor-title">编辑XML</div>
                         <TextArea
+                            disabled={disableXML}
                             className="xml-editor"
                             style={{height: editorHeight - 35}}
                             value={xml}
@@ -173,6 +181,7 @@ export default class Edit extends Component {
                         />
                         <div className="editor-tools-bar">
                             <Button
+                                disabled={disableXML}
                                 type="primary"
                                 onClick={this.handleXmlToJson}
                             >解析为JSON</Button>
