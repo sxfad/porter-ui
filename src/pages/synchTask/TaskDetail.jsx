@@ -10,6 +10,7 @@ import './style.less';
 import connectComponent from '../../redux/store/connectComponent';
 
 export const PAGE_ROUTE = '/synchTask/+detail/:TaskId';
+
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
@@ -17,25 +18,36 @@ export class LayoutComponent extends Component {
         userStr: '',
     };
 
-    Columns = [
+    columns = [
         {
             title: '源表名',
-            render: (text, record) => {
-                return (
-                    record.sourceTableName
-                );
-            },
-
+            dataIndex: 'sourceTableName',
+            key:'sourceTableName',
         },
         {
             title: '目标表名',
-            render: (text, record) => {
-                return (
-                    record.targetTableName
-                );
-            },
-
+            dataIndex: 'targetTableName',
+            key:'targetTableName',
         },
+        {
+            title: '忽略目标端大小写',
+            dataIndex: 'ignoreTargetCase',
+            key:'ignoreTargetCase',
+            render: (text) => text ? '是' : '否',
+        },
+        {
+            title: '目标端字段和源端字段一致',
+            dataIndex: 'forceMatched',
+            key: 'forceMatched',
+            render: text => text ? '是' : '否',
+        },
+        {
+            title: '直接映射表',
+            dataIndex: 'directMapTable',
+            key: 'directMapTable',
+            render: text => text ? '是' : '否',
+        },
+
     ]
 
     componentDidMount() {
@@ -57,7 +69,7 @@ export class LayoutComponent extends Component {
     }
 
     render() {
-        const {taskData} =this.state;
+        const {taskData} = this.state;
         const expandedRowRender = (id) => {
             let dataColumn = [];
             for (let i = 0; i < taskData.tables.length; i++) {
@@ -66,8 +78,35 @@ export class LayoutComponent extends Component {
                 }
             }
             const columns = [
-                {title: '源表列名', dataIndex: 'sourceTableField', key: 'sourceTableField'},
-                {title: '目标表列名', dataIndex: 'targetTableField', key: 'targetTableField'},
+                {
+                    title: '源表名',
+                    dataIndex: 'sourceTableName',
+                    key:'sourceTableName',
+                },
+                {
+                    title: '目标表名',
+                    dataIndex: 'targetTableName',
+                    key:'targetTableName',
+                },
+                {
+                    title: '忽略目标端大小写',
+                    dataIndex: 'ignoreTargetCase',
+                    key:'ignoreTargetCase',
+                    render: (text) => text ? '是' : '否',
+                },
+                {
+                    title: '目标端字段和源端字段一致',
+                    dataIndex: 'forceMatched',
+                    key: 'forceMatched',
+                    render: text => text ? '是' : '否',
+                },
+                {
+                    title: '直接映射表',
+                    dataIndex: 'directMapTable',
+                    key: 'directMapTable',
+                    render: text => text ? '是' : '否',
+                },
+
             ];
             return (
                 <Table
@@ -107,7 +146,8 @@ export class LayoutComponent extends Component {
                     );
                 });
             }
-        };
+        }
+        ;
 
         var sourceDbaHtml = [];
         console.log('taskData', taskData.id);
@@ -127,7 +167,8 @@ export class LayoutComponent extends Component {
                     );
                 });
             }
-        };
+        }
+        ;
 
         var targetDbaHtml = [];
         console.log('taskData', taskData.id);
@@ -147,7 +188,8 @@ export class LayoutComponent extends Component {
                     );
                 });
             }
-        };
+        }
+        ;
 
         return (
             <PageContent>
@@ -299,7 +341,7 @@ export class LayoutComponent extends Component {
                                     创建时间：
                                 </Col>
                                 <Col span={9}>
-                                    { formatDefaultTime(taskData.createTime) }
+                                    {formatDefaultTime(taskData.createTime)}
                                 </Col>
                             </Row>
                         </Col>
@@ -308,16 +350,18 @@ export class LayoutComponent extends Component {
                             <Table
                                 size="middle"
                                 rowKey={(record) => record.sourceTableName}
-                                columns={this.Columns}
+                                columns={this.columns}
                                 dataSource={taskData.tables}
                                 pagination={false}
                                 expandedRowRender={(record) => expandedRowRender(record.id)}
                             />
                         </Col>
-                        <Col span={24} style={{paddingTop:20}}>
+                        <Col span={24} style={{paddingTop: 20}}>
                             <Row>
                                 <Col span={9}>
-                                    <Button type="primary" onClick={() => { history.back(); }} size="large">返回</Button>
+                                    <Button type="primary" onClick={() => {
+                                        history.back();
+                                    }} size="large">返回</Button>
                                 </Col>
                             </Row>
                         </Col>
@@ -327,6 +371,7 @@ export class LayoutComponent extends Component {
         )
     }
 }
+
 export function mapStateToProps(state) {
     return {
         ...state.frame,
