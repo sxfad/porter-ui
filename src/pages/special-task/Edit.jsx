@@ -171,7 +171,7 @@ export default class Edit extends Component {
                 </Form>
                 <Row>
                     <Col span={12} style={{paddingRight: 8}}>
-                        <div className="xml-editor-title">编辑XML</div>
+                        <div className="xml-editor-title">编辑Properties</div>
                         <TextArea
                             disabled={disableXML}
                             className="xml-editor"
