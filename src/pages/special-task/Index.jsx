@@ -198,6 +198,11 @@ export class LayoutComponent extends Component {
 
     componentDidMount() {
         this.search();
+        this.st = setInterval(this.search, 5 * 1000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.st);
     }
 
     search = (args) => {
