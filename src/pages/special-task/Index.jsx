@@ -3,7 +3,7 @@
  */
 import React, {Component} from 'react';
 import {browserHistory} from 'react-router';
-import {Form, Input, Button, Table, Row, Col, DatePicker, message, Popconfirm} from 'antd';
+import {Form, Input, Button, Table, Row, Col, DatePicker, message, Popconfirm, Select} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, FontIcon} from 'sx-ui/antd';
 import moment from 'moment';
 import {promiseAjax} from 'sx-ui';
@@ -13,6 +13,8 @@ import connectComponent from '../../redux/store/connectComponent';
 
 const {RangePicker} = DatePicker;
 const FormItem = Form.Item;
+const {Option} = Select;
+
 export const PAGE_ROUTE = '/specialTask';
 
 @Form.create()
@@ -207,12 +209,13 @@ export class LayoutComponent extends Component {
 
     search = (args) => {
         const {form: {getFieldValue}} = this.props;
-        let jobName = getFieldValue('jobName');
-        let times = getFieldValue('times');
+        const jobName = getFieldValue('jobName');
+        const times = getFieldValue('times');
+        const jobState = getFieldValue('jobState');
 
         let endTimeStr = '';
         let startTimeStr = '';
-        if (times !== undefined) {
+        if (times) {
             if (times.length > 0) {
                 endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
                 startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
@@ -222,6 +225,7 @@ export class LayoutComponent extends Component {
 
         let params = {
             jobName,
+            jobState,
             jobType: 2,
             pageNo: pageNum,
             pageSize,
@@ -333,17 +337,12 @@ export class LayoutComponent extends Component {
                 sm: {span: 17},
             },
         };
-        const queryItemLayout = {
-            xs: 12,
-            md: 8,
-            lg: 6,
-        };
         return (
             <PageContent className="special-task">
                 <QueryBar>
                     <Form>
                         <Row>
-                            <Col {...queryItemLayout}>
+                            <Col span={6}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="任务名称">
@@ -352,7 +351,21 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
+                            <Col span={4}>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label="状态">
+                                    {getFieldDecorator('jobState')(
+                                        <Select placeholder="请选择状态">
+                                            <Option value="NEW">新建</Option>
+                                            <Option value="STOPPED">已停止</Option>
+                                            <Option value="WORKING">工作中</Option>
+                                            <Option value="DELETED">已删除</Option>
+                                        </Select>
+                                    )}
+                                </FormItem>
+                            </Col>
+                            <Col span={6}>
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
                                     {getFieldDecorator('times', {})(
@@ -360,23 +373,22 @@ export class LayoutComponent extends Component {
                                             showTime
                                             style={{width: '100%'}}
                                             format="YYYY-MM-DD HH:mm"
-                                            placeholder={['Start Time', 'End Time']}
+                                            placeholder={['开始时间', '结束时间']}
                                             onOk={this.onOk}
                                         />
                                     )}
 
                                 </FormItem>
                             </Col>
-                            <Col span={7} style={{textAlign: 'right'}}>
+                            <Col span={6} style={{textAlign: 'right'}}>
                                 <FormItem
                                     label=""
                                     colon={false}>
                                     <Button
                                         type="primary"
                                         onClick={() => this.handleAddTask()}
-                                        style={{marginLeft: 15}}
                                     >
-                                        <FontIcon type="plus"/>新增任务
+                                        <FontIcon type="plus"/>新增
                                     </Button>
                                     <Button
                                         type="primary"

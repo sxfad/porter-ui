@@ -12,6 +12,7 @@ import ResetSetUp from '../pages/User/ResetSetUp';
 
 const FormItem = Form.Item;
 const SubMenu = Menu.SubMenu;
+
 class LayoutComponent extends Component {
     state = {
         passwordVisible: false,
@@ -104,16 +105,7 @@ class LayoutComponent extends Component {
                 loginName: 'no name',
                 avatar: '',
             };
-        const formItemLayout = {
-            labelCol: {
-                xs: {span: 24},
-                sm: {span: 5},
-            },
-            wrapperCol: {
-                xs: {span: 24},
-                sm: {span: 15},
-            },
-        };
+        user.name = user.nickName;
         return (
             <div className={`frame-header ${frameHeaderClass}`}>
                 <div className={`left-menu ${frameHeaderClass}`} style={{display: frameHeaderMenu}}>
@@ -128,9 +120,9 @@ class LayoutComponent extends Component {
                     <div className="right-menu-item">
                         <Menu mode="horizontal" onClick={this.handleClick}>
                             <SubMenu title={<div className="right-menu-item">
-                            <UserAvatar user={user}/>
-                            <span>{user.nickName}</span>
-                        </div>}>
+                                <UserAvatar user={user}/>
+                                <span>{user.nickName}</span>
+                            </div>}>
                                 <Menu.Item key="1">修改密码</Menu.Item>
                                 <Menu.Item key="2">修改个人信息</Menu.Item>
                             </SubMenu>

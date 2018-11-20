@@ -7,6 +7,7 @@
   "scripts": {
     "dll": "webpack --config ./builder/webpack.dll.conf.js",
     "dev": "yarn run dll && cross-env NODE_ENV=development node ./builder/dev-server.js",
+    "start": "yarn dev",
     "build:prod": "cross-env NODE_ENV=production node ./builder/build.js",
     "build:test": "cross-env NODE_ENV=test node ./builder/build.js",
     "build:rc": "cross-env NODE_ENV=rc node ./builder/build.js",

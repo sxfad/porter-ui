@@ -58,7 +58,7 @@ export default class Edit extends Component {
                         this.jsonEditor.set(json);
                         this.jsonEditor.expandAll();
 
-                        if(xml === null || xml === 'null') {
+                        if (xml === null || xml === 'null') {
                             this.setState({toJsonClicked: true, disableXML: true});
                         }
 
@@ -95,8 +95,9 @@ export default class Edit extends Component {
     handleXmlToJson = () => {
         const {xml} = this.state;
         const result = window.encodeURIComponent(xml);
+
         this.setState({toJsonLoading: true});
-        promiseAjax.post('/jobtasks/dealspecialjson', result).then(res => {
+        promiseAjax.post('/jobtasks/dealspecialjson', {jobXmlText: result}).then(res => {
             if (res.success && res.data) {
                 message.success('转换成功！');
                 res.data.status = 'NEW';

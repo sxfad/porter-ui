@@ -3,18 +3,20 @@
  */
 import React, {Component} from 'react';
 import {Form, Input, Button, Table, Select, Row, Col, DatePicker, message, Popconfirm} from 'antd';
-import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
+import {PageContent, PaginationComponent, QueryBar, FontIcon} from 'sx-ui/antd';
+import {browserHistory} from 'react-router';
 import moment from 'moment';
 import {promiseAjax} from 'sx-ui';
 import './style.less';
 import {formatDefaultTime} from '../common/getTime';
-import {browserHistory} from 'react-router';
+
 import connectComponent from '../../redux/store/connectComponent';
 
 const {RangePicker} = DatePicker;
 const FormItem = Form.Item;
 const Option = Select.Option;
 export const PAGE_ROUTE = '/synchTask';
+
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
@@ -22,8 +24,8 @@ export class LayoutComponent extends Component {
         pageSize: 10,
         total: 0,
         application: [],
-        startTimeStr: '', //开始时间
-        endTimeStr: '',   //结束时间(默认当前时间)
+        startTimeStr: '', // 开始时间
+        endTimeStr: '',   // 结束时间(默认当前时间)
         endTime: Date(),
         dataSource: [],
         tabLoading: false,
@@ -34,103 +36,85 @@ export class LayoutComponent extends Component {
     columns = [
         {
             title: '序号',
+            key: '__number',
             render: (text, record, index) => (index + 1) + ((this.state.pageNum - 1) * this.state.pageSize),
         },
         {
             title: '任务ID',
-            render: (text, record) => {
-                return (
-                    record.id
-                );
-            },
+            dataIndex: 'id',
+            key: 'id',
         },
         {
             title: '任务名称',
-            render: (text, record) => {
-                return (
-                    record.jobName
-                );
-            },
+            dataIndex: 'jobName',
+            key: 'jobName',
         },
         {
             title: '来源数据-消费插件',
-            render: (text, record) => {
-                return (
-                    record.sourceConsumeAdt.name
-                );
-            },
+            dataIndex: 'sourceConsumeAdt.name',
+            key: 'sourceConsumeAdt.name',
         },
         {
             title: '来源数据-消费转换插件',
-            render: (text, record) => {
-                return (
-                    record.sourceConvertAdt.name
-                );
-            },
+            dataIndex: 'sourceConvertAdt.name',
+            key: 'sourceConvertAdt.name',
         },
         {
             title: '目标数据-载入插件',
-            render: (text, record) => {
-                return (
-                    record.targetLoadAdt.name
-                );
-            },
+            dataIndex: 'targetLoadAdt.name',
+            key: 'targetLoadAdt.name',
         },
         {
             title: '创建时间',
-            render: (text, record) => {
-                return (
-                    formatDefaultTime(record.createTime)
-                );
-            },
+            dataIndex: 'createTime',
+            key: 'createTime',
+            render: (text) => formatDefaultTime(text),
         },
         {
             title: '状态',
-            render: (text, record) => {
-                return (
-                    record.jobState.name
-                );
-            },
+            dataIndex: 'jobState.name',
+            key: 'jobState.name',
         },
         {
             title: '操作',
+            key: 'operator',
             render: (text, record) => {
                 if (record.jobState.name === '新建') {
                     return (
                         <span>
                             <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
                             <span className="ant-divider"/>
-                            <a onClick={() => this.handleStop('WORKING',record.id)}>开始</a>
+                            <a onClick={() => this.handleStop('WORKING', record.id)}>开始</a>
                             <span className="ant-divider"/>
                             <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
-                              <a href="#">删除</a>
+                                <a>删除</a>
                             </Popconfirm>
                             <span className="ant-divider"/>
                             <a onClick={() => this.handleDetail(record.id)}>查看</a>
                         </span>
-                    )
+                    );
                 } else if (record.jobState.name === '工作中') {
                     return (
                         <span>
-                            <a onClick={() => this.handleStop('STOPPED',record.id)}>停止</a>
+                            <a onClick={() => this.handleStop('STOPPED', record.id)}>停止</a>
                             <span className="ant-divider"/>
                             <a onClick={() => this.handleDetail(record.id)}>查看</a>
                         </span>
-                    )
+                    );
                 } else if (record.jobState.name === '已停止') {
                     return (
                         <span>
                             <a onClick={() => this.handleUpdate(record.id)}>编辑</a>
                             <span className="ant-divider"/>
-                            <a onClick={() => this.handleStop('WORKING',record.id)}>开始</a>
+                            <a onClick={() => this.handleStop('WORKING', record.id)}>开始</a>
                             <span className="ant-divider"/>
                             <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
-                              <a href="#">删除</a>
+                                <a>删除</a>
                             </Popconfirm>
                             <span className="ant-divider"/>
                             <a onClick={() => this.handleDetail(record.id)}>查看</a>
                         </span>
-                    )
+                    );
                 }
             },
         },
@@ -142,12 +126,12 @@ export class LayoutComponent extends Component {
      */
     handleUpdate = (id) => {
         browserHistory.push(`/synchTask/+add/${id}`);
-    }
+    };
 
     /**
      * 查看元素
      */
-    handleDetail = (id)=> {
+    handleDetail = (id) => {
         browserHistory.push(`/synchTask/+detail/${id}`);
     };
 
@@ -155,16 +139,16 @@ export class LayoutComponent extends Component {
      * 删除
      * @param id
      */
-    handleDelete = (id)=> {
+    handleDelete = (id) => {
         this.setState({
             tabLoading: true,
         });
         promiseAjax.del(`/jobtasks/${id}`).then(rsp => {
             if (rsp.success) {
-                const {dataSource, total} = this.state
+                const {dataSource, total} = this.state;
                 this.setState({
                     dataSource: dataSource.filter(item => item.id !== id),
-                    total: total - 1
+                    total: total - 1,
                 });
                 message.success('删除成功', 3);
             }
@@ -179,7 +163,7 @@ export class LayoutComponent extends Component {
      * 开始任务
      * @param id
      */
-    handleStop = (type, id)=> {
+    handleStop = (type, id) => {
         this.setState({
             tabLoading: true,
         });
@@ -192,7 +176,7 @@ export class LayoutComponent extends Component {
         promiseAjax.put(`/jobtasks/${id}?taskStatusType=${type}`).then(rsp => {
             if (rsp.success) {
                 const {dataSource} = this.state;
-                dataSource.map((key, value)=> {
+                dataSource.forEach((key, value) => {
                     if (key.id === id) {
                         dataSource[value].jobState.name = typeStr;
                         dataSource[value].jobState.code = type;
@@ -218,10 +202,11 @@ export class LayoutComponent extends Component {
         const {form: {getFieldValue}} = this.props;
         let jobName = getFieldValue('jobName');
         let times = getFieldValue('times');
+        const jobState = getFieldValue('jobState');
 
-        let endTimeStr = '',
-            startTimeStr = '';
-        if (times != undefined) {
+        let endTimeStr = '';
+        let startTimeStr = '';
+        if (times !== undefined) {
             if (times.length > 0) {
                 endTimeStr = moment(times[1]).format('YYYY-MM-DD HH:mm:ss');
                 startTimeStr = moment(times[0]).format('YYYY-MM-DD HH:mm:ss');
@@ -231,6 +216,7 @@ export class LayoutComponent extends Component {
 
         let params = {
             jobName,
+            jobState,
             pageNo: pageNum,
             pageSize,
             beginTime: startTimeStr,
@@ -240,12 +226,12 @@ export class LayoutComponent extends Component {
         this.setState({
             tabLoading: true,
         });
-        promiseAjax.get(`/jobtasks`, params).then(rsp => {
-            if (rsp.success && rsp.data != undefined) {
+        promiseAjax.get('/jobtasks', params).then(rsp => {
+            if (rsp.success && rsp.data) {
                 this.setState({
                     pageNum: rsp.data.pageNo,
                     pageSize: rsp.data.pageSize,
-                    total: parseInt(rsp.data.totalItems),
+                    total: window.parseInt(rsp.data.totalItems),
                     dataSource: rsp.data.result,
                     startTimeStr,
                     endTimeStr,
@@ -260,18 +246,18 @@ export class LayoutComponent extends Component {
                 tabLoading: false,
             });
         });
-    }
+    };
 
     /**
      * 查询
      */
-    handleQuery = ()=> {
+    handleQuery = () => {
         this.setState({
             pageNum: 1,
         });
         const data = {
             pageNo: 1,
-        }
+        };
         this.search(data);
     };
 
@@ -279,16 +265,16 @@ export class LayoutComponent extends Component {
      * 重置
      * @param data
      */
-    handleReset = ()=> {
+    handleReset = () => {
         this.props.form.resetFields();
         this.setState({
             pageNum: 1,
         });
         const data = {
             pageNo: 1,
-        }
+        };
         this.search(data);
-    }
+    };
 
     handlePageSizeChange = (pageSize) => {
         this.setState({
@@ -299,7 +285,7 @@ export class LayoutComponent extends Component {
             pageNo: 1,
         };
         this.search(data);
-    }
+    };
 
     handlePageNumChange = (value) => {
         const {pageSize} = this.state;
@@ -311,12 +297,12 @@ export class LayoutComponent extends Component {
             pageNo: value,
         };
         this.search(data);
-    }
+    };
 
     /**
      * 设置时间
      */
-    onOk = (value)=> {
+    onOk = (value) => {
         console.log(value);
         this.setState({
             startTimeStr: moment(value[0]).format('YYYY-MM-DD HH:mm:ss'),
@@ -330,7 +316,7 @@ export class LayoutComponent extends Component {
 
     render() {
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
-        const {dataSource, total, pageNum, pageSize, tabLoading, visible, startTimeStr, endTimeStr, applicationName} =this.state;
+        const {dataSource, total, pageNum, pageSize, tabLoading} = this.state;
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
@@ -341,17 +327,12 @@ export class LayoutComponent extends Component {
                 sm: {span: 17},
             },
         };
-        const queryItemLayout = {
-            xs: 12,
-            md: 8,
-            lg: 6,
-        };
         return (
             <PageContent>
                 <QueryBar>
                     <Form>
                         <Row>
-                            <Col {...queryItemLayout}>
+                            <Col span={6}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="任务名称">
@@ -360,7 +341,23 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
+
+                            <Col span={4}>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label="状态">
+                                    {getFieldDecorator('jobState')(
+                                        <Select placeholder="请选择状态">
+                                            <Option value="NEW">新建</Option>
+                                            <Option value="STOPPED">已停止</Option>
+                                            <Option value="WORKING">工作中</Option>
+                                            <Option value="DELETED">已删除</Option>
+                                        </Select>
+                                    )}
+                                </FormItem>
+                            </Col>
+
+                            <Col span={6}>
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
                                     {getFieldDecorator('times', {})(
@@ -368,23 +365,30 @@ export class LayoutComponent extends Component {
                                             showTime
                                             style={{width: '100%'}}
                                             format="YYYY-MM-DD HH:mm"
-                                            placeholder={['Start Time', 'End Time']}
+                                            placeholder={['开始时间', '结束时间']}
                                             onOk={this.onOk}
                                         />
                                     )}
 
                                 </FormItem>
                             </Col>
-                            <Col span={7} style={{textAlign:'right'}}>
+                            <Col span={6} style={{textAlign: 'right'}}>
                                 <FormItem
                                     label=""
                                     colon={false}>
-                                    <Button type="primary" onClick={() => this.handleAddTask()}
-                                            style={{marginLeft: 15}}><FontIcon type="plus"/>新增任务</Button>
-                                    <Button type="primary" onClick={()=>this.handleQuery(getFieldsValue())}
-                                            style={{marginLeft: 15}}><FontIcon type="search"/>查询</Button>
-                                    <Button type="ghost" onClick={() => this.handleReset()}
-                                            style={{marginLeft: 15}}>重置</Button>
+                                    <Button
+                                        type="primary"
+                                        onClick={() => this.handleAddTask()}
+                                    ><FontIcon type="plus"/>新增</Button>
+                                    <Button
+                                        type="primary"
+                                        onClick={() => this.handleQuery(getFieldsValue())}
+                                        style={{marginLeft: 15}}
+                                    ><FontIcon type="search"/>查询</Button>
+                                    <Button
+                                        type="ghost"
+                                        onClick={() => this.handleReset()}
+                                        style={{marginLeft: 15}}>重置</Button>
                                 </FormItem>
                             </Col>
                         </Row>
@@ -409,10 +413,10 @@ export class LayoutComponent extends Component {
                     onPageSizeChange={this.handlePageSizeChange}
                 />
             </PageContent>
-        )
+        );
     }
-    ;
 }
+
 export function mapStateToProps(state) {
     return {
         ...state.frame,
