@@ -22,17 +22,17 @@ export class LayoutComponent extends Component {
         {
             title: '源表名',
             dataIndex: 'sourceTableName',
-            key:'sourceTableName',
+            key: 'sourceTableName',
         },
         {
             title: '目标表名',
             dataIndex: 'targetTableName',
-            key:'targetTableName',
+            key: 'targetTableName',
         },
         {
             title: '忽略目标端大小写',
             dataIndex: 'ignoreTargetCase',
-            key:'ignoreTargetCase',
+            key: 'ignoreTargetCase',
             render: (text) => text ? '是' : '否',
         },
         {
@@ -78,35 +78,8 @@ export class LayoutComponent extends Component {
                 }
             }
             const columns = [
-                {
-                    title: '源表名',
-                    dataIndex: 'sourceTableName',
-                    key:'sourceTableName',
-                },
-                {
-                    title: '目标表名',
-                    dataIndex: 'targetTableName',
-                    key:'targetTableName',
-                },
-                {
-                    title: '忽略目标端大小写',
-                    dataIndex: 'ignoreTargetCase',
-                    key:'ignoreTargetCase',
-                    render: (text) => text ? '是' : '否',
-                },
-                {
-                    title: '目标端字段和源端字段一致',
-                    dataIndex: 'forceMatched',
-                    key: 'forceMatched',
-                    render: text => text ? '是' : '否',
-                },
-                {
-                    title: '直接映射表',
-                    dataIndex: 'directMapTable',
-                    key: 'directMapTable',
-                    render: text => text ? '是' : '否',
-                },
-
+                {title: '源表列名', dataIndex: 'sourceTableField', key: 'sourceTableField'},
+                {title: '目标表列名', dataIndex: 'targetTableField', key: 'targetTableField'},
             ];
             return (
                 <Table
