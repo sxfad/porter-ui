@@ -12,6 +12,7 @@ import connectComponent from '../../../redux/store/connectComponent';
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 export const PAGE_ROUTE = '/dataSource/+add/:DataSourceId';
+
 @Form.create()
 export class LayoutComponent extends Component {
     state = {
@@ -50,33 +51,29 @@ export class LayoutComponent extends Component {
     /**
      * 选择数据源类型
      */
-    selectSourceType = (e)=> {
+    selectSourceType = (e) => {
         const sourceType = e.target.value;  //选择的数据源类型
         promiseAjax.get(`/dicdatasourceplugin/${sourceType}`).then(rsp => {
             if (rsp.success) {
                 var fieldType = rsp.data;
-                var list = [];
                 fieldType.map((k, index) => {
                     if (fieldType[index].fieldType.code === 'RADIO') {
                         var type = fieldType[index].fieldTypeKey;
-                        promiseAjax.get(`/dict/${type}`).then(rspradio => {
-                            if (rspradio.success) {
-                                var radioTypeList = {};
-                                var radioData = rspradio.data;
-                                for (let key in radioData) {
-                                    radioTypeList[key] = radioData[key];
+                        promiseAjax.get(`/dict/${type}`)
+                            .then(rspradio => {
+                                if (rspradio.success) {
+                                    var radioTypeList = {};
+                                    var radioData = rspradio.data;
+                                    for (let key in radioData) {
+                                        radioTypeList[key] = radioData[key];
+                                    }
+                                    fieldType[index].radioTypeList = radioTypeList;
                                 }
-                                fieldType[index].radioTypeList = radioTypeList;
-                            }
-                        })
+                            })
+                            .finally(() => this.setState({fieldType}));
                     }
                 });
-                list = fieldType;
-                setTimeout(() => {
-                    this.setState({
-                        fieldType: list,
-                    });
-                }, 100);
+                this.setState({fieldType});
             }
         }).finally(() => {
         });
@@ -85,7 +82,7 @@ export class LayoutComponent extends Component {
     /**
      * 提交表单
      */
-    handleSubmit = ()=> {
+    handleSubmit = () => {
         const {form} = this.props;
         form.validateFieldsAndScroll((err, values) => {
             if (!err) {
@@ -121,7 +118,7 @@ export class LayoutComponent extends Component {
 
     render() {
         const {getFieldDecorator} = this.props.form;
-        const {fieldType} =this.state;
+        const {fieldType} = this.state;
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
@@ -157,17 +154,23 @@ export class LayoutComponent extends Component {
                         hasFeedback
                     >
                         {getFieldDecorator(`${fieldType[index].fieldCode}--${fieldType[index].fieldName}`, {
-                            rules: [{required: true, message: '请输入' + fieldType[index].fieldName+' '+ fieldType[index].fieldExplain }],
+                            rules: [{required: true, message: '请输入' + fieldType[index].fieldName + ' ' + fieldType[index].fieldExplain}],
                         })(
-                            <Input style={{ width: '60%', marginRight: 8 }}/>
+                            <Input style={{width: '60%', marginRight: 8}}/>
                         )}
                     </FormItem>
                 );
             } else if (fieldType[index].fieldType.code === 'RADIO') {
                 var radioTypeHtml = [];
                 for (let key in fieldType[index].radioTypeList) {
-                    radioTypeHtml.push(<Radio key={fieldType[index].radioTypeList[key]}
-                                              value={key}>{fieldType[index].radioTypeList[key]}</Radio>);
+                    radioTypeHtml.push(
+                        <Radio
+                            key={fieldType[index].radioTypeList[key]}
+                            value={key}
+                        >
+                            {fieldType[index].radioTypeList[key]}
+                        </Radio>
+                    );
                 }
                 formItemsHtml.push(
                     <FormItem
@@ -176,7 +179,7 @@ export class LayoutComponent extends Component {
                         key={fieldType[index].fieldCode}
                         hasFeedback
                     >
-                        {getFieldDecorator(`${fieldType[index].fieldCode}--${fieldType[index].fieldName}`,{
+                        {getFieldDecorator(`${fieldType[index].fieldCode}--${fieldType[index].fieldName}`, {
                             rules: [{required: true, message: '请选择' + fieldType[index].fieldName}],
                         })(
                             <RadioGroup>
@@ -210,8 +213,9 @@ export class LayoutComponent extends Component {
                             hasFeedback>
                             {getFieldDecorator('dataType', {
                                 rules: [{required: true, message: '请选择数据源类型'}],
+                                onChange: this.selectSourceType,
                             })(
-                                <RadioGroup onChange={this.selectSourceType}>
+                                <RadioGroup>
                                     {this.renderSourceType()}
                                 </RadioGroup>
                             )}
@@ -225,7 +229,9 @@ export class LayoutComponent extends Component {
                                     style={{marginRight: 16}}>
                                 重置
                             </Button>
-                            <Button type="primary" onClick={() => { history.back(); }} size="large">返回</Button>
+                            <Button type="primary" onClick={() => {
+                                history.back();
+                            }} size="large">返回</Button>
                         </FormItem>
                     </Form>
                 </div>
@@ -233,6 +239,7 @@ export class LayoutComponent extends Component {
         )
     }
 }
+
 export function mapStateToProps(state) {
     return {
         ...state.frame,
