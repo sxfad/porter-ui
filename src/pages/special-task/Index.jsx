@@ -48,6 +48,7 @@ export class LayoutComponent extends Component {
             title: '任务名称',
             dataIndex: 'jobName',
             key: 'jobName',
+            width: 200,
         },
         {
             title: '来源数据-消费插件',
