@@ -269,7 +269,7 @@ export class LayoutComponent extends Component {
                                         <Select placeholder="请选择任务类型">
                                             <Select.Option key="0" value="">全部</Select.Option>
                                             <Select.Option key="1" value="1">正常任务</Select.Option>
-                                            <Select.Option key="2" value="2">抓取任务</Select.Option>
+                                            <Select.Option key="2" value="2">本地任务</Select.Option>
                                         </Select>
                                     )}
                                 </FormItem>
