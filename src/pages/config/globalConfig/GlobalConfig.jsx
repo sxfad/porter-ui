@@ -13,6 +13,7 @@ const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 export const PAGE_ROUTE = '/globalConfig';
+
 @Form.create()
 
 export class LayoutComponent extends Component {
@@ -31,7 +32,7 @@ export class LayoutComponent extends Component {
 
     componentDidMount() {
         const {configType} = this.state;
-        const {form:{setFieldsValue, getFieldValue}} =this.props;
+        const {form: {setFieldsValue, getFieldValue}} = this.props;
 
         if (configType === 'alarm') {
             this.getFiledTypeByThis();
@@ -87,7 +88,7 @@ export class LayoutComponent extends Component {
     /**
      * 告警方式
      */
-    renderAlertPlugin = ()=> {
+    renderAlertPlugin = () => {
         let alertPluginList = session.getItem('alertPlugin');
         if (alertPluginList === null) {
             promiseAjax.get(`/dict/all`).then(rsp => {
@@ -110,7 +111,7 @@ export class LayoutComponent extends Component {
     };
 
     renderUserList = () => {
-        const {userList} =this.state;
+        const {userList} = this.state;
         const userListHtml = [];
         for (let key in userList) {
             userListHtml.push(<Option key={userList[key].id}
@@ -122,23 +123,36 @@ export class LayoutComponent extends Component {
     /**
      * 选择数据源类型
      */
-    selectAlertPluginType = (e)=> {
+    selectAlertPluginType = (e) => {
         const alertPluginType = e.target.value;  //选择的数据源类型
         this.getFieldType(alertPluginType);
+    };
+
+    getFieldTypeInfo = (dataSource) => {
+        dataSource.forEach(item => {
+            const {fieldTypeKey, fieldType} = item;
+            if (fieldType === 'RADIO') {
+                promiseAjax.get(`/dict/${fieldTypeKey}`)
+                    .then(res => {
+                        if (res.success && res.data) {
+                            item.radioTypeList = {...res.data};
+                            this.setState({fieldType: dataSource});
+                        }
+                    });
+            }
+        });
     };
 
     /**
      * 获取表单列表(根据选择的数据源类型)
      */
-    getFieldType = (alertPluginType)=> {
+    getFieldType = (alertPluginType) => {
         promiseAjax.get(`/alarm/info`).then(rsp => {
             if (rsp.success && rsp.data != null) {
-                const alarmInfo = rsp.data.alarmPlugins,
-                    alarmUsers = rsp.data.alarmUsers;
-                const users = [];
-                alarmUsers.map((k, v) => {
-                    users.push(alarmUsers[v].userId);
-                });
+                const alarmInfo = rsp.data.alarmPlugins;
+                const alarmUsers = rsp.data.alarmUsers;
+                const users = alarmUsers.map(item => item.userId);
+
                 promiseAjax.get(`/dicalarmplugin/${alertPluginType}`).then(rsp1 => {
                     if (rsp1.success) {
                         const fieldType = rsp1.data;
@@ -149,9 +163,9 @@ export class LayoutComponent extends Component {
                                 }
                             })
                         });
-                        this.setState({fieldType, users, alarmInfo: rsp.data});
+                        this.setState({users, alarmInfo: rsp.data});
+                        this.getFieldTypeInfo(fieldType);
                     }
-                }).finally(() => {
                 });
             } else {
                 promiseAjax.get(`/dicalarmplugin/${alertPluginType}`).then(rsp1 => {
@@ -160,19 +174,17 @@ export class LayoutComponent extends Component {
                         fieldType.map((key, value) => {
                             fieldType[value].pluginValue = ''
                         });
-                        this.setState({fieldType});
+                        this.getFieldTypeInfo(fieldType);
                     }
-                }).finally(() => {
                 });
             }
-        }).finally(() => {
         });
     };
 
     /**
      * 获取表单列表(根据已保存的数据源类型)
      */
-    getFiledTypeByThis = ()=> {
+    getFiledTypeByThis = () => {
         promiseAjax.get(`/alarm/info`).then(rsp => {
             if (rsp.success && rsp.data != null) {
                 const alarmInfo = rsp.data.alarmPlugins,
@@ -192,7 +204,8 @@ export class LayoutComponent extends Component {
                             })
                         });
 
-                        this.setState({fieldType, users});
+                        this.setState({users});
+                        this.getFieldTypeInfo(fieldType);
                     }
                 }).finally(() => {
                 });
@@ -208,7 +221,7 @@ export class LayoutComponent extends Component {
     /**
      * 提交表单
      */
-    handleSubmit = ()=> {
+    handleSubmit = () => {
         const {form} = this.props;
         form.validateFieldsAndScroll((err, values) => {
             if (!err) {
@@ -251,7 +264,7 @@ export class LayoutComponent extends Component {
     /**
      * 提交其他设置信息
      */
-    handleOtherSubmit = ()=> {
+    handleOtherSubmit = () => {
         const {form} = this.props;
         form.validateFieldsAndScroll((err, values) => {
             if (!err) {
@@ -288,37 +301,46 @@ export class LayoutComponent extends Component {
             },
         };
         const formItemsHtml = [];
-        fieldType.map((k, index) => {
-            if (fieldType[index].fieldType === 'TEXT') {
+        fieldType.forEach((item, index) => {
+            if (item.fieldType === 'TEXT') {
                 formItemsHtml.push(
                     <FormItem
                         {...formItemLayout}
-                        label={fieldType[index].fieldName}
-                        key={fieldType[index].fieldCode}
+                        label={item.fieldName}
+                        key={item.fieldCode}
                         hasFeedback
                     >
-                        {getFieldDecorator(`${fieldType[index].fieldCode}--${fieldType[index].fieldName}`, {
-                            initialValue: fieldType[index] && fieldType[index].pluginValue,
-                            rules: [{required: true, message: '请输入' + fieldType[index].fieldName}],
+                        {getFieldDecorator(`${item.fieldCode}--${item.fieldName}`, {
+                            initialValue: item && item.pluginValue,
+                            rules: [{required: true, message: '请输入' + item.fieldName}],
                         })(
-                            <Input style={{ width: '100%', marginRight: 8 }}/>
+                            <Input style={{width: '100%', marginRight: 8}}/>
                         )}
                     </FormItem>
                 );
-            } else if (fieldType[index].fieldType === 'RADIO') {
+            }
+
+            if (item.fieldType === 'RADIO') {
                 const radioTypeHtml = [];
-                for (let key in fieldType[index].radioTypeList) {
-                    radioTypeHtml.push(<Radio key={fieldType[index].radioTypeList[key]}
-                                              value={key}>{fieldType[index].radioTypeList[key]}</Radio>);
+                for (let key in item.radioTypeList) {
+                    radioTypeHtml.push(
+                        <Radio
+                            key={item.radioTypeList[key]}
+                            value={key}>
+                            {item.radioTypeList[key]}
+                        </Radio>
+                    );
                 }
                 formItemsHtml.push(
                     <FormItem
                         {...formItemLayout}
-                        label={fieldType[index].fieldName}
-                        key={fieldType[index].fieldCode}
+                        label={item.fieldName}
+                        key={item.fieldCode}
                         hasFeedback
                     >
-                        {getFieldDecorator(`${fieldType[index].fieldCode}--${fieldType[index].fieldName}`)(
+                        {getFieldDecorator(`${item.fieldCode}--${item.fieldName}`, {
+                            initialValue: item.pluginValue || 'false',
+                        })(
                             <RadioGroup>
                                 {radioTypeHtml}
                             </RadioGroup>
@@ -330,14 +352,14 @@ export class LayoutComponent extends Component {
         return formItemsHtml;
     };
 
-    setConfigTypeAlarm = ()=> {
-        const {alarmType} =this.state;
+    setConfigTypeAlarm = () => {
+        const {alarmType} = this.state;
         this.setState({configType: 'alarm'});
         this.getFiledTypeByThis();
     }
 
-    setConfigTypeOther = ()=> {
-        const {alarmType} =this.state;
+    setConfigTypeOther = () => {
+        const {alarmType} = this.state;
         this.setState({configType: 'other'});
     }
 
@@ -347,7 +369,7 @@ export class LayoutComponent extends Component {
 
     render() {
         const {getFieldDecorator} = this.props.form;
-        const {fieldType, alarmInfo, users, configType, logLevel} =this.state;
+        const {fieldType, alarmInfo, users, configType, logLevel} = this.state;
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
@@ -377,10 +399,14 @@ export class LayoutComponent extends Component {
                     <div className="sub-title">全部设置</div>
                     <Row>
                         <Col span={5} className="leftMenu">
-                            <div className="left-SubTitle" onClick={()=>{this.setConfigTypeAlarm()}}><FontIcon
+                            <div className="left-SubTitle" onClick={() => {
+                                this.setConfigTypeAlarm()
+                            }}><FontIcon
                                 type="fa-bomb"/>告警设置
                             </div>
-                            <div className="left-SubTitle" onClick={()=>{this.setConfigTypeOther()}}><FontIcon
+                            <div className="left-SubTitle" onClick={() => {
+                                this.setConfigTypeOther()
+                            }}><FontIcon
                                 type="fa-cog"/>其他设置
                             </div>
                         </Col>
@@ -411,8 +437,8 @@ export class LayoutComponent extends Component {
                                             rules: [{required: true, message: '请选择告警通知人'}],
                                         })(
                                             <Select
-                                                multiple
-                                                style={{ width: '100%' }}
+                                                mode="multiple"
+                                                style={{width: '100%'}}
                                                 placeholder="请选择告警通知人"
                                                 onChange={this.handleUsersChange}
                                             >
@@ -465,6 +491,7 @@ export class LayoutComponent extends Component {
         )
     }
 }
+
 export function mapStateToProps(state) {
     return {
         ...state.frame,
