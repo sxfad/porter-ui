@@ -129,6 +129,8 @@ export class LayoutComponent extends Component {
     };
 
     getFieldTypeInfo = (dataSource) => {
+        this.setState({fieldType: dataSource});
+
         dataSource.forEach(item => {
             const {fieldTypeKey, fieldType} = item;
             if (fieldType === 'RADIO') {
@@ -152,7 +154,6 @@ export class LayoutComponent extends Component {
                 const alarmInfo = rsp.data.alarmPlugins;
                 const alarmUsers = rsp.data.alarmUsers;
                 const users = alarmUsers.map(item => item.userId);
-
                 promiseAjax.get(`/dicalarmplugin/${alertPluginType}`).then(rsp1 => {
                     if (rsp1.success) {
                         const fieldType = rsp1.data;
@@ -301,6 +302,7 @@ export class LayoutComponent extends Component {
             },
         };
         const formItemsHtml = [];
+
         fieldType.forEach((item, index) => {
             if (item.fieldType === 'TEXT') {
                 formItemsHtml.push(
@@ -417,6 +419,7 @@ export class LayoutComponent extends Component {
                                         {...formItemLayout}
                                         label="告警方式"
                                         hasFeedback>
+
                                         {getFieldDecorator('alarmType', {
                                             initialValue: alarmInfo.alarmType && alarmInfo.alarmType.code
                                         })(
