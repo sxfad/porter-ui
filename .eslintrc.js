@@ -16,7 +16,6 @@ module.exports = {
         }
     },
     "plugins": [
-        "markdown",
         "react",
         "babel"
     ],
