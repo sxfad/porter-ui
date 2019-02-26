@@ -345,7 +345,7 @@ export class LayoutComponent extends Component {
                 <QueryBar>
                     <Form>
                         <Row>
-                            <Col span={4}>
+                            <Col style={{width: "20%", float:'left'}}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="任务ID">
@@ -354,7 +354,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={4} offset={1}>
+                            <Col style={{width: "20%", float:'left'}}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="任务名称">
@@ -363,7 +363,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={4} offset={1}>
+                            <Col style={{width: "20%", float:'left'}}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="状态">
@@ -377,7 +377,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={4} offset={1}>
+                            <Col style={{width: "20%", float:'left'}}>
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
                                     {getFieldDecorator('times', {})(
@@ -392,7 +392,7 @@ export class LayoutComponent extends Component {
 
                                 </FormItem>
                             </Col>
-                            <Col span={5} style={{textAlign: 'right'}}>
+                            <Col style={{width: "20%", float:'left', textAlign: 'right'}}>
                                 <FormItem
                                     label=""
                                     colon={false}>
