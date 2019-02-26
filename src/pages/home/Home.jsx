@@ -14,8 +14,8 @@ export class LayoutComponent extends Component {
     componentWillReceiveProps(/* nextProps */) {
     }
 
-    renderCard = ()=> {
-        const {cardData} =this.state;
+    renderCard = () => {
+        const {cardData} = this.state;
         const cardHtml = [];
         for (let i = 0; i < cardData.length; i++) {
             const cardMessagesHtml = [];
@@ -45,9 +45,9 @@ export class LayoutComponent extends Component {
 
         promiseAjax.get(`/home/blocks`).then(rsp => {
             if (rsp.success) {
-                this.setState({cardData: rsp.data})
+                this.setState({cardData: rsp.data});
             }
-        })
+        });
     }
 
     render() {

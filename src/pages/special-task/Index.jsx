@@ -211,6 +211,7 @@ export class LayoutComponent extends Component {
     search = (args) => {
         const {form: {getFieldValue}} = this.props;
         const jobName = getFieldValue('jobName');
+        const jobId = getFieldValue('jobId');
         const times = getFieldValue('times');
         const jobState = getFieldValue('jobState');
 
@@ -225,6 +226,7 @@ export class LayoutComponent extends Component {
         const {pageNum, pageSize} = this.state;
 
         let params = {
+            jobId,
             jobName,
             jobState,
             jobType: 2,
@@ -343,7 +345,16 @@ export class LayoutComponent extends Component {
                 <QueryBar>
                     <Form>
                         <Row>
-                            <Col span={6}>
+                            <Col span={4}>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label="任务ID">
+                                    {getFieldDecorator('jobId')(
+                                        <Input placeholder="请填写任务Id" style={{width: '100%'}}/>
+                                    )}
+                                </FormItem>
+                            </Col>
+                            <Col span={4} offset={1}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="任务名称">
@@ -352,7 +363,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={4}>
+                            <Col span={4} offset={1}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="状态">
@@ -366,7 +377,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={6}>
+                            <Col span={4} offset={1}>
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
                                     {getFieldDecorator('times', {})(
@@ -381,7 +392,7 @@ export class LayoutComponent extends Component {
 
                                 </FormItem>
                             </Col>
-                            <Col span={6} style={{textAlign: 'right'}}>
+                            <Col span={5} style={{textAlign: 'right'}}>
                                 <FormItem
                                     label=""
                                     colon={false}>
