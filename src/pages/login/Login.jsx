@@ -373,13 +373,13 @@ class Login extends Component {
                                 <FormItem
                                     style={{marginBottom: 8}}
                                 >
-                                    <Button
+                                    <a
                                         style={{width: '100%'}}
                                         type='primary'
                                         onClick={this.handleRegister}
                                     >
                                         注册
-                                    </Button>
+                                    </a>
                                 </FormItem>
                             </Form>
                             <div className="error-message">
