@@ -105,7 +105,7 @@ class LayoutComponent extends Component {
                 loginName: 'no name',
                 avatar: '',
             };
-        user.name = user.nickName;
+        user.name = user.realName || user.nickName;
         return (
             <div className={`frame-header ${frameHeaderClass}`}>
                 <div className={`left-menu ${frameHeaderClass}`} style={{display: frameHeaderMenu}}>

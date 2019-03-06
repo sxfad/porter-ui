@@ -48,6 +48,7 @@ export class LayoutComponent extends Component {
             title: '任务名称',
             dataIndex: 'jobName',
             key: 'jobName',
+            width: 200,
         },
         {
             title: '来源数据-消费插件',
@@ -201,6 +202,7 @@ export class LayoutComponent extends Component {
     search = (args) => {
         const {form: {getFieldValue}} = this.props;
         let jobName = getFieldValue('jobName');
+        let jobId = getFieldValue('jobId');
         let times = getFieldValue('times');
         const jobState = getFieldValue('jobState');
 
@@ -215,6 +217,7 @@ export class LayoutComponent extends Component {
         const {pageNum, pageSize} = this.state;
 
         let params = {
+            jobId,
             jobName,
             jobState,
             pageNo: pageNum,
@@ -251,7 +254,8 @@ export class LayoutComponent extends Component {
     /**
      * 查询
      */
-    handleQuery = () => {
+    handleQuery = (values) => {
+        console.log(values);
         this.setState({
             pageNum: 1,
         });
@@ -332,7 +336,17 @@ export class LayoutComponent extends Component {
                 <QueryBar>
                     <Form>
                         <Row>
-                            <Col span={6}>
+                            <Col style={{width: "20%", float:'left'}}>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label="任务ID">
+                                    {getFieldDecorator('jobId')(
+                                        <Input placeholder="请填写任务Id" style={{width: '100%'}}/>
+                                    )}
+                                </FormItem>
+                            </Col>
+
+                            <Col style={{width: "20%", float:'left'}}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="任务名称">
@@ -342,7 +356,7 @@ export class LayoutComponent extends Component {
                                 </FormItem>
                             </Col>
 
-                            <Col span={4}>
+                            <Col style={{width: "20%", float:'left'}}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="状态">
@@ -357,7 +371,7 @@ export class LayoutComponent extends Component {
                                 </FormItem>
                             </Col>
 
-                            <Col span={6}>
+                            <Col style={{width: "20%", float:'left'}}>
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
                                     {getFieldDecorator('times', {})(
@@ -372,7 +386,7 @@ export class LayoutComponent extends Component {
 
                                 </FormItem>
                             </Col>
-                            <Col span={6} style={{textAlign: 'right'}}>
+                            <Col style={{width: "20%",  float:'left', textAlign: 'right'}}>
                                 <FormItem
                                     label=""
                                     colon={false}>

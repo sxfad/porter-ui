@@ -117,6 +117,18 @@ export default [
         icon: 'fa-user-md',
         path: '/user',
     },
+    {
+        key: 'sysmenu-setup-text',
+        parentKey: 'sysmenu-setup',
+        text: '测试页面',
+        icon: 'fa-user-md',
+        path: '/user-text',
+    },
+    {
+        key: 'register',
+        text: '注册',
+        path: '/register',
+    },
     // {
     //     key: 'sysmenu-setup-iconfont',
     //     parentKey: 'sysmenu',

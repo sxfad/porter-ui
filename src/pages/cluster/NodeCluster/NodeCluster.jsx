@@ -333,7 +333,16 @@ export class LayoutComponent extends Component {
                 <QueryBar>
                     <Form>
                         <Row>
-                            <Col {...queryItemLayout}>
+                            <Col style={{width: '20%', float: 'left'}} >
+                                <FormItem
+                                    {...formItemLayout}
+                                    label="节点ID">
+                                    {getFieldDecorator('nodeId')(
+                                        <Input placeholder="请填写节点ID" style={{width: '100%'}}/>
+                                    )}
+                                </FormItem>
+                            </Col>
+                            <Col style={{width: '20%', float: 'left'}}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="IP地址">
@@ -342,7 +351,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col {...queryItemLayout}>
+                            <Col style={{width: '20%', float: 'left'}}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="机器名称">
@@ -351,7 +360,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={5}>
+                            <Col style={{width: '20%', float: 'left'}}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="当前状态">
@@ -364,16 +373,16 @@ export class LayoutComponent extends Component {
                                 </FormItem>
                             </Col>
 
-                            <Col span={7} style={{textAlign:'right'}}>
+                            <Col style={{textAlign:'right', width: '20%', float: 'left'}}>
                                 <FormItem
                                     label=""
                                     colon={false}>
                                     <Button type="primary" onClick={() => this.handleAddTask()}
-                                            style={{marginLeft: 15}}><FontIcon type="plus"/>新增</Button>
+                                            style={{marginLeft: 10}}><FontIcon type="plus"/>新增</Button>
                                     <Button type="primary" onClick={()=>this.handleQuery(getFieldsValue())}
-                                            style={{marginLeft: 15}}><FontIcon type="search"/>查询</Button>
+                                            style={{marginLeft: 10}}><FontIcon type="search"/>查询</Button>
                                     <Button type="ghost" onClick={() => this.handleReset()}
-                                            style={{marginLeft: 15}}>重置</Button>
+                                            style={{marginLeft: 10}}>重置</Button>
                                 </FormItem>
                             </Col>
                         </Row>
