@@ -322,7 +322,7 @@ export class LayoutComponent extends Component {
                 {
                     echartsVisible ? <Modal
                         title="节点实时监控图"
-                        visible={this.state.echartsVisible}
+                        visible={echartsVisible}
                         onOk={this.handleOk}
                         onCancel={this.handleCancel}
                         width='70%'

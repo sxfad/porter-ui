@@ -2,8 +2,9 @@
  * Created by lhyin on 2018/11/4.
  */
 import React, {Component} from 'react';
-import {Form, Radio, Button, Spin} from 'antd';
+import {Form, Radio, Button, Spin, DatePicker} from 'antd';
 import {promiseAjax} from 'sx-ui';
+import moment from 'moment'
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import connectComponent from '../../redux/store/connectComponent';
 import ReactEcharts from 'echarts-for-react';
@@ -16,8 +17,11 @@ export const PAGE_ROUTE = '/echarts';
 export class LayoutComponent extends Component {
     state = {
         dataSource: [],
-        timeNumber: 10,
+        timeNumber: '10',
         spinLoading: false,
+        date: moment(new Date(), 'YYYY/MM/DD'),
+        isShowNowDate: 'block',
+        isShowOtherDate: 'none',
     }
 
     getOption = () => {
@@ -25,7 +29,7 @@ export class LayoutComponent extends Component {
 
         return {
             title: {
-                text: '堆叠区域图'
+                // text: '堆叠区域图'
             },
             tooltip: {
                 trigger: 'axis'
@@ -121,17 +125,20 @@ export class LayoutComponent extends Component {
         this.getMonitorDetail(10);
     }
 
+    // 新增查询日期
     getMonitorDetail = (timeNumber)=> {
         this.setState({spinLoading: true});
         const {jobmonitor} = this.props;
+        const date = moment(new Date()).format("YYYY-MM-DD");
         const params = {
             jobId: jobmonitor.jobId,
             swimlaneId: jobmonitor.swimlaneId,
             schemaTable: jobmonitor.schemaTable,
             intervalTime: timeNumber,
-            intervalCount: 0
-        }
-        promiseAjax.get(`/mrjobtasksmonitor/jobmonitor`, params).then(rsp => {
+            intervalCount: 0,
+            monitorDate: date
+        };
+        promiseAjax.get(`/mrjobtasksmonitor/jobMonitorDetail`, params).then(rsp => {
             if (rsp.success && rsp.data != undefined) {
                 for (let key in rsp.data.xAxisData) {
                     rsp.data.xAxisData[key] = formatdetailTime1(rsp.data.xAxisData[key]);
@@ -142,8 +149,7 @@ export class LayoutComponent extends Component {
                     spinLoading: false
                 });
             }
-        }).finally(() => {
-        });
+        })
     };
 
     /**
@@ -151,17 +157,107 @@ export class LayoutComponent extends Component {
      */
     searchChange = (e)=> {
         this.getMonitorDetail(e.target.value);
+        this.setState({timeNumber: e.target.value});
+    };
+
+    // 改变日期选框
+    handleChangeDate = (e) => {
+        const todayDate = moment(new Date()).add('year',0).format("YYYY-MM-DD");
+        const newDate = moment(e).format('YYYY-MM-DD');
+        const {jobmonitor} = this.props;
+        let params = {};
+
+        // 只有同一天时 才发送 intervalTime
+        if(todayDate === newDate) {
+            params = {
+                jobId: jobmonitor.jobId,
+                swimlaneId: jobmonitor.swimlaneId,
+                schemaTable: jobmonitor.schemaTable,
+                intervalCount: 0,
+                intervalTime: this.state.timeNumber,
+                monitorDate: todayDate,
+            };
+            this.setState({
+                isShowNowDate: 'block',
+                isShowOtherDate: 'none',
+                date: todayDate,
+            });
+        } else {
+            params = {
+                jobId: jobmonitor.jobId,
+                swimlaneId: jobmonitor.swimlaneId,
+                schemaTable: jobmonitor.schemaTable,
+                intervalCount: 0,
+                monitorDate: newDate,
+            };
+            this.setState({
+                isShowNowDate: 'none',
+                isShowOtherDate: 'block',
+                date: newDate,
+            });
+        }
+
+        promiseAjax.get(`/mrjobtasksmonitor/jobMonitorDetail`, params).then(rsp => {
+            console.log(rsp);
+            if (rsp.success && rsp.data !== undefined) {
+                for (let key in rsp.data.xAxisData) {
+                    rsp.data.xAxisData[key] = formatdetailTime1(rsp.data.xAxisData[key]);
+                }
+                this.setState({
+                    dataSource: rsp.data,
+                    timeNumber,
+                    spinLoading: false
+                });
+            }
+        })
     };
 
     /**
      * 刷新
      */
     handleRefresh = () => {
-        const {timeNumber} = this.state;
-        this.getMonitorDetail(timeNumber);
+        const {timeNumber, date} = this.state;
+        const {jobmonitor} = this.props;
+        const now = moment(date).format('YYYY-MM-DD');
+        const todayDate = moment(new Date()).add('year',0).format("YYYY-MM-DD");
+        let params = {};
+
+        if(now === todayDate) {
+            params = {
+                jobId: jobmonitor.jobId,
+                swimlaneId: jobmonitor.swimlaneId,
+                schemaTable: jobmonitor.schemaTable,
+                intervalCount: 0,
+                intervalTime: this.state.timeNumber,
+                monitorDate: now
+            };
+        } else {
+            params = {
+                jobId: jobmonitor.jobId,
+                swimlaneId: jobmonitor.swimlaneId,
+                schemaTable: jobmonitor.schemaTable,
+                intervalCount: 0,
+                monitorDate: now
+            };
+        }
+
+        promiseAjax.get(`/mrjobtasksmonitor/jobMonitorDetail`, params).then(rsp => {
+            console.log(rsp);
+            if (rsp.success && rsp.data != undefined) {
+                for (let key in rsp.data.xAxisData) {
+                    rsp.data.xAxisData[key] = formatdetailTime1(rsp.data.xAxisData[key]);
+                }
+                this.setState({
+                    dataSource: rsp.data,
+                    timeNumber,
+                    spinLoading: false
+                });
+            }
+        })
     };
 
     render() {
+        const {interval, isShowNowDate, isShowOtherDate, timeNumber} = this.state;
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
         const formItemLayout = {
             labelCol: {
@@ -181,7 +277,20 @@ export class LayoutComponent extends Component {
         return (
             <PageContent>
                 <div className="search-monitor">
-                    <RadioGroup defaultValue="10" onChange={this.searchChange}>
+                    <DatePicker
+                        style={{float: 'left', marginRight: 16}}
+                        defaultValue={this.state.date}
+                        format={'YYYY/MM/DD'}
+                        onChange={this.handleChangeDate}
+                    />
+                    <RadioGroup defaultValue={timeNumber} onChange={this.searchChange} style={{float: 'left', display: isShowNowDate}}>
+                        <RadioButton value="10">10分钟</RadioButton>
+                        <RadioButton value="30">半个小时</RadioButton>
+                        <RadioButton value="60">1个小时</RadioButton>
+                        <RadioButton value="480">8个小时</RadioButton>
+                        <RadioButton value="1440">24个小时</RadioButton>
+                    </RadioGroup>
+                    <RadioGroup defaultValue={''} onChange={this.searchChange} disabled={true} style={{float: 'left', display: isShowOtherDate}}>
                         <RadioButton value="10">10分钟</RadioButton>
                         <RadioButton value="30">半个小时</RadioButton>
                         <RadioButton value="60">1个小时</RadioButton>
@@ -191,12 +300,11 @@ export class LayoutComponent extends Component {
                     <Button type="primary" onClick={()=>this.handleRefresh()} style={{marginLeft: 15}}><FontIcon
                         type="fa-refresh"/> 刷新</Button>
                 </div>
-                <Spin spinning={this.state.spinLoading}>
-                    <ReactEcharts
-                        option={this.getOption()}
-                        style={{height: '350px', width: '100%'}}
-                        className='react_for_echarts'/>
-                </Spin>
+                <ReactEcharts
+                    option={this.getOption()}
+                    style={{height: 340, width: '100%', top: 20}}
+                    className='react_for_echarts'
+                />
             </PageContent>
         )
     };

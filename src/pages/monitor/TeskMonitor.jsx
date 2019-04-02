@@ -4,6 +4,7 @@
 import React, {Component} from 'react';
 import {Form, Input, Button, Table, Row, Col, Modal, message, DatePicker} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
+import uuid from '../../../node_modules/uuid/v4';
 import {promiseAjax} from 'sx-ui';
 import moment from 'moment';
 import {formatDefaultTime} from '../common/getTime';
@@ -30,6 +31,7 @@ export class LayoutComponent extends Component {
         {
             title: '编号',
             render: (text, record, index) => (index + 1),
+            key: uuid()
         },
         {
             title: '任务ID',
@@ -38,6 +40,7 @@ export class LayoutComponent extends Component {
                     record.jobId
                 );
             },
+            key: uuid()
         },
         {
             title: '任务泳道',
@@ -46,6 +49,7 @@ export class LayoutComponent extends Component {
                     record.swimlaneId
                 );
             },
+            key: uuid()
         },
         {
             title: '分配节点',
@@ -54,6 +58,7 @@ export class LayoutComponent extends Component {
                     record.nodeIdIp
                 );
             },
+            key: uuid()
         },
         {
             title: '数据表',
@@ -62,6 +67,7 @@ export class LayoutComponent extends Component {
                     record.schemaTable
                 );
             },
+            key: uuid()
         },
         // {
         //     title: '注册时间',
@@ -78,6 +84,7 @@ export class LayoutComponent extends Component {
                     formatDefaultTime(record.heartBeatDate)
                 );
             },
+            key: uuid()
         },
         // {
         //     title: '处理进度',
@@ -94,64 +101,74 @@ export class LayoutComponent extends Component {
                     <span className="text-warning">{record.alarmNumber}</span>
                 );
             },
+            key: uuid()
         },
         {
-            title: '插入成功',
+            title: '插入成功(本日增量)',
             render: (text, record) => {
+                console.log(record);
                 return (
-                    <span className="text-green">{record.insertSuccess}</span>
+                    <span className="text-green">{record.insertSuccess}({record.insertSuccessByDay}↑)</span>
                 );
             },
+            key: uuid()
         },
         {
-            title: '插入失败',
+            title: '插入失败(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-error">{record.insertFailure}</span>
+                    <span className="text-error">{record.insertFailure}({record.insertFailureByDay}↓)</span>
                 );
             },
+            key: uuid()
         },
         {
-            title: '更新成功',
+            title: '更新成功(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-green">{record.updateSuccess}</span>
+                    <span className="text-green">{record.updateSuccess}({record.updateSuccessByDay}↑)</span>
                 );
             },
+            key: uuid()
         },
         {
-            title: '更新失败',
+            title: '更新失败(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-error">{record.updateFailure}</span>
+                    <span className="text-error">{record.updateFailure}({record.updateFailureByDay}↓)</span>
                 );
             },
+            key: uuid()
         },
         {
-            title: '删除成功',
+            title: '删除成功(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-green">{record.deleteSuccess}</span>
+                    <span className="text-green">{record.deleteSuccess}({record.deleteSuccessByDay}↑)</span>
                 );
             },
+            key: uuid()
         },
         {
-            title: '删除失败',
+            title: '删除失败(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-error">{record.deleteFailure}</span>
+                    <span className="text-error">{record.deleteFailure}({record.deleteFailureByDay}↓)</span>
                 );
             },
+            key: uuid()
         },
         {
             title: '操作',
             render: (text, record) => {
                 return (
                     <span>
-                        <a onClick={() => this.handleEcharts(record)}>查看详情</a>
+                        <a onClick={() => this.handleEcharts(record)}>详情</a>
                     </span>
-                )
-            }
+                );
+            },
+            width: 100,
+            key: uuid()
         },
     ];
 
@@ -210,8 +227,9 @@ export class LayoutComponent extends Component {
         this.setState({
             tabLoading: true,
         });
-        promiseAjax.get(`/mrjobtasksschedule`, params).then(rsp => {
+        promiseAjax.get(`/mrjobtasksschedule/list`, params).then(rsp => {
             if (rsp.success && rsp.data != undefined) {
+                console.log(rsp);
                 this.setState({
                     dataSource: rsp.data,
                 });
@@ -254,13 +272,13 @@ export class LayoutComponent extends Component {
             selectTaskVisible: false,
         });
         this.search();
-    }
+    };
 
     handleSelectTaskCancel = () => {
         this.setState({
             selectTaskVisible: false,
         });
-    }
+    };
 
     /**
      * 选择任务
@@ -335,7 +353,6 @@ export class LayoutComponent extends Component {
                         dataSource={dataSource}
                         loading={tabLoading}
                         size="middle"
-                        rowKey={(record) => record.id}
                         columns={this.columns}
                         pagination={false}
                         expandedRowRender={record => this.renderNumber(record)}
