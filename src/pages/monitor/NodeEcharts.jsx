@@ -23,8 +23,18 @@ export class LayoutComponent extends Component {
         date: moment(new Date(), 'YYYY/MM/DD'),
     };
 
+    // 对后台时间格式进行转换
+    renderTime = (date) => {
+        const dateee = new Date(date).toJSON();
+        return new Date(+new Date(dateee) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '');
+    };
+
     getOption = () => {
         const {dataSource} =this.state;
+        const correctXdata = [];
+        dataSource.xAxisData && dataSource.xAxisData.forEach(item => {
+            correctXdata.push(this.renderTime(item));
+        });
         return {
             title: {
                 // text: '堆叠区域图'
@@ -50,7 +60,13 @@ export class LayoutComponent extends Component {
                 {
                     type: 'category',
                     boundaryGap: false,
-                    data: dataSource.xAxisData,
+                    data: correctXdata,
+                    axisLabel: {
+                        show: true,
+                        textStyle: {
+                            fontSize: 11,
+                        }
+                    }
                 }
             ],
             yAxis: [
@@ -93,10 +109,7 @@ export class LayoutComponent extends Component {
             date: moment(new Date()).format("YYYY-MM-DD")
         };
         promiseAjax.get(`/mrnodesmonitor/nodeMonitorDetail`, params).then(rsp => {
-            if (rsp.success && rsp.data != undefined) {
-                for (let key in rsp.data.xAxisData) {
-                    rsp.data.xAxisData[key] = formatdetailTime1(rsp.data.xAxisData[key]);
-                }
+            if (rsp.success && rsp.data !== undefined) {
                 this.setState({
                     dataSource: rsp.data,
                     timeNumber,
@@ -144,13 +157,9 @@ export class LayoutComponent extends Component {
         promiseAjax.get(`/mrnodesmonitor/nodeMonitorDetail`, params).then(rsp => {
             console.log(rsp);
             if (rsp.success && rsp.data !== undefined) {
-                for (let key in rsp.data.xAxisData) {
-                    rsp.data.xAxisData[key] = formatdetailTime1(rsp.data.xAxisData[key]);
-                }
                 this.setState({
                     dataSource: rsp.data,
-                    timeNumber,
-                    spinLoading: false
+                    spinLoading: false,
                 });
             }
         })
@@ -192,9 +201,6 @@ export class LayoutComponent extends Component {
         promiseAjax.get(`/mrnodesmonitor/nodeMonitorDetail`, params).then(rsp => {
             console.log(rsp);
             if (rsp.success && rsp.data !== undefined) {
-                for (let key in rsp.data.xAxisData) {
-                    rsp.data.xAxisData[key] = formatdetailTime1(rsp.data.xAxisData[key]);
-                }
                 this.setState({
                     dataSource: rsp.data,
                     timeNumber,
