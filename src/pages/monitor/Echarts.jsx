@@ -281,6 +281,7 @@ export class LayoutComponent extends Component {
                         style={{float: 'left', marginRight: 16}}
                         defaultValue={this.state.date}
                         format={'YYYY/MM/DD'}
+                        allowClear={false}
                         onChange={this.handleChangeDate}
                     />
                     <RadioGroup defaultValue={timeNumber} onChange={this.searchChange} style={{float: 'left', display: isShowNowDate}}>

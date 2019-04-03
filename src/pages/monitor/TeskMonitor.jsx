@@ -106,7 +106,6 @@ export class LayoutComponent extends Component {
         {
             title: '插入成功(本日增量)',
             render: (text, record) => {
-                console.log(record);
                 return (
                     <span className="text-green">{record.insertSuccess}({record.insertSuccessByDay}↑)</span>
                 );
