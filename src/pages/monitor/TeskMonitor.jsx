@@ -107,7 +107,7 @@ export class LayoutComponent extends Component {
             title: '插入成功(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-green">{record.insertSuccess}({record.insertSuccessByDay}↑)</span>
+                    <span className="text-green">{record.insertSuccess}&nbsp;&nbsp;({record.insertSuccessByDay}↑)</span>
                 );
             },
             key: uuid()
@@ -116,7 +116,7 @@ export class LayoutComponent extends Component {
             title: '插入失败(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-error">{record.insertFailure}({record.insertFailureByDay}↓)</span>
+                    <span className="text-error">{record.insertFailure}&nbsp;&nbsp;({record.insertFailureByDay}↓)</span>
                 );
             },
             key: uuid()
@@ -125,7 +125,7 @@ export class LayoutComponent extends Component {
             title: '更新成功(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-green">{record.updateSuccess}({record.updateSuccessByDay}↑)</span>
+                    <span className="text-green">{record.updateSuccess}&nbsp;&nbsp;({record.updateSuccessByDay}↑)</span>
                 );
             },
             key: uuid()
@@ -134,7 +134,7 @@ export class LayoutComponent extends Component {
             title: '更新失败(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-error">{record.updateFailure}({record.updateFailureByDay}↓)</span>
+                    <span className="text-error">{record.updateFailure}&nbsp;&nbsp;({record.updateFailureByDay}↓)</span>
                 );
             },
             key: uuid()
@@ -143,7 +143,7 @@ export class LayoutComponent extends Component {
             title: '删除成功(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-green">{record.deleteSuccess}({record.deleteSuccessByDay}↑)</span>
+                    <span className="text-green">{record.deleteSuccess}&nbsp;&nbsp;({record.deleteSuccessByDay}↑)</span>
                 );
             },
             key: uuid()
@@ -152,7 +152,7 @@ export class LayoutComponent extends Component {
             title: '删除失败(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-error">{record.deleteFailure}({record.deleteFailureByDay}↓)</span>
+                    <span className="text-error">{record.deleteFailure}&nbsp;&nbsp;({record.deleteFailureByDay}↓)</span>
                 );
             },
             key: uuid()
