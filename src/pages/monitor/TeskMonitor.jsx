@@ -265,7 +265,7 @@ export class LayoutComponent extends Component {
     };
 
     handleSelectTaskOk = () => {
-        const {selectedTask} =this.state;
+        const {selectedTask} = this.state;
         const {setFieldsValue} = this.props.form;
         setFieldsValue({jobName: selectedTask[0].jobName, jobId: selectedTask[0].id});
         this.setState({
@@ -359,12 +359,14 @@ export class LayoutComponent extends Component {
                         defaultExpandAllRows={true}
                     />
                 </div>
+                <div>
                 {
                     echartsVisible ? <Modal
                         title="泳道实时监控图"
                         visible={this.state.echartsVisible}
                         onOk={this.handleOk}
                         onCancel={this.handleCancel}
+                        className="chartRoot"
                         width='70%'
                     >
                         <Echarts jobmonitor={jobmonitor}/>
@@ -382,6 +384,7 @@ export class LayoutComponent extends Component {
                         <SelectTask changeTask={this.changeTask.bind(this)}/>
                     </Modal> : null
                 }
+                </div>
             </PageContent>
         )
     };

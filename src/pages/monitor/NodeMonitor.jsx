@@ -325,6 +325,7 @@ export class LayoutComponent extends Component {
                         visible={echartsVisible}
                         onOk={this.handleOk}
                         onCancel={this.handleCancel}
+                        className="chartRoot"
                         width='70%'
                     >
                         <NodeEcharts jobmonitor={jobmonitor}/>
