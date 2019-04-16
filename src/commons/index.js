@@ -1,13 +1,12 @@
 import {isDev, isPro, isTest, isRC} from 'sx-ui';
 import {session} from 'sx-ui/utils/storage';
-import devAjaxBaseUrl from '../../local/local-ajax-base-url';
 import mockUrls from '../mock/url-config';
 
-import deployAjaxBaseUrl from '../../ajax-config';
+import deployAjaxBaseUrl from '../../api-config';
 export function getAjaxBaseUrl() {
     console.log('isDev, isPro, isTest, isRC',isDev, isPro, isTest, isRC);
-    if (isDev) {
-        return devAjaxBaseUrl;
+    if (isDev || process.env.NODE_ENV == "dev") {
+        return deployAjaxBaseUrl.dev;
     }
     if (isPro) {
 	return deployAjaxBaseUrl.production;
@@ -19,10 +18,6 @@ export function getAjaxBaseUrl() {
 
     if (isRC) {
 	return deployAjaxBaseUrl.rc;
-    }
-
-    if (process.env.NODE_ENV == "dev") {
-	return deployAjaxBaseUrl.dev;
     }
     return '/';
 }
