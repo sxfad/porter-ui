@@ -2,11 +2,6 @@ const path = require('path');
 const srcPath = './src';
 let routesIgnore = [];
 let pagePath = path.join(srcPath, '**/*.jsx');
-if (process.env.NODE_ENV === 'development') {
-    const localConfig = require('../local/local-build-config.js');
-    routesIgnore = localConfig.routesIgnore;
-    pagePath = localConfig.pagePath;
-}
 
 module.exports = {
     staticPath: './static', // 非webpack构建的静态文件存放目录，会被一同拷贝到assetsRoot目录下
@@ -61,7 +56,7 @@ module.exports = {
     },
     dev: {
         env: '"development"',
-        port: 8080,
+        port: process.env.SERVER_PORT,
         assetsSubDirectory: 'static',
         assetsPublicPath: '/',
         // CSS Sourcemaps off by default because relative paths are "buggy"
