@@ -16,7 +16,7 @@ UI构建自[yarn](https://yarnpkg.com).
 
 安装yarn环境依赖
 
-安装流程移步[安装步骤](https://yarn.bootcss.com/docs/install)
+安装流程移步[安装步骤](https://yarnpkg.com/zh-Hans/docs/install)
 
 ### 运行porter-ui
 
@@ -24,11 +24,8 @@ UI构建自[yarn](https://yarnpkg.com).
 
 通过api-config.js修改dev、test、rc、production环境下manager-boot的接口地址
 ```
-export default  {
-    'production': '/api/manager',
-    'test': 'http://127.0.0.1:8080/api/manager',
-    'rc': '/api/manager',
-    'dev': 'http://127.0.0.1:8080/api/manager'
+module.exports = {
+	api:'/api/manager',
 }
 ```
 
@@ -41,19 +38,21 @@ export default  {
 
 #### 命令
 
-| Command                 | Description                                                 |
+| 命令                 | 描述                                                 |
 | ----------------------- | ----------------------------------------------------------- |
-| `yarn run dev`          | "dev"环境下的开发模式                                         |
-| `yarn run build:prod`   | 打包生产环境静态页面                                           |
-| `yarn run build:rc`     | 打包仿真环境静态页面                                           |
-| `yarn run build:test`   | 打包测试环境静态页面                                           |
-| `yarn run clear-dev-cache`   | 清理缓存                                                |
+| `yarn run dev`          | 开发模式                                         |
+| `yarn run build`        | 打包静态页面                                                 |
 
 
+| 环境变量                 | 描述                                                 |
+| ----------------------- | ----------------------------------------------------------- |
+| `cross-env API=接口地址`    |  优先级高于api-config.js配置的接口地址              |
+| `cross-env OUTPUT=目录`    | 打包后静态页面输出位置                               |
+| `cross-env HTTP_PORT=端口号`    |优先级高于package.json 开发模式http server端口号  |
 
 ## 打包
 
-运行打包命令后，静态页面会被输出到public目录下:
+运行打包命令后，静态页面会被默认输出到public目录下:
 ```
- yarn & yarn run build:环境
+ yarn & yarn run build 
 ```

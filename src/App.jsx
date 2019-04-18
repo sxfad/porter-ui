@@ -10,6 +10,9 @@ import Router from './route/Router';
 import handleErrorMessage from './commons/handle-error-message';
 import {getCurrentLoginUser, getAjaxBaseUrl, isMock} from './commons';
 
+if(process.env.NODE_ENV === 'development') {
+
+}
 if (isDev) {
     require('./mock/index');
 
