@@ -1,25 +1,9 @@
-import {isDev, isPro, isTest, isRC} from 'sx-ui';
 import {session} from 'sx-ui/utils/storage';
 import mockUrls from '../mock/url-config';
 
 import deployAjaxBaseUrl from '../../api-config';
 export function getAjaxBaseUrl() {
-    console.log('isDev, isPro, isTest, isRC',isDev, isPro, isTest, isRC);
-    if (isDev || process.env.NODE_ENV == "dev") {
-        return deployAjaxBaseUrl.dev;
-    }
-    if (isPro) {
-	return deployAjaxBaseUrl.production;
-    }
-
-    if (isTest) {
-	return deployAjaxBaseUrl.test;
-    }
-
-    if (isRC) {
-	return deployAjaxBaseUrl.rc;
-    }
-    return '/';
+    return deployAjaxBaseUrl.api;
 }
 
 // 这里由于keyPrefix 要设置成 currentLoginUser.id 的原因，无法使用封装过的storage

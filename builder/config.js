@@ -2,7 +2,6 @@ const path = require('path');
 const srcPath = './src';
 let routesIgnore = [];
 let pagePath = path.join(srcPath, '**/*.jsx');
-
 module.exports = {
     staticPath: './static', // 非webpack构建的静态文件存放目录，会被一同拷贝到assetsRoot目录下
     projectRoot: './',
@@ -16,38 +15,7 @@ module.exports = {
     useESLint: true,
     build: {
         env: '"production"',
-        assetsRoot: path.join(__dirname, '../public'), // webpack 构建生成文件存放路径
-        assetsSubDirectory: 'static',
-        assetsPublicPath: '/', // cdn
-        productionSourceMap: false,
-        // Gzip off by default as many popular static hosts such as
-        // Surge or Netlify already gzip all static assets for you.
-        // Before setting to `true`, make sure to:
-        // npm install --save-dev compression-webpack-plugin
-        productionGzip: false,
-        productionGzipExtensions: ['js', 'css']
-    },
-    build: {
-        env: '"test"',
-        assetsRoot: path.join(__dirname, '../public'), // webpack 构建生成文件存放路径
-        assetsSubDirectory: 'static',
-        assetsPublicPath: '/', // cdn
-        productionSourceMap: false,
-        productionGzip: false,
-        productionGzipExtensions: ['js', 'css']
-    },
-    build: {
-        env: '"rc"',
-        assetsRoot: path.join(__dirname, '../public'), // webpack 构建生成文件存放路径
-        assetsSubDirectory: 'static',
-        assetsPublicPath: '/', // cdn
-        productionSourceMap: false,
-        productionGzip: false,
-        productionGzipExtensions: ['js', 'css']
-    },
-    build: {
-        env: '"dev"',
-        assetsRoot: path.join(__dirname, '../public'), // webpack 构建生成文件存放路径
+        assetsRoot: process.env.OUTPUT || path.join(__dirname, '../public'), // webpack 构建生成文件存放路径
         assetsSubDirectory: 'static',
         assetsPublicPath: '/', // cdn
         productionSourceMap: false,
@@ -56,7 +24,7 @@ module.exports = {
     },
     dev: {
         env: '"development"',
-        port: process.env.SERVER_PORT,
+        port: process.env.HTTP_PORT || 8080,
         assetsSubDirectory: 'static',
         assetsPublicPath: '/',
         // CSS Sourcemaps off by default because relative paths are "buggy"
