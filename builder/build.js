@@ -22,7 +22,9 @@ require('./generator');
 const assetsPath = path.join(config.build.assetsRoot, config.build.assetsSubDirectory);
 if (process.env.API) {
     mv("./api-config.js", "./api-config-tmp.js");
-    fs.writeFile("./api-config.js", 'module.exports = {api:"' + process.env.API + '"}');
+    fs.writeFile("./api-config.js", 'module.exports = {api:"' + process.env.API + '"}', function(err) {
+        console.log("stuff api-config.js error" + err);
+    });
 }
 rm('-rf', assetsPath);
 mkdir('-p', assetsPath);
