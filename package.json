@@ -1,18 +1,13 @@
 {
-  "name": "sx-admin",
-  "version": "1.0.0",
-  "description": "A React.js project",
-  "author": "suixingpay",
+  "name": "porter-ui",
+  "version": "3.0.2",
+  "description": "数据同步前端界面",
+  "author": "sxfad",
   "private": true,
   "scripts": {
     "dll": "webpack --config ./builder/webpack.dll.conf.js",
-    "dev": "yarn run dll && cross-env NODE_ENV=development node ./builder/dev-server.js",
-    "start": "yarn dev",
-    "build:prod": "cross-env NODE_ENV=production node ./builder/build.js",
-    "build:test": "cross-env NODE_ENV=test node ./builder/build.js",
-    "build:rc": "cross-env NODE_ENV=rc node ./builder/build.js",
-    "build:dev": "cross-env NODE_ENV=dev node ./builder/build.js",
-    "clear-cache": "rm -rf ./node_modules/.cache"
+    "dev": "yarn run dll && cross-env NODE_ENV=development HTTP_PORT=8081 node ./builder/dev-server.js",
+    "build": "cross-env NODE_ENV=production node ./builder/build.js"
   },
   "dependencies": {
     "acorn-dynamic-import": "^2.0.2",

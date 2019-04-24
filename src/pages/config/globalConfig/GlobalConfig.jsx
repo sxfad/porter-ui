@@ -130,7 +130,6 @@ export class LayoutComponent extends Component {
 
     getFieldTypeInfo = (dataSource) => {
         this.setState({fieldType: dataSource});
-
         dataSource.forEach(item => {
             const {fieldTypeKey, fieldType} = item;
             if (fieldType === 'RADIO') {
@@ -302,7 +301,6 @@ export class LayoutComponent extends Component {
             },
         };
         const formItemsHtml = [];
-
         fieldType.forEach((item, index) => {
             if (item.fieldType === 'TEXT') {
                 formItemsHtml.push(

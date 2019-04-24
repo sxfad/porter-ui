@@ -379,7 +379,7 @@ export class LayoutComponent extends Component {
                                             showTime
                                             style={{width: '100%'}}
                                             format="YYYY-MM-DD HH:mm"
-                                            placeholder={['start', 'end']}
+                                            placeholder={['开始时间', '结束时间']}
                                             onOk={this.onOk}
                                         />
                                     )}
