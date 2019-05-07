@@ -2,7 +2,21 @@
  * Created by lhyin on 2017/12/5.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Select, Row, Col, DatePicker, message, Popconfirm} from 'antd';
+import {
+    Form,
+    Input,
+    Button,
+    Table,
+    Select,
+    Row,
+    Col,
+    DatePicker,
+    message,
+    Popconfirm,
+    Modal,
+    Radio,
+    Checkbox,
+} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, FontIcon} from 'sx-ui/antd';
 import {browserHistory} from 'react-router';
 import moment from 'moment';
@@ -15,10 +29,15 @@ import connectComponent from '../../redux/store/connectComponent';
 const {RangePicker} = DatePicker;
 const FormItem = Form.Item;
 const Option = Select.Option;
+const RadioGroup = Radio.Group;
+const CheckboxGroup = Checkbox.Group;
+const { TextArea } = Input;
+
 export const PAGE_ROUTE = '/synchTask';
 
 @Form.create()
 export class LayoutComponent extends Component {
+
     state = {
         pageNum: 1,
         pageSize: 10,
@@ -31,7 +50,16 @@ export class LayoutComponent extends Component {
         tabLoading: false,
         visible: false,
         applicationName: '',
-    }
+        confirmLoading: false,
+        data:[],
+        visableTable: false,
+        value: null,
+        dicControlTypePlugins: [],
+        owner: null,
+        record: null,
+        loading: false,
+        shareOwner: null
+    };
 
     columns = [
         {
@@ -72,9 +100,32 @@ export class LayoutComponent extends Component {
             render: (text) => formatDefaultTime(text),
         },
         {
+            title: '权限设置',
+            dataIndex: 'PermissionSet',
+            key: 'PermissionSet',
+            render: (text, record) => (
+                <a
+                    onClick={
+                        () => this.showModal(record)
+                    }
+                >
+                    设置
+                </a>
+            )
+        },
+        {
             title: '状态',
             dataIndex: 'jobState.name',
             key: 'jobState.name',
+            render: text => (
+                <span
+                    style={{
+                        color: text === "工作中" ? "green" : "gray"
+                    }}
+                >
+                    {text}
+                </span>
+            )
         },
         {
             title: '操作',
@@ -120,6 +171,257 @@ export class LayoutComponent extends Component {
             },
         },
     ];
+
+    /**
+     *权限设置columns
+     */
+    setTingsForm = [
+        {
+            name: "任务所有者",
+            key: "name",
+            init: null,
+            rule: null,
+            labelCol: 10,
+            wrapperCol: 14,
+            disable: true,
+            span: 7,
+            type: "input"
+        },{
+            name: "任务共享者",
+            key: "shareOwner",
+            init: null,
+            rule: null,
+            labelCol: 5,
+            wrapperCol: 18,
+            disable: true,
+            span: 14,
+            type:  "input"
+        },{
+            name: "操作类型",
+            key: "oprType",
+            init: null,
+            rule: [{
+                required: true, message: '请选择操作类型!',
+            }],
+            labelCol: 3,
+            wrapperCol: 20,
+            disable: false,
+            span: 23,
+            type: "radio"
+        }
+    ];
+
+    columnsModal = [{
+        title: '',
+        dataIndex: 'sj',
+        width: 100,
+        render: (text, record) => (
+            <Radio
+                value={record.nickname}
+                onChange={
+                    (e) => this.handelChange(e,record.nickname)
+                }
+                checked={
+                    record.sj === 1 ? true : false
+                }
+            >
+            </Radio>
+            )
+        },{
+        title: '用户',
+        dataIndex: 'nickname',
+        width: 180
+    },{
+        title: '部门',
+        dataIndex: 'departMent',
+        width: 180
+    },{
+        title: '操作',
+        dataIndex: 'opr',
+        render: (text, record)=> (
+            <Popconfirm
+                title="确定移除?"
+                onConfirm={
+                    () => this.handelDel(record.nickname)
+                }
+                okText="是"
+                cancelText="否"
+            >
+                <a
+                    disabled = {
+                        record.sj === 1 ? false : true
+                    }
+                >
+                    移除
+                </a>
+            </Popconfirm>
+
+        )
+    }];
+
+    /**
+     * 权限设置
+     */
+    showModal = (record) => {
+        this.setState({
+            visible: true,
+            record,
+        });
+        promiseAjax.get(`/jobtasksowner/setPage/${record.id}`).then(
+            res => {
+                this.props.form.setFieldsValue({
+                    name:res.data.owner ? res.data.owner.name : "无",
+                    shareOwner: res.data.shareOwner ? this.aryOper(res.data.shareOwner,"name").join(",") : "无"
+                });
+                this.setState({
+                    dicControlTypePlugins: res.data.dicControlTypePlugins,
+                    owner: res.data.owner,
+                    shareOwner: res.data.shareOwner
+                })
+            }
+        );
+    };
+
+    /**
+     * 处理数组问题
+     * @param ary
+     * @param val
+     * @returns {Array}
+     */
+    aryOper = (ary,val) => {
+        let arry = [];
+        ary && ary.map (
+            v => {
+                arry.push(v[val])
+            }
+        );
+        return arry
+    };
+
+    /**
+     * 操作类型
+     * @param e
+     */
+     handleRadio = (e) => {
+        let value = e.target.value;
+        const {shareOwner} = this.state;
+        this.setState({
+            loading: true
+        });
+        promiseAjax.get(`/cuser/findRegister`).then(
+            res => {
+                    let arry = this.state.owner
+                        ? res.data.filter(
+                                v => v.id !== this.state.owner.ownerId
+                            )
+                        : res.data;
+                    if (value === "SHARE" || value === "RECYCLE") {
+                        let ownerId = this.aryOper(shareOwner,"ownerId");
+                        arry.forEach(
+                            (v,index) => {
+                                ownerId.indexOf(v.id) !== -1
+                                    ? arry[index]["sj"] = 1
+                                    : null
+                            }
+                        );
+                    }
+                    this.setState({
+                        data: arry,
+                        loading: false
+                    });
+            }
+        );
+        value === "CHANGE" || value === "SHARE"
+            ? this.setState({
+                visableTable: true,
+                value
+            })
+            : this.setState({
+                visableTable: false
+            });
+    };
+
+    /**
+     * 选择归属明细
+     * @param e
+     */
+    handelChange = (e,record) => {
+        const {data} = this.state;
+        data.map(
+            item => {
+                if(this.state.value === "SHARE"){
+                    if (item.nickname === record) {
+                        item.sj = 1;
+                    }
+                    return
+                }
+                if (item.nickname === record) {
+                    item.sj = 1;
+                } else {
+                    item.sj = 0;
+                }
+            }
+        );
+        this.setState({data});
+    };
+
+    /**
+     * 移除归属明细
+     */
+    handelDel = (record) => {
+        const {data} = this.state;
+        data.map(
+            v => {
+                if (v.nickname === record) {
+                    v.sj = 0;
+                }
+            }
+        );
+        this.setState({data})
+    };
+
+    handleOk = () => {
+        this.setState({
+            confirmLoading: true,
+        });
+        const radioValue = this.props.form.getFieldValue('oprType');
+        const { record, data } = this.state;
+        let toUserIds = data.filter(
+            v => v.sj === 1
+        );
+        const ControlSettingVo = {
+            controlTypeEnum: radioValue,
+            jobId: record.id,
+            toUserIds: this.aryOper(toUserIds,"id")
+        };
+        this.props.form.validateFieldsAndScroll((err) => {
+            if (!err) {
+                promiseAjax.put( `/jobtasksowner`, ControlSettingVo ).then(
+                    res => {
+                        res.code === 200
+                        ? message.success("操作成功!")
+                        : message.error("操作失败!");
+                        this.handleCancel();
+                        this.search();
+                    }
+                ).finally(
+                    () => {
+                        this.setState({
+                            confirmLoading: false,
+                        });
+                    }
+                );
+            }
+        });
+    };
+
+    handleCancel = () => {
+        this.props.form.resetFields(["oprType"]);
+        this.setState({
+            visible: false,
+            visableTable: false,
+        });
+    };
 
     /**
      * 编辑任务
@@ -255,7 +557,6 @@ export class LayoutComponent extends Component {
      * 查询
      */
     handleQuery = (values) => {
-        console.log(values);
         this.setState({
             pageNum: 1,
         });
@@ -307,7 +608,6 @@ export class LayoutComponent extends Component {
      * 设置时间
      */
     onOk = (value) => {
-        console.log(value);
         this.setState({
             startTimeStr: moment(value[0]).format('YYYY-MM-DD HH:mm:ss'),
             endTimeStr: moment(value[1]).format('YYYY-MM-DD HH:mm:ss'),
@@ -320,7 +620,19 @@ export class LayoutComponent extends Component {
 
     render() {
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
-        const {dataSource, total, pageNum, pageSize, tabLoading} = this.state;
+        const {
+            dataSource,
+            total,
+            pageNum,
+            pageSize,
+            tabLoading,
+            visible,
+            confirmLoading,
+            data,
+            visableTable,
+            dicControlTypePlugins,
+            loading
+        } = this.state;
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
@@ -426,6 +738,72 @@ export class LayoutComponent extends Component {
                     onPageNumChange={this.handlePageNumChange}
                     onPageSizeChange={this.handlePageSizeChange}
                 />
+                <Modal
+                    title="权限控制"
+                    visible={visible}
+                    onOk={this.handleOk}
+                    confirmLoading={confirmLoading}
+                    onCancel={this.handleCancel}
+                    width="50%"
+                >
+                    <Form>
+                        <Row>
+                            {
+                                this.setTingsForm && this.setTingsForm.map(
+                                    (v,k) =>
+                                        <Col span={v.span} key={k}>
+                                            <FormItem
+                                                label={v.name}
+                                                labelCol={{span:v.labelCol}}
+                                                wrapperCol={{span:v.wrapperCol}}
+                                                key={k}
+                                            >
+
+                                                {getFieldDecorator(v.key,{
+                                                    initialValue: v.init,
+                                                    rules: v.rule
+                                                })(
+
+                                                        v.type === "input"
+                                                        ? <Input style={{border: "none"}} readOnly="readonly"/>
+                                                        : v.type === "radio"
+                                                            ? <RadioGroup onChange={this.handleRadio}>
+                                                                {
+                                                                    dicControlTypePlugins && dicControlTypePlugins.map(
+                                                                        v => {
+                                                                            return <Radio
+                                                                                        key={v.alertType}
+                                                                                        value={v.alertType}
+                                                                                    >
+                                                                                        {v.fieldName}
+                                                                                    </Radio>
+                                                                        }
+                                                                    )
+                                                                }
+                                                                </RadioGroup>
+                                                            : <p/>
+                                                )}
+                                            </FormItem>
+                                        </Col>
+                                )
+                            }
+                        </Row>
+                    </Form>
+                    {
+                        visableTable
+                            ? <div style={{margin: "0 10px"}}>
+                                <Table
+                                    columns={this.columnsModal}
+                                    dataSource={data}
+                                    pagination={false}
+                                    scroll={{ y: 340 }}
+                                    rowKey={record => record.id}
+                                    loading={loading}
+                                />
+                              </div>
+                            : null
+                    }
+                </Modal>
             </PageContent>
         );
     }
