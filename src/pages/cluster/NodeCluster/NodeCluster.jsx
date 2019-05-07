@@ -35,7 +35,8 @@ export class LayoutComponent extends Component {
         loading: false,
         dataRirht: [],
         valueChange: null,
-        selectedRowKeys: null
+        selectedRowKeys: null,
+        modalSelectData: []
     }
 
     columns = [
@@ -217,6 +218,7 @@ export class LayoutComponent extends Component {
 
     componentDidMount() {
         this.search();
+        this.requestAjax();
     }
 
 
@@ -224,10 +226,6 @@ export class LayoutComponent extends Component {
      * 权限设置
      */
     showModal = (record) => {
-        this.setState({
-            visible: true,
-            record,
-        });
         promiseAjax.get(`/nodesowner/setPage/${record.nodeId}`).then(
             res => {
                 this.props.form.setFieldsValue({
@@ -241,6 +239,10 @@ export class LayoutComponent extends Component {
                 })
             }
         );
+        this.setState({
+            visible: true,
+            record,
+        });
     };
 
     /**
@@ -260,37 +262,47 @@ export class LayoutComponent extends Component {
     };
 
     /**
+     * 操作类型数据处理
+     * @param e
+     */
+    dataProcessing = (e) => {
+        const {shareOwner, modalSelectData} = this.state;
+        let arry = this.state.owner
+            ? modalSelectData.filter(
+                v => v.id !== this.state.owner.ownerId
+            )
+            : modalSelectData;
+        let rowKeys = [];
+        let rowData = [];
+        if (e === "SHARE") {
+            let ownerId = this.aryOper(shareOwner,"ownerId");
+            arry.forEach(
+                v => {
+                    if(ownerId.indexOf(v.id) !== -1) {
+                        rowKeys.push(v.id);
+                        rowData.push(v)
+                    }
+
+                }
+            );
+        }
+        this.setState({
+            data: arry,
+            loading: false,
+            selectedRowKeys:rowKeys,
+            dataRirht:rowData
+        });
+    };
+
+    /**
      * 操作类型请求接口
      * @param e
      */
-    requestAjax = (e) => {
-        const {shareOwner} = this.state;
+    requestAjax = () => {
         promiseAjax.get(`/cuser/findRegister`).then(
             res => {
-                let arry = this.state.owner
-                    ? res.data.filter(
-                        v => v.id !== this.state.owner.ownerId
-                    )
-                    : res.data;
-                let rowKeys = [];
-                let rowData = [];
-                if (e === "SHARE") {
-                    let ownerId = this.aryOper(shareOwner,"ownerId");
-                    arry.forEach(
-                        v => {
-                            if(ownerId.indexOf(v.id) !== -1) {
-                                rowKeys.push(v.id);
-                                rowData.push(v)
-                            }
-
-                        }
-                    );
-                }
                 this.setState({
-                    data: arry,
-                    loading: false,
-                    selectedRowKeys:rowKeys,
-                    dataRirht:rowData
+                    modalSelectData: res.data
                 });
             }
         );
@@ -305,7 +317,7 @@ export class LayoutComponent extends Component {
             loading: true,
             valueChange: e,
         });
-        this.requestAjax(e);
+        this.dataProcessing(e);
         e === "CHANGE" || e === "SHARE"
             ? this.setState({
                 visableTable: true,
@@ -321,6 +333,7 @@ export class LayoutComponent extends Component {
             confirmLoading: true,
         });
         const radioValue = this.props.form.getFieldValue('oprType');
+        const { record, selectedRowKeys } = this.state;
         if(!radioValue){
             message.error("请选择操作类型!");
             this.setState({
@@ -328,7 +341,15 @@ export class LayoutComponent extends Component {
             });
             return
         }
-        const { record, selectedRowKeys } = this.state;
+        if(radioValue === "CHANGE"){
+            if(selectedRowKeys.length <=0) {
+                message.error("请选择移交人!");
+                this.setState({
+                    confirmLoading: false
+                });
+                return
+            }
+        }
         const ControlSettingVo = {
             controlTypeEnum: radioValue,
             id: record.nodeId,

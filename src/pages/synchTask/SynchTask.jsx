@@ -61,7 +61,8 @@ export class LayoutComponent extends Component {
         shareOwner: null,
         dataRirht: [],
         valueChange: null,
-        selectedRowKeys: null
+        selectedRowKeys: null,
+        modalSelectData: []
     };
 
     columns = [
@@ -226,10 +227,6 @@ export class LayoutComponent extends Component {
      * 权限设置
      */
     showModal = (record) => {
-        this.setState({
-            visible: true,
-            record,
-        });
         promiseAjax.get(`/jobtasksowner/setPage/${record.id}`).then(
             res => {
                 this.props.form.setFieldsValue({
@@ -243,6 +240,10 @@ export class LayoutComponent extends Component {
                 })
             }
         );
+        this.setState({
+            visible: true,
+            record,
+        });
     };
 
     /**
@@ -265,37 +266,47 @@ export class LayoutComponent extends Component {
      * 操作类型请求接口
      * @param value
      */
-    requestAjax = (value) => {
-        const {shareOwner} = this.state;
+    requestAjax = () => {
         promiseAjax.get(`/cuser/findRegister`).then(
             res => {
-                let arry = this.state.owner
-                    ? res.data.filter(
-                        v => v.id !== this.state.owner.ownerId
-                    )
-                    : res.data;
-                let rowKeys = [];
-                let rowData = [];
-                if (value === "SHARE") {
-                    let ownerId = this.aryOper(shareOwner,"ownerId");
-                    arry.forEach(
-                        v => {
-                            if(ownerId.indexOf(v.id) !== -1) {
-                                rowKeys.push(v.id);
-                                rowData.push(v)
-                            }
-
-                        }
-                    );
-                }
                 this.setState({
-                    data: arry,
-                    loading: false,
-                    selectedRowKeys:rowKeys,
-                    dataRirht:rowData
+                    modalSelectData: res.data
                 });
             }
         );
+    };
+
+    /**
+     * 操作类型数据处理
+     * @param e
+     */
+    dataProcessing = (value) => {
+        const {shareOwner, modalSelectData} = this.state;
+        let arry = this.state.owner
+            ? modalSelectData.filter(
+                v => v.id !== this.state.owner.ownerId
+            )
+            : modalSelectData;
+        let rowKeys = [];
+        let rowData = [];
+        if (value === "SHARE") {
+            let ownerId = this.aryOper(shareOwner,"ownerId");
+            arry.forEach(
+                v => {
+                    if(ownerId.indexOf(v.id) !== -1) {
+                        rowKeys.push(v.id);
+                        rowData.push(v)
+                    }
+
+                }
+            );
+        }
+        this.setState({
+            data: arry,
+            loading: false,
+            selectedRowKeys:rowKeys,
+            dataRirht:rowData
+        });
     };
 
     /**
@@ -308,7 +319,7 @@ export class LayoutComponent extends Component {
             loading: true,
             valueChange: value
         });
-        this.requestAjax(value);
+        this.dataProcessing(value);
         value === "CHANGE" || value === "SHARE"
             ? this.setState({
                 visableTable: true,
@@ -325,6 +336,15 @@ export class LayoutComponent extends Component {
         });
         const radioValue = this.props.form.getFieldValue('oprType');
         const { record, selectedRowKeys } = this.state;
+        if(radioValue === "CHANGE"){
+            if(selectedRowKeys.length <=0) {
+                 message.error("请选择移交人!");
+                this.setState({
+                    confirmLoading: false
+                });
+                return
+            }
+        }
         const ControlSettingVo = {
             controlTypeEnum: radioValue,
             id: record.id,
@@ -439,6 +459,7 @@ export class LayoutComponent extends Component {
 
     componentDidMount() {
         this.search();
+        this.requestAjax();
     }
 
     search = (args) => {
@@ -560,14 +581,14 @@ export class LayoutComponent extends Component {
 
     expandedRowRender = (record) => {
         return <Row>
-            <Col span={7}>
-                节点所有者：{record.id}
-            </Col>
-            <Col span={17}>
-                节点共享者: {record.id}
+                    <Col span={7}>
+                        任务所有者：{record.id}
+                    </Col>
+                    <Col span={17}>
+                        任务共享者: {record.id}
 
-            </Col>
-        </Row>
+                    </Col>
+                </Row>
     };
 
     render() {
