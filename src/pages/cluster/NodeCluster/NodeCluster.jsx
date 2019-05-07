@@ -2,7 +2,7 @@
  * Created by lhyin on 2018/19/3.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Row, Col, Select, message, Popconfirm} from 'antd';
+import {Form, Input, Button, Table, Row, Col, Select, message, Popconfirm, Radio, Modal} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import {promiseAjax} from 'sx-ui';
 import './style.less';
@@ -10,6 +10,9 @@ import {browserHistory} from 'react-router';
 import connectComponent from '../../../redux/store/connectComponent';
 
 const FormItem = Form.Item;
+const RadioGroup = Radio.Group;
+const Option = Select.Option;
+
 export const PAGE_ROUTE = '/nodeCluster';
 @Form.create()
 export class LayoutComponent extends Component {
@@ -23,15 +26,27 @@ export class LayoutComponent extends Component {
         endTime: Date(),
         dataSource: [],
         tabLoading: false,
+        visible: false,
+        record: null,
+        confirmLoading: false,
+        visableTable: false,
+        dicControlTypePlugins:[],
+        data: [],
+        loading: false,
+        dataRirht: [],
+        valueChange: null,
+        selectedRowKeys: null
     }
 
     columns = [
         {
             title: '编号',
+            key: "编号",
             render: (text, record, index) => (index + 1) + ((this.state.pageNum - 1) * this.state.pageSize),
         },
         {
             title: '节点ID',
+            key: "nodeId",
             render: (text, record) => {
                 return (
                     record.nodeId
@@ -40,6 +55,7 @@ export class LayoutComponent extends Component {
         },
         {
             title: '机器名称',
+            key: "machineName",
             render: (text, record) => {
                 return (
                     record.machineName
@@ -48,6 +64,7 @@ export class LayoutComponent extends Component {
         },
         {
             title: 'IP地址',
+            key: "ipAddress",
             render: (text, record) => {
                 return (
                     record.ipAddress
@@ -56,6 +73,7 @@ export class LayoutComponent extends Component {
         },
         {
             title: '心跳时间',
+            key: "heartBeatTime",
             render: (text, record) => {
                 return (
                     record.heartBeatTime
@@ -64,6 +82,7 @@ export class LayoutComponent extends Component {
         },
         {
             title: '进程号',
+            key: "pidNumber",
             render: (text, record) => {
                 return (
                     record.pidNumber
@@ -72,6 +91,7 @@ export class LayoutComponent extends Component {
         },
         {
             title: '状态',
+            key: "state",
             render: (text, record) => {
                 if (record.state === -1) {
                     return (
@@ -86,7 +106,22 @@ export class LayoutComponent extends Component {
             },
         },
         {
+            title: '权限设置',
+            dataIndex: 'PermissionSet',
+            key: 'PermissionSet',
+            render: (text, record) => (
+                <a
+                    onClick={
+                        () => this.showModal(record)
+                    }
+                >
+                    设置
+                </a>
+            )
+        },
+        {
             title: '任务推送状态',
+            key: "taskPushState",
             render: (text, record) => {
                 return (
                     record.taskPushState && record.taskPushState.name
@@ -95,6 +130,7 @@ export class LayoutComponent extends Component {
         },
         {
             title: '操作',
+            key: "opr",
             render: (text, record) => {
                 if (record.state === -1) {
                     return (
@@ -135,10 +171,201 @@ export class LayoutComponent extends Component {
         },
     ];
 
+    /**
+     *权限设置columns
+     */
+    setTingsForm = [
+        {
+            name: "节点所有者",
+            key: "name",
+            init: null,
+            rule: null,
+            labelCol: 10,
+            wrapperCol: 14,
+            disable: true,
+            span: 7,
+            type: "input"
+        },{
+            name: "节点共享者",
+            key: "shareOwner",
+            init: null,
+            rule: null,
+            labelCol: 5,
+            wrapperCol: 18,
+            disable: true,
+            span: 14,
+            type:  "input"
+        },{
+            name: "操作类型",
+            key: "oprType",
+            labelCol: 3,
+            wrapperCol: 7,
+            disable: false,
+            span: 23,
+            type: "radio"
+        }
+    ];
+
+    columnsModal = [{
+        title: '用户',
+        dataIndex: 'nickname',
+    },{
+        title: '部门',
+        dataIndex: 'departMent',
+      }
+    ];
+
     componentDidMount() {
         this.search();
     }
 
+
+    /**
+     * 权限设置
+     */
+    showModal = (record) => {
+        this.setState({
+            visible: true,
+            record,
+        });
+        promiseAjax.get(`/nodesowner/setPage/${record.nodeId}`).then(
+            res => {
+                this.props.form.setFieldsValue({
+                    name:res.data.owner ? res.data.owner.name : "无",
+                    shareOwner: res.data.shareOwner ? this.aryOper(res.data.shareOwner,"name").join(",") : "无"
+                });
+                this.setState({
+                    dicControlTypePlugins: res.data.dicControlTypePlugins,
+                    owner: res.data.owner,
+                    shareOwner: res.data.shareOwner
+                })
+            }
+        );
+    };
+
+    /**
+     * 处理数组问题
+     * @param ary
+     * @param val
+     * @returns {Array}
+     */
+    aryOper = (ary,val) => {
+        let arry = [];
+        ary && ary.map (
+            v => {
+                arry.push(v[val])
+            }
+        );
+        return arry
+    };
+
+    /**
+     * 操作类型请求接口
+     * @param e
+     */
+    requestAjax = (e) => {
+        const {shareOwner} = this.state;
+        promiseAjax.get(`/cuser/findRegister`).then(
+            res => {
+                let arry = this.state.owner
+                    ? res.data.filter(
+                        v => v.id !== this.state.owner.ownerId
+                    )
+                    : res.data;
+                let rowKeys = [];
+                let rowData = [];
+                if (e === "SHARE") {
+                    let ownerId = this.aryOper(shareOwner,"ownerId");
+                    arry.forEach(
+                        v => {
+                            if(ownerId.indexOf(v.id) !== -1) {
+                                rowKeys.push(v.id);
+                                rowData.push(v)
+                            }
+
+                        }
+                    );
+                }
+                this.setState({
+                    data: arry,
+                    loading: false,
+                    selectedRowKeys:rowKeys,
+                    dataRirht:rowData
+                });
+            }
+        );
+    };
+
+    /**
+     * 操作类型
+     * @param e
+     */
+    handleRadio = (e) => {
+        this.setState({
+            loading: true,
+            valueChange: e,
+        });
+        this.requestAjax(e);
+        e === "CHANGE" || e === "SHARE"
+            ? this.setState({
+                visableTable: true,
+                value: e
+            })
+            : this.setState({
+                visableTable: false
+            });
+    };
+
+    handleOk = () => {
+        this.setState({
+            confirmLoading: true,
+        });
+        const radioValue = this.props.form.getFieldValue('oprType');
+        if(!radioValue){
+            message.error("请选择操作类型!");
+            this.setState({
+                confirmLoading: false
+            });
+            return
+        }
+        const { record, selectedRowKeys } = this.state;
+        const ControlSettingVo = {
+            controlTypeEnum: radioValue,
+            id: record.nodeId,
+            toUserIds: selectedRowKeys
+        };
+        this.props.form.validateFieldsAndScroll(["oprType"],(err) => {
+            if (!err) {
+                promiseAjax.put( `/nodesowner`, ControlSettingVo ).then(
+                    res => {
+                        res.code === 200
+                            ? message.success("操作成功!")
+                            : message.error("操作失败!");
+                        this.handleCancel();
+                        this.search();
+                    }
+                ).finally(
+                    () => {
+                        this.setState({
+                            confirmLoading: false,
+                        });
+                    }
+                );
+            } else {
+                this.setState({
+                    confirmLoading: false,
+                });
+            }
+        });
+    };
+
+    handleCancel = () => {
+        this.props.form.resetFields(["oprType"]);
+        this.setState({
+            visible: false,
+            visableTable: false,
+        });
+    };
     /**
      * (停止)接收任务推送
      * @param dataId
@@ -149,7 +376,6 @@ export class LayoutComponent extends Component {
         });
         promiseAjax.post(`/nodes/taskpushstate?id=${dataId}&taskPushState=${PushState}`).then(rsp => {
             if (rsp.success) {
-                console.log(rsp);
                 const {dataSource} = this.state;
                 dataSource.map((key, value)=> {
                     if (key.id === dataId) {
@@ -276,12 +502,11 @@ export class LayoutComponent extends Component {
         });
         const data = {
             pageNo: 1,
-        }
+        };
         this.search(data);
-    }
+    };
 
     handlePageSizeChange = (pageSize) => {
-        console.log('value', pageSize);
         this.setState({
             pageNum: 1,
         });
@@ -290,11 +515,9 @@ export class LayoutComponent extends Component {
             pageNo: 1,
         };
         this.search(data);
-    }
+    };
 
     handlePageNumChange = (value) => {
-        console.log('value', value);
-
         const {pageSize} = this.state;
         this.setState({
             pageNum: value,
@@ -304,15 +527,72 @@ export class LayoutComponent extends Component {
             pageNo: value,
         };
         this.search(data);
-    }
+    };
 
     handleAddTask = () => {
         browserHistory.push('/nodeCluster/+add/NodeId');
-    }
+    };
+
+    expandedRowRender = (record) => {
+        return <Row>
+                    <Col span={7}>
+                        节点所有者：{record.nodeId}
+                    </Col>
+                    <Col span={17}>
+                        节点共享者: {record.nodeId}
+
+                    </Col>
+                </Row>
+    };
 
     render() {
         const {form: {getFieldDecorator, getFieldsValue}} = this.props;
-        const {dataSource, total, pageNum, pageSize, tabLoading} =this.state;
+        const {
+            dataSource,
+            total,
+            pageNum,
+            pageSize,
+            tabLoading,
+            visible,
+            confirmLoading,
+            visableTable,
+            dicControlTypePlugins,
+            data,
+            loading,
+            dataRirht,
+            valueChange,
+            selectedRowKeys,
+            record
+        } =this.state;
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: (selectedRowKeys, selectedRows) => {
+                if(valueChange === "SHARE"){
+                    this.setState({
+                        dataRirht:selectedRows,
+                        selectedRowKeys
+                    });
+                }
+            },
+            onSelect : (record) => {
+                if(valueChange === "CHANGE"){
+                    let ary = [];
+                    ary.push(record);
+                    if(selectedRowKeys[0] !== record.id ){
+                        this.setState({
+                            selectedRowKeys: [record.id],
+                            dataRirht: ary
+                        });
+
+                    }else{
+                        this.setState({
+                            selectedRowKeys: [],
+                            dataRirht: []
+                        });
+                    }
+                }
+            }
+        };
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
@@ -397,6 +677,7 @@ export class LayoutComponent extends Component {
                         rowKey={(record) => record.id}
                         columns={this.columns}
                         pagination={false}
+                        expandedRowRender={ (record) => this.expandedRowRender (record)}
                     />
                 </div>
                 <PaginationComponent
@@ -407,6 +688,102 @@ export class LayoutComponent extends Component {
                     onPageSizeChange={this.handlePageSizeChange}
 
                 />
+
+                <Modal
+                    title={
+                        <span>
+                            <Col span={3}>
+                                权限控制
+                            </Col>
+                        <span/>
+                            <Col style={{color: "gray", fontSize: 6}}>
+                                节点ID:{ record ? record.nodeId : null }
+                            </Col>
+                        </span>
+                    }
+                    visible={visible}
+                    onOk={this.handleOk}
+                    confirmLoading={confirmLoading}
+                    onCancel={this.handleCancel}
+                    width="60%"
+                >
+                    <Form>
+                        <Row>
+                            {
+                                this.setTingsForm && this.setTingsForm.map(
+                                    (v,k) =>
+                                        <Col span={v.span} key={k}>
+                                            <FormItem
+                                                label={v.name}
+                                                labelCol={{span:v.labelCol}}
+                                                wrapperCol={{span:v.wrapperCol}}
+                                                key={k}
+                                            >
+
+                                                {getFieldDecorator(v.key,{
+                                                    initialValue: v.init,
+                                                    rules: v.rule
+                                                })(
+
+                                                    v.type === "input"
+                                                        ? <Input
+                                                            style={{
+                                                                border: "none",
+                                                                boxShadow: "none"
+                                                            }}
+                                                            readOnly="readonly"
+                                                        />
+                                                        : v.type === "radio"
+                                                        ? <Select placeholder="请选择" onChange={this.handleRadio}>
+                                                            {
+                                                                dicControlTypePlugins && dicControlTypePlugins.map(
+                                                                    v => {
+                                                                        return <Option
+                                                                            key={v.alertType}
+                                                                            value={v.alertType}
+                                                                        >
+                                                                            {v.fieldName}
+                                                                        </Option>
+                                                                    }
+                                                                )
+                                                            }
+                                                        </Select>
+                                                        : <p/>
+                                                )}
+                                            </FormItem>
+                                        </Col>
+                                )
+                            }
+                        </Row>
+                    </Form>
+                    {
+                        visableTable
+                            ? <Row style={{margin: "0 10px"}}>
+                                <Col span={11} style={{marginRight: "6%"}}>
+                                    <Table
+                                        columns={this.columnsModal}
+                                        dataSource={data}
+                                        pagination={false}
+                                        scroll={{ y: 340 }}
+                                        rowKey={record => record.id}
+                                        loading={loading}
+                                        rowSelection={rowSelection}
+                                    />
+                                </Col>
+                                <Col span={11}>
+                                    <Table
+                                        columns={this.columnsModal}
+                                        dataSource={dataRirht}
+                                        pagination={false}
+                                        scroll={{ y: 340 }}
+                                        rowKey={record => record.id}
+                                        loading={loading}
+                                    />
+                                </Col>
+                            </Row>
+                            : null
+                    }
+                </Modal>
             </PageContent>
         )
     };
