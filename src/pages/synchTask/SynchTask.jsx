@@ -765,7 +765,13 @@ export class LayoutComponent extends Component {
                                                 })(
 
                                                         v.type === "input"
-                                                        ? <Input style={{border: "none"}} readOnly="readonly"/>
+                                                        ? <Input
+                                                                style={{
+                                                                    border: "none",
+                                                                    boxShadow: "none"
+                                                                }}
+                                                                readOnly="readonly"
+                                                            />
                                                         : v.type === "radio"
                                                             ? <RadioGroup onChange={this.handleRadio}>
                                                                 {
