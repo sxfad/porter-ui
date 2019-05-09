@@ -359,6 +359,9 @@ export class LayoutComponent extends Component {
                         : message.error("操作失败!");
                         this.handleCancel();
                         this.search();
+                        setTimeout(
+                            () => this.expandedRowRender(null,record),100
+                        )
                     }
                 ).finally(
                     () => {
@@ -844,7 +847,7 @@ export class LayoutComponent extends Component {
                                         columns={this.columnsModal}
                                         dataSource={data}
                                         pagination={false}
-                                        scroll={{ y: 340 }}
+                                        scroll={{ y: 300 }}
                                         rowKey={record => record.id}
                                         loading={loading}
                                         rowSelection={rowSelection}
@@ -855,7 +858,7 @@ export class LayoutComponent extends Component {
                                         columns={this.columnsModal}
                                         dataSource={dataRirht}
                                         pagination={false}
-                                        scroll={{ y: 340 }}
+                                        scroll={{ y: 300 }}
                                         rowKey={record => record.id}
                                         loading={loading}
                                     />
