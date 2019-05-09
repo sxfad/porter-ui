@@ -62,7 +62,7 @@ export class LayoutComponent extends Component {
         dataRirht: [],
         valueChange: null,
         selectedRowKeys: null,
-        modalSelectData: []
+        modalSelectData: [],
     };
 
     columns = [
@@ -264,7 +264,6 @@ export class LayoutComponent extends Component {
 
     /**
      * 操作类型请求接口
-     * @param value
      */
     requestAjax = () => {
         promiseAjax.get(`/cuser/findRegister`).then(
@@ -278,7 +277,7 @@ export class LayoutComponent extends Component {
 
     /**
      * 操作类型数据处理
-     * @param e
+     * @param value
      */
     dataProcessing = (value) => {
         const {shareOwner, modalSelectData} = this.state;
@@ -347,8 +346,9 @@ export class LayoutComponent extends Component {
         }
         const ControlSettingVo = {
             controlTypeEnum: radioValue,
-            id: record.id,
-            toUserIds: selectedRowKeys
+            jobId: record.id,
+            toUserIds: selectedRowKeys,
+            nodeId: null
         };
         this.props.form.validateFieldsAndScroll((err) => {
             if (!err) {
@@ -579,16 +579,30 @@ export class LayoutComponent extends Component {
         browserHistory.push('/synchTask/+add/TaskId');
     };
 
-    expandedRowRender = (record) => {
-        return <Row>
-                    <Col span={7}>
-                        任务所有者：{record.id}
-                    </Col>
-                    <Col span={17}>
-                        任务共享者: {record.id}
-
-                    </Col>
-                </Row>
+    /**
+     * table额外展开行
+     * @param val
+     * @param record
+     */
+    expandedRowRender = (val,record) => {
+        const { dataSource } = this.state;
+        promiseAjax.get(`/jobtasksowner/findJobOwner/${record.id}`).then(
+            res => {
+                dataSource.forEach(
+                    (v,index) => {
+                        if(v.id === record.id){
+                            dataSource[index]["expandOwner"] = res.data.owner
+                                ? res.data.owner.name
+                                : "无";
+                            dataSource[index]["expandShareOwner"] = res.data.shareOwner
+                                ? this.aryOper(res.data.shareOwner,"name").join(",")
+                                : "无"
+                        }
+                    }
+                );
+                this.setState({dataSource:dataSource});
+            }
+        );
     };
 
     render() {
@@ -735,7 +749,17 @@ export class LayoutComponent extends Component {
                         rowKey={(record) => record.id}
                         columns={this.columns}
                         pagination={false}
-                        expandedRowRender={ (record) => this.expandedRowRender (record)}
+                        onExpand = { (expanded, record) => this.expandedRowRender(expanded, record) }
+                        expandedRowRender={
+                            record => <Row>
+                                <Col span={10}>
+                                    <a>任务所有者：{record.expandOwner}</a>
+                                </Col>
+                                <Col span={14}>
+                                    <a>任务共享者: {record.expandShareOwner}</a>
+                                </Col>
+                            </Row>
+                        }
                     />
                 </div>
                 <PaginationComponent
@@ -753,7 +777,7 @@ export class LayoutComponent extends Component {
                             </Col>
                         <span/>
                             <Col style={{color: "gray", fontSize: 6}}>
-                                节点ID:{ record ? record.id : null }
+                                任务ID:{ record ? record.id : null }
                             </Col>
                         </span>
                     }
