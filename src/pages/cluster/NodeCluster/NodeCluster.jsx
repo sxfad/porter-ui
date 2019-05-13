@@ -181,26 +181,26 @@ export class LayoutComponent extends Component {
             key: "name",
             init: null,
             rule: null,
-            labelCol: 10,
+            labelCol: 3,
             wrapperCol: 14,
             disable: true,
-            span: 7,
+            span: 23,
             type: "input"
         },{
             name: "节点共享者",
             key: "shareOwner",
             init: null,
             rule: null,
-            labelCol: 5,
-            wrapperCol: 18,
+            labelCol: 3,
+            wrapperCol: 10,
             disable: true,
-            span: 14,
+            span: 23,
             type:  "input"
         },{
             name: "操作类型",
             key: "oprType",
             labelCol: 3,
-            wrapperCol: 7,
+            wrapperCol: 20,
             disable: false,
             span: 23,
             type: "radio"
@@ -230,9 +230,11 @@ export class LayoutComponent extends Component {
             res => {
                 this.props.form.setFieldsValue({
                     name:res.data.owner ? res.data.owner.name : "无",
-                    shareOwner: res.data.shareOwner ? this.aryOper(res.data.shareOwner,"name").join(",") : "无"
+                    shareOwner: res.data.shareOwner ? this.aryOper(res.data.shareOwner,"name").join(" , ") : "无",
+                    nodeId: record.nodeId
                 });
                 this.setState({
+                    name:res.data.owner ? res.data.owner.name : "无",
                     dicControlTypePlugins: res.data.dicControlTypePlugins,
                     owner: res.data.owner,
                     shareOwner: res.data.shareOwner
@@ -312,15 +314,16 @@ export class LayoutComponent extends Component {
      * @param e
      */
     handleRadio = (e) => {
+        let val = e.target.value;
         this.setState({
             loading: true,
-            valueChange: e,
+            valueChange: val,
         });
-        this.dataProcessing(e);
-        e === "CHANGE" || e === "SHARE"
+        this.dataProcessing(val);
+        val === "CHANGE" || val === "SHARE"
             ? this.setState({
                 visableTable: true,
-                value: e
+                value: val
             })
             : this.setState({
                 visableTable: false
@@ -368,8 +371,7 @@ export class LayoutComponent extends Component {
                             () => this.expandedRowRender(null,record),100
                         )
                     }
-                ).finally(
-                    () => {
+                ).finally(() => {
                         this.setState({
                             confirmLoading: false,
                         });
@@ -573,7 +575,7 @@ export class LayoutComponent extends Component {
                                     ? res.data.owner.name
                                     : "无";
                                 dataSource[index]["expandShareOwner"] = res.data.shareOwner
-                                    ? this.aryOper(res.data.shareOwner,"name").join(",")
+                                    ? this.aryOper(res.data.shareOwner,"name").join(" , ")
                                     : "无"
                             }
                         }
@@ -600,7 +602,6 @@ export class LayoutComponent extends Component {
             dataRirht,
             valueChange,
             selectedRowKeys,
-            record,
         } =this.state;
         const rowSelection = {
             selectedRowKeys,
@@ -738,17 +739,7 @@ export class LayoutComponent extends Component {
                 />
 
                 <Modal
-                    title={
-                        <span>
-                            <Col span={3}>
-                                权限控制
-                            </Col>
-                        <span/>
-                            <Col style={{color: "gray", fontSize: 6}}>
-                                节点ID:{ record ? record.nodeId : null }
-                            </Col>
-                        </span>
-                    }
+                    title="权限控制"
                     visible={visible}
                     onOk={this.handleOk}
                     confirmLoading={confirmLoading}
@@ -760,7 +751,7 @@ export class LayoutComponent extends Component {
                             {
                                 this.setTingsForm && this.setTingsForm.map(
                                     (v,k) =>
-                                        <Col span={v.span} key={k}>
+                                        <Col span={v.span} key={k} style={{height: 40}}>
                                             <FormItem
                                                 label={v.name}
                                                 labelCol={{span:v.labelCol}}
@@ -775,27 +766,27 @@ export class LayoutComponent extends Component {
 
                                                     v.type === "input"
                                                         ? <Input
-                                                            style={{
-                                                                border: "none",
-                                                                boxShadow: "none"
-                                                            }}
-                                                            readOnly="readonly"
-                                                        />
+                                                                style={{
+                                                                    border: "none",
+                                                                    boxShadow: "none",
+                                                                }}
+                                                                readOnly="readonly"
+                                                            />
                                                         : v.type === "radio"
-                                                        ? <Select placeholder="请选择" onChange={this.handleRadio}>
+                                                        ? <RadioGroup placeholder="请选择" onChange={this.handleRadio}>
                                                             {
                                                                 dicControlTypePlugins && dicControlTypePlugins.map(
                                                                     v => {
-                                                                        return <Option
+                                                                        return <Radio
                                                                             key={v.alertType}
                                                                             value={v.alertType}
                                                                         >
                                                                             {v.fieldName}
-                                                                        </Option>
+                                                                        </Radio>
                                                                     }
                                                                 )
                                                             }
-                                                        </Select>
+                                                        </RadioGroup>
                                                         : <p/>
                                                 )}
                                             </FormItem>

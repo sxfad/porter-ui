@@ -181,25 +181,36 @@ export class LayoutComponent extends Component {
      */
     setTingsForm = [
         {
+            name: "任务ID",
+            key: "id",
+            init: null,
+            rule: null,
+            labelCol: 3,
+            wrapperCol: 14,
+            disable: true,
+            span: 23,
+            type: "input",
+        },
+        {
             name: "任务所有者",
             key: "name",
             init: null,
             rule: null,
-            labelCol: 10,
+            labelCol: 3,
             wrapperCol: 14,
             disable: true,
-            span: 7,
-            type: "input"
+            span: 23,
+            type: "input",
         },{
             name: "任务共享者",
             key: "shareOwner",
             init: null,
             rule: null,
-            labelCol: 5,
-            wrapperCol: 18,
+            labelCol: 3,
+            wrapperCol: 20,
             disable: true,
-            span: 14,
-            type:  "input"
+            span: 23,
+            type:  "input",
         },{
             name: "操作类型",
             key: "oprType",
@@ -231,7 +242,8 @@ export class LayoutComponent extends Component {
             res => {
                 this.props.form.setFieldsValue({
                     name:res.data.owner ? res.data.owner.name : "无",
-                    shareOwner: res.data.shareOwner ? this.aryOper(res.data.shareOwner,"name").join(",") : "无"
+                    shareOwner: res.data.shareOwner ? this.aryOper(res.data.shareOwner,"name").join(",") : "无",
+                    id: record.id
                 });
                 this.setState({
                     dicControlTypePlugins: res.data.dicControlTypePlugins,
@@ -772,18 +784,9 @@ export class LayoutComponent extends Component {
                     onPageNumChange={this.handlePageNumChange}
                     onPageSizeChange={this.handlePageSizeChange}
                 />
+
                 <Modal
-                    title={
-                        <span>
-                            <Col span={3}>
-                                权限控制
-                            </Col>
-                        <span/>
-                            <Col style={{color: "gray", fontSize: 6}}>
-                                任务ID:{ record ? record.id : null }
-                            </Col>
-                        </span>
-                    }
+                    title="权限控制"
                     visible={visible}
                     onOk={this.handleOk}
                     confirmLoading={confirmLoading}
@@ -795,7 +798,7 @@ export class LayoutComponent extends Component {
                             {
                                 this.setTingsForm && this.setTingsForm.map(
                                     (v,k) =>
-                                        <Col span={v.span} key={k}>
+                                        <Col span={v.span} key={k} style={{height: 40}}>
                                             <FormItem
                                                 label={v.name}
                                                 labelCol={{span:v.labelCol}}
