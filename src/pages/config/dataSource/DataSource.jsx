@@ -24,7 +24,8 @@ export class LayoutComponent extends Component {
         endTime: Date(),
         dataSource: [],
         tabLoading: false,
-    }
+        dataSign: null
+    };
 
     columns = [
         {
@@ -64,11 +65,26 @@ export class LayoutComponent extends Component {
                     <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
                       <a href="#">删除</a>
                     </Popconfirm>
+                    <span style={{display: this.state.dataSign ? null : "none"}}>
+                        <span className="ant-divider"/>
+                        <a onClick={() => this.handlePermissionSet(record)}>权限设置</a>
+                    </span>
                 </span>
             )
         },
     ];
 
+    /**
+     * 权限设置
+     * @param record
+     */
+    handlePermissionSet = (record) => {
+        const { dataSign } = this.state;
+        browserHistory.push({
+            pathname: `/PermissionSet/${record.id}`,
+            state: { dataSign:dataSign, path:"/dataSource", text:"数据源配置" }
+        })
+    };
 
     componentDidMount() {
         const {form: {getFieldValue}} = this.props;
@@ -149,6 +165,7 @@ export class LayoutComponent extends Component {
                     dataSource: rsp.data.result,
                     startTimeStr,
                     endTimeStr,
+                    dataSign : rsp.dataSign
                 });
             } else {
                 this.setState({

@@ -2,7 +2,7 @@
  * Created by lhyin on 2018/19/3.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Row, Col, DatePicker, Popconfirm,Pagination,message} from 'antd';
+import {Form, Input, Button, Table, Row, Col, DatePicker, Popconfirm,Pagination,message, Select} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import {promiseAjax} from 'sx-ui';
 import moment from 'moment';
@@ -10,6 +10,7 @@ import {getBeforeHoursTime, formatDefaultTime} from '../../common/getTime';
 import {browserHistory} from 'react-router';
 import connectComponent from '../../../redux/store/connectComponent';
 
+const Option = Select.Option;
 const {RangePicker} = DatePicker;
 const FormItem = Form.Item;
 export const PAGE_ROUTE = '/publicDataSource';
@@ -24,7 +25,8 @@ export class LayoutComponent extends Component {
         endTime: Date(),
         dataSource: [],
         tabLoading: false,
-    }
+        dataSign: null
+    };
 
     columns = [
         {
@@ -91,15 +93,23 @@ export class LayoutComponent extends Component {
                     </Popconfirm>
                      <span className="ant-divider"/>
                     <a onClick={() => this.handleDetail(record.id)}>查看</a>
+                    <span style={{display: this.state.dataSign ? null : "none"}}>
+                        <span className="ant-divider"/>
+                        <a onClick={() => this.handlePermissionSet(record)}>权限设置</a>
+                    </span>
                 </span>
             );
                 }
                 else if (record.ispush === 1 ) {
                     return (
                       <span>
-                    <a onClick={() => this.handleRecycle(record.id)}>回收</a>
-                     <span className="ant-divider"/>
-                    <a onClick={() => this.handleDetail(record.id)}>查看</a>
+                        <a onClick={() => this.handleRecycle(record.id)}>回收</a>
+                         <span className="ant-divider"/>
+                        <a onClick={() => this.handleDetail(record.id)}>查看</a>
+                      <span style={{display: this.state.dataSign ? null : "none"}}>
+                        <span className="ant-divider"/>
+                        <a onClick={() => this.handlePermissionSet(record)}>权限设置</a>
+                      </span>
                 </span>
                 );
                 }
@@ -211,6 +221,18 @@ export class LayoutComponent extends Component {
         browserHistory.push(`/publicDetail/+detail/${id}`);
     };
 
+    /**
+     * 权限设置
+     * @param record
+     */
+    handlePermissionSet = (record) => {
+        const { dataSign } = this.state;
+        browserHistory.push({
+            pathname: `/PermissionSet/${record.id}`,
+            state: { dataSign:dataSign, path:"/publicDataSource", text:"公共数据源" }
+        })
+    };
+
     search = (args = {}) => {
         const {pageNum = this.state.pageNum, pageSize = this.state.pageSize} = args;
         this.props.form.validateFields((err, values) => {
@@ -220,11 +242,13 @@ export class LayoutComponent extends Component {
                         let total = 0;
                         let dataSource = [];
                         let pageNum = this.state.pageNum;
+                        let dataSign = null;
                         if (rsp) {
                             total = parseInt(rsp.data.totalItems) || 0;
                             dataSource = rsp.data.result || [];
+                            dataSign = rsp.dataSign;
                             pageNum = rsp.data.pageNo;
-                            this.setState({total, dataSource, pageNum, tableLoading: false});
+                            this.setState({total, dataSource, pageNum, tableLoading: false, dataSign});
                         }
 
                     })
@@ -258,7 +282,7 @@ export class LayoutComponent extends Component {
         //     pageNo: 1,
         // }
         // this.search(data);
-    }
+    };
 
     /**
      * 设置时间
@@ -273,7 +297,7 @@ export class LayoutComponent extends Component {
 
     handleAddTask = () => {
         browserHistory.push('/publicDataSource/+edit/:id');
-    }
+    };
 
     render() {
         const {form: {getFieldDecorator}} = this.props;
