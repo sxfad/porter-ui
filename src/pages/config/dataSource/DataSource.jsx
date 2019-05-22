@@ -2,13 +2,15 @@
  * Created by lhyin on 2018/19/3.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Row, Col, DatePicker, Popconfirm} from 'antd';
+import {Form, Input, Button, Table, Row, Col, DatePicker, Popconfirm, Tooltip, Tag} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import {promiseAjax} from 'sx-ui';
 import moment from 'moment';
 import {getBeforeHoursTime, formatDefaultTime} from '../../common/getTime';
 import {browserHistory} from 'react-router';
 import connectComponent from '../../../redux/store/connectComponent';
+import {handlePermissionSet, permissionSet} from "../../common/permissionSet";
+import '../../common/style.less'
 
 const {RangePicker} = DatePicker;
 const FormItem = Form.Item;
@@ -24,16 +26,26 @@ export class LayoutComponent extends Component {
         endTime: Date(),
         dataSource: [],
         tabLoading: false,
-        dataSign: null
     };
 
     columns = [
         {
             title: '编号',
-            render: (text, record, index) => (index + 1) + ((this.state.pageNum - 1) * this.state.pageSize),
+            index: "num",
+            render: (text, record, index) => record.dataSign ?
+                <Tooltip title="权限设置">
+                    <a onClick={ () => handlePermissionSet(record) }>
+                        <Tag color="cyan"
+                             style={{ width: 20, height: 20}}
+                        >权</Tag>
+                        {(index + 1) + ((this.state.pageNum - 1) * this.state.pageSize)}
+                    </a>
+                </Tooltip> :
+                (index + 1) + ((this.state.pageNum - 1) * this.state.pageSize)
         },
         {
             title: '数据源名称',
+            index: "name",
             render: (text, record) => {
                 return (
                     record.name
@@ -42,6 +54,7 @@ export class LayoutComponent extends Component {
         },
         {
             title: '类型',
+            index: "type",
             render: (text, record) => {
                 return (
                     record.dataType.name
@@ -50,6 +63,7 @@ export class LayoutComponent extends Component {
         },
         {
             title: '创建时间',
+            index: "time",
             render: (text, record) => {
                 return (
                     formatDefaultTime(record.createTime)
@@ -58,6 +72,7 @@ export class LayoutComponent extends Component {
         },
         {
             title: '操作',
+            index: "opr",
             render: (text, record) => (
                 <span>
                     <a onClick={() => this.handleDetail(record.id)}>查看</a>
@@ -65,26 +80,10 @@ export class LayoutComponent extends Component {
                     <Popconfirm title="是否确定删除?" onConfirm={() => this.handleDelete(record.id)}>
                       <a href="#">删除</a>
                     </Popconfirm>
-                    <span style={{display: this.state.dataSign ? null : "none"}}>
-                        <span className="ant-divider"/>
-                        <a onClick={() => this.handlePermissionSet(record)}>权限设置</a>
-                    </span>
                 </span>
             )
         },
     ];
-
-    /**
-     * 权限设置
-     * @param record
-     */
-    handlePermissionSet = (record) => {
-        const { dataSign } = this.state;
-        browserHistory.push({
-            pathname: `/PermissionSet/${record.id}`,
-            state: { dataSign:dataSign, path:"/dataSource", text:"数据源配置" }
-        })
-    };
 
     componentDidMount() {
         const {form: {getFieldValue}} = this.props;
@@ -162,10 +161,16 @@ export class LayoutComponent extends Component {
                     pageNum: rsp.data.pageNo,
                     pageSize: rsp.data.pageSize,
                     total: parseInt(rsp.data.totalItems),
-                    dataSource: rsp.data.result,
+                    dataSource: rsp.data.result.map(
+                        item => (
+                            {   ...item,
+                                dataSign : rsp.dataSign,
+                                pageTitle: "数据源配置"
+                            }
+                        )
+                    ),
                     startTimeStr,
                     endTimeStr,
-                    dataSign : rsp.dataSign
                 });
             } else {
                 this.setState({
@@ -311,6 +316,7 @@ export class LayoutComponent extends Component {
 
                 <div style={{marginTop: '10px'}}>
                     <Table
+                        className="table"
                         dataSource={dataSource}
                         loading={tabLoading}
                         size="middle"

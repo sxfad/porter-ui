@@ -2,13 +2,15 @@
  * Created by lhyin on 2018/19/3.
  */
 import React, {Component} from 'react';
-import {Form, Input, Button, Table, Row, Col, DatePicker, Popconfirm,Pagination,message, Select} from 'antd';
+import {Form, Input, Button, Table, Row, Col, DatePicker, Popconfirm,Pagination,message, Select, Tooltip,Badge, Tag} from 'antd';
 import {PageContent, PaginationComponent, QueryBar, Operator, FontIcon} from 'sx-ui/antd';
 import {promiseAjax} from 'sx-ui';
 import moment from 'moment';
 import {getBeforeHoursTime, formatDefaultTime} from '../../common/getTime';
 import {browserHistory} from 'react-router';
 import connectComponent from '../../../redux/store/connectComponent';
+import {handlePermissionSet, permissionSet} from '../../common/permissionSet';
+import '../../common/style.less'
 
 const Option = Select.Option;
 const {RangePicker} = DatePicker;
@@ -25,14 +27,22 @@ export class LayoutComponent extends Component {
         endTime: Date(),
         dataSource: [],
         tabLoading: false,
-        dataSign: null
     };
 
     columns = [
         {
             title: '序号',
             key: '__num',
-            render: (text, record, index) => (index + 1) + ((this.state.pageNum - 1) * this.state.pageSize),
+            render: (text, record, index) => record.dataSign ?
+                <Tooltip title="权限设置">
+                    <a onClick={ () => handlePermissionSet(record) }>
+                        <Tag color="cyan"
+                             style={{ width: 20, height: 20}}
+                        >权</Tag>
+                        {(index + 1) + ((this.state.pageNum - 1) * this.state.pageSize)}
+                    </a>
+                </Tooltip> :
+                (index + 1) + ((this.state.pageNum - 1) * this.state.pageSize)
         },
 
         {
@@ -76,7 +86,6 @@ export class LayoutComponent extends Component {
                 }
             },
         },
-
         {
             title: '操作',
             render: (text, record) => {
@@ -93,10 +102,6 @@ export class LayoutComponent extends Component {
                     </Popconfirm>
                      <span className="ant-divider"/>
                     <a onClick={() => this.handleDetail(record.id)}>查看</a>
-                    <span style={{display: this.state.dataSign ? null : "none"}}>
-                        <span className="ant-divider"/>
-                        <a onClick={() => this.handlePermissionSet(record)}>权限设置</a>
-                    </span>
                 </span>
             );
                 }
@@ -106,10 +111,6 @@ export class LayoutComponent extends Component {
                         <a onClick={() => this.handleRecycle(record.id)}>回收</a>
                          <span className="ant-divider"/>
                         <a onClick={() => this.handleDetail(record.id)}>查看</a>
-                      <span style={{display: this.state.dataSign ? null : "none"}}>
-                        <span className="ant-divider"/>
-                        <a onClick={() => this.handlePermissionSet(record)}>权限设置</a>
-                      </span>
                 </span>
                 );
                 }
@@ -221,18 +222,6 @@ export class LayoutComponent extends Component {
         browserHistory.push(`/publicDetail/+detail/${id}`);
     };
 
-    /**
-     * 权限设置
-     * @param record
-     */
-    handlePermissionSet = (record) => {
-        const { dataSign } = this.state;
-        browserHistory.push({
-            pathname: `/PermissionSet/${record.id}`,
-            state: { dataSign:dataSign, path:"/publicDataSource", text:"公共数据源" }
-        })
-    };
-
     search = (args = {}) => {
         const {pageNum = this.state.pageNum, pageSize = this.state.pageSize} = args;
         this.props.form.validateFields((err, values) => {
@@ -242,13 +231,19 @@ export class LayoutComponent extends Component {
                         let total = 0;
                         let dataSource = [];
                         let pageNum = this.state.pageNum;
-                        let dataSign = null;
                         if (rsp) {
                             total = parseInt(rsp.data.totalItems) || 0;
                             dataSource = rsp.data.result || [];
-                            dataSign = rsp.dataSign;
+                            let ary = dataSource && dataSource.map(
+                                item => (
+                                    {   ...item,
+                                        dataSign : rsp.dataSign,
+                                        pageTitle: "公共数据源"
+                                    }
+                                )
+                            );
                             pageNum = rsp.data.pageNo;
-                            this.setState({total, dataSource, pageNum, tableLoading: false, dataSign});
+                            this.setState({total, dataSource:ary, pageNum, tableLoading: false});
                         }
 
                     })
@@ -266,7 +261,6 @@ export class LayoutComponent extends Component {
     };
 
     onShowSizeChange = (current, pageSize) => {
-        console.log(current, pageSize);
     }
 
     /**
@@ -373,6 +367,7 @@ export class LayoutComponent extends Component {
 
                 <div style={{marginTop: '10px'}}>
                     <Table
+                        className='table'
                         dataSource={dataSource}
                         loading={tabLoading}
                         size="middle"

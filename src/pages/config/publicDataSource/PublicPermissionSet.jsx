@@ -255,7 +255,7 @@ export class LayoutComponent extends Component {
             readOnly:"readonly"
         };
         const name = ownerName ? `${ownerName.name}(${ownerName.email})` : "无";
-        const share = tags && tags.length <= 0 ? [{name:"无"}] : tags;
+        const share = tags && tags.length <= 0 ? [{name:"无",email:"无"}] : tags;
         return (
             <PageContent>
                 <div className="sub-title">
