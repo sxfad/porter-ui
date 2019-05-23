@@ -655,14 +655,19 @@ export class LayoutComponent extends Component {
                 }
             }
         };
+        const layout = {
+            xs: 24,
+            sm: 12,
+            md: 6
+        };
         const formItemLayout = {
             labelCol: {
                 xs: {span: 24},
-                sm: {span: 7},
+                sm: {span: 8},
             },
             wrapperCol: {
                 xs: {span: 24},
-                sm: {span: 17},
+                sm: {span: 16},
             },
         };
         return (
@@ -670,7 +675,7 @@ export class LayoutComponent extends Component {
                 <QueryBar>
                     <Form>
                         <Row>
-                            <Col style={{width: "20%", float:'left'}}>
+                            <Col {...layout}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="任务ID">
@@ -679,7 +684,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col style={{width: "20%", float:'left'}}>
+                            <Col {...layout}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="任务名称">
@@ -688,7 +693,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col style={{width: "20%", float:'left'}}>
+                            <Col {...layout}>
                                 <FormItem
                                     {...formItemLayout}
                                     label="状态">
@@ -702,7 +707,7 @@ export class LayoutComponent extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col style={{width: "20%", float:'left'}}>
+                            <Col {...layout}>
                                 <FormItem
                                     {...formItemLayout} label="创建时间">
                                     {getFieldDecorator('times', {})(
@@ -717,7 +722,7 @@ export class LayoutComponent extends Component {
 
                                 </FormItem>
                             </Col>
-                            <Col style={{width: "20%", float:'left', textAlign: 'right'}}>
+                            <Col style={{float: 'right'}}>
                                 <FormItem
                                     label=""
                                     colon={false}>
