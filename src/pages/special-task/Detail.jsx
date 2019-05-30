@@ -40,9 +40,9 @@ export default class Detail extends Component {
                 if (res.success) {
                     const {
                         id,
-                        sourceConsumeAdt: {name: sourceConsumeAdtName},
-                        sourceConvertAdt: {name: sourceConvertAdtName},
-                        targetLoadAdt: {name: targetLoadAdtName},
+                        sourceConsumeAdt,
+                        sourceConvertAdt,
+                        targetLoadAdt,
                         jobName,
                         jobXmlText,
                         jobJsonText,
@@ -58,9 +58,9 @@ export default class Detail extends Component {
 
                     this.setState({
                         id,
-                        sourceConsumeAdtName,
-                        sourceConvertAdtName,
-                        targetLoadAdtName,
+                        sourceConsumeAdtName: sourceConsumeAdt ? sourceConsumeAdt.name : null,
+                        sourceConvertAdtName: sourceConvertAdt ? sourceConvertAdt.name:null,
+                        targetLoadAdtName: targetLoadAdt ? targetLoadAdt.name: null,
                         createTime,
                         jobName,
                         status: jobState && jobState.name,
