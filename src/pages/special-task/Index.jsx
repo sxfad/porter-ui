@@ -72,6 +72,7 @@ export class LayoutComponent extends Component {
             title: '来源数据-消费转换插件',
             dataIndex: 'sourceConvertAdt.name',
             key: 'sourceConvertAdt.name',
+			render: (text) => text || '消费插件默认'
         },
         {
             title: '目标数据-载入插件',
