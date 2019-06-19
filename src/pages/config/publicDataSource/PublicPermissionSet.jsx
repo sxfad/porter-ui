@@ -5,7 +5,7 @@ import {promiseAjax} from 'sx-ui';
 import connectComponent from "../../../redux/store/connectComponent";
 import {browserHistory} from "react-router";
 
-export const PAGE_ROUTE = "/PermissionSet/:id";
+export const PAGE_ROUTE = "/dataSource/+PermissionSet/:id";
 const FormItem = Form.Item;
 const Option = Select.Option;
 @Form.create()
@@ -260,22 +260,6 @@ export class LayoutComponent extends Component {
             <PageContent>
                 <div className="sub-title">
                     {`${this.props.location.state.text}(权限设置)`}
-                    <Button
-                        type="primary"
-                        ghost
-                        style={{
-                            float: "right",
-                            marginTop: -7,
-                            display: "inline",
-                            border: "none",
-                            boxShadow: "none"
-                        }}
-                        icon="rollback"
-                        onClick={
-                            () => browserHistory.push(`${path}`)
-
-                        }
-                    >返回</Button>
                 </div>
                 <Form style={{marginTop: 40}}>
                     <Row style={{marginLeft: "4%"}} key="button">
@@ -416,6 +400,25 @@ export class LayoutComponent extends Component {
                                 )}
                             </FormItem>
                         </Col>
+                    </Row>
+                    <Row style={{paddingLeft: "45%", marginTop: 40}}>
+                        <Button
+                            type="primary"
+                            // ghost
+                            // style={{
+                            //     float: "right",
+                            //     marginTop: -7,
+                            //     display: "inline",
+                            //     border: "none",
+                            //     boxShadow: "none"
+                            // }}
+                            // icon="rollback"
+                            type={"primary"}
+                            onClick={
+                                () => browserHistory.push(`${path}`)
+
+                            }
+                        >返回</Button>
                     </Row>
                 </Form>
             </PageContent>

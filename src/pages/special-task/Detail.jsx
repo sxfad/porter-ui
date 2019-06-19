@@ -40,9 +40,9 @@ export default class Detail extends Component {
                 if (res.success) {
                     const {
                         id,
-                        sourceConsumeAdt: {name: sourceConsumeAdtName},
-                        sourceConvertAdt: {name: sourceConvertAdtName},
-                        targetLoadAdt: {name: targetLoadAdtName},
+                        sourceConsumeAdt,
+                        sourceConvertAdt,
+                        targetLoadAdt,
                         jobName,
                         jobXmlText,
                         jobJsonText,
@@ -58,9 +58,9 @@ export default class Detail extends Component {
 
                     this.setState({
                         id,
-                        sourceConsumeAdtName,
-                        sourceConvertAdtName,
-                        targetLoadAdtName,
+                        sourceConsumeAdtName: sourceConsumeAdt ? sourceConsumeAdt.name : null,
+                        sourceConvertAdtName: sourceConvertAdt ? sourceConvertAdt.name:null,
+                        targetLoadAdtName: targetLoadAdt ? targetLoadAdt.name: null,
                         createTime,
                         jobName,
                         status: jobState && jobState.name,
@@ -99,7 +99,7 @@ export default class Detail extends Component {
                     <div style={{marginBottom: 16}}><h3>任务ID: {id}</h3></div>
                     <div style={{marginBottom: 16}}><h3>任务名称: {jobName}</h3></div>
                     <div style={{marginBottom: 16}}><h3>来源数据-消费插件: {sourceConsumeAdtName}</h3></div>
-                    <div style={{marginBottom: 16}}><h3>来源数据-消费转换插件: {sourceConvertAdtName}</h3></div>
+                    <div style={{marginBottom: 16}}><h3>来源数据-消费转换插件: {sourceConvertAdtName||'消费插件默认'}</h3></div>
                     <div style={{marginBottom: 16}}><h3>目标数据-载入插件: {targetLoadAdtName}</h3></div>
                     <div style={{marginBottom: 16}}><h3>状态: {status}</h3></div>
                     <div style={{marginBottom: 16}}><h3>创建时间: {moment(createTime).format('YYYY-MM-DD HH:mm:ss')}</h3></div>
