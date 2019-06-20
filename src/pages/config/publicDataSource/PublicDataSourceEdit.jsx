@@ -185,15 +185,15 @@ export default class Edit extends Component {
                     </FormItem>
                     <Col span={24}>
                         <FormItem
-                            label="数据源唯一码"
+                            label="数据源识别码"
                         >
                             {getFieldDecorator('code', {
                                 initialValue: null,
                                 rules: [
-                                    {required: true, message: '请输入数据源唯一码'},
+                                    {required: true, message: '请输入数据源识别码'},
                                 ],
                             })(
-                                <Input disabled={disable}  placeholder="请输入数据源唯一码"/>
+                                <Input disabled={disable}  placeholder="请输入数据源识别码"/>
                             )}
                         </FormItem>
                     </Col>
