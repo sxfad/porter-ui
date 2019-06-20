@@ -46,7 +46,7 @@ export class LayoutComponent extends Component {
         },
 
         {
-            title: '识别码',
+            title: 'ZK识别码',
             dataIndex: 'code',
             key: 'code'
         },
