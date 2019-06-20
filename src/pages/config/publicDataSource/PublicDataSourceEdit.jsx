@@ -53,7 +53,6 @@ export default class Edit extends Component {
                         const json = window.JSON.parse(jsonText) || {};
                         console.log(json,'json');
                         json.status = 'new';
-                        console.log(name,'name');
                         this.props.form.setFieldsValue({name,declares, code});
                         this.setState({xml,editId: json.taskId});
                         this.jsonEditor.set(json);

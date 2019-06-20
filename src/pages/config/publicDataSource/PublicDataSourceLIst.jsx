@@ -141,7 +141,7 @@ export class LayoutComponent extends Component {
      * 查看元素
      */
     handleDetail = (id) => {
-        browserHistory.push(`/publicDetail/+detail/${id}`);
+        browserHistory.push(`/publicDataSource/+detail/${id}`);
     };
     /**
      * 编辑元素
@@ -219,7 +219,7 @@ export class LayoutComponent extends Component {
      * 查看元素
      */
     handleDetail = (id)=> {
-        browserHistory.push(`/publicDetail/+detail/${id}`);
+        browserHistory.push(`/publicDataSource/+detail/${id}`);
     };
 
     search = (args = {}) => {
