@@ -533,24 +533,24 @@ export class LayoutComponent extends Component {
                         <Input onClick={() => this.selectNode()} placeholder="请选择分发节点"/>
                     )}
                 </FormItem>
-                <FormItem
-                    {...formItemLayout}
-                    label="告警通知人"
-                    hasFeedback>
-                    {getFieldDecorator('userIds', {
-                        rules: [{required: true, message: '请选择告警通知人'}],
-                        initialValue: users
-                    })(
-                        <Select
-                            multiple
-                            style={{ width: '100%' }}
-                            placeholder="请选择告警通知人"
-                            onChange={this.handleUsersChange}
-                        >
-                            {this.renderUserList()}
-                        </Select>
-                    )}
-                </FormItem>
+                {/*<FormItem*/}
+                    {/*{...formItemLayout}*/}
+                    {/*label="告警通知人"*/}
+                    {/*hasFeedback>*/}
+                    {/*{getFieldDecorator('userIds', {*/}
+                        {/*rules: [{required: true, message: '请选择告警通知人'}],*/}
+                        {/*initialValue: users*/}
+                    {/*})(*/}
+                        {/*<Select*/}
+                            {/*multiple*/}
+                            {/*style={{ width: '100%' }}*/}
+                            {/*placeholder="请选择告警通知人"*/}
+                            {/*onChange={this.handleUsersChange}*/}
+                        {/*>*/}
+                            {/*{this.renderUserList()}*/}
+                        {/*</Select>*/}
+                    {/*)}*/}
+                {/*</FormItem>*/}
                 <FormItem
                     {...formItemLayout}
                     label="自定义处理类全名"

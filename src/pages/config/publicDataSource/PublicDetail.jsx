@@ -6,7 +6,7 @@ import moment from 'moment';
 import JSONEditor from 'jsoneditor';
 import 'jsoneditor/dist/jsoneditor.min.css';
 
-export const PAGE_ROUTE = '/publicDetail/+detail/:id';
+export const PAGE_ROUTE = '/publicDataSource/+detail/:id';
 
 function deleteNullProperty(obj) {
     if (!obj) return;

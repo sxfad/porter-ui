@@ -26,6 +26,7 @@ export default class Edit extends Component {
         gettingJob: false,
         editId: '',
         disableXML: false,
+        disable: false
     };
 
     componentWillMount() {
@@ -47,13 +48,12 @@ export default class Edit extends Component {
                 .then(res => {
                     if (res.success) {
 
-                        const {name,declares,xmlText, jsonText} = res.data;
+                        const {name,declares,xmlText, jsonText,code} = res.data;
                         const xml = window.decodeURIComponent(xmlText);
                         const json = window.JSON.parse(jsonText) || {};
                         console.log(json,'json');
                         json.status = 'new';
-                        console.log(name,'name');
-                        this.props.form.setFieldsValue({name,declares});
+                        this.props.form.setFieldsValue({name,declares, code});
                         this.setState({xml,editId: json.taskId});
                         this.jsonEditor.set(json);
                         this.jsonEditor.expandAll();
@@ -65,7 +65,7 @@ export default class Edit extends Component {
                     } else {
                         message.error('获取数据失败！');
                     }
-                }).finally(() => this.setState({gettingJob: false}));
+                }).finally(() => this.setState({disable: true,gettingJob: false}));
         } else {
             // this.jsonEditor.set({});
             // const json = this.jsonEditor.get();
@@ -92,65 +92,77 @@ export default class Edit extends Component {
         this.setState({xml: value, toJsonClicked: false});
     };
 
-    handleXmlToJson = () => {
-        const {xml} = this.state;
-        const result = window.encodeURIComponent(xml);
+    handleXmlToJson = (e) => {
+        e.preventDefault();
 
-        this.setState({toJsonLoading: true});
-        promiseAjax.post('/pdse/dealxml', {xmlText: result}).then(res => {
-            if (res.success && res.data) {
-                message.success('转换成功！');
-                res.data.status = 'NEW';
-                this.setState({json: res.data, toJsonClicked: true});
-                this.jsonEditor.set(res.data);
-                this.jsonEditor.expandAll();
-            } else {
-                message.error('转换失败！');
-                this.setState({json: ''});
-                this.jsonEditor.set({});
+        this.props.form.validateFieldsAndScroll((err, values) => {
+            if (!err) {
+                const {xml} = this.state;
+                const result = window.encodeURIComponent(xml);
+
+                this.setState({toJsonLoading: true});
+                promiseAjax.post('/pdse/dealxml', {xmlText: result, code:values.code}).then(res => {
+                    if (res.success && res.data) {
+                        message.success('转换成功！');
+                        res.data.status = 'NEW';
+                        this.setState({json: res.data, toJsonClicked: true});
+                        this.jsonEditor.set(res.data);
+                        this.jsonEditor.expandAll();
+                    } else {
+                        message.error('转换失败！');
+                        this.setState({json: ''});
+                        this.jsonEditor.set({});
+                    }
+                }).finally(() => this.setState({tabLoading: false}));
             }
-        }).finally(() => this.setState({tabLoading: false}));
+        })
     };
 
-    handleSave = () => {
-        const {form: {getFieldValue}, params: {id}} = this.props;
-        const {xml, isEdit, editId} = this.state;
-        const xmlText = window.encodeURIComponent(xml);
+    handleSave = (e) => {
+        e.preventDefault();
 
-        const json = this.jsonEditor.get();
-        const jsonText = window.JSON.stringify(json);
-        const name = getFieldValue('name');
-        const declares = getFieldValue('declares');
-        const params = {name,declares,xmlText, jsonText};
+        this.props.form.validateFieldsAndScroll((err, values) => {
+            if (!err) {
+                const {form: {getFieldValue}, params: {id}} = this.props;
+                const {xml, isEdit, editId} = this.state;
+                const xmlText = window.encodeURIComponent(xml);
 
-        this.setState({saving: true});
+                const json = this.jsonEditor.get();
+                const jsonText = window.JSON.stringify(json);
+                const name = getFieldValue('name');
+                const declares = getFieldValue('declares');
+                const params = {name,declares,xmlText, jsonText};
 
-        if (isEdit) {
-            // if (json.taskId !== editId) {
-            //     message.error('任务id不允许修改！');
-            // } else {
-                params.id = id;
-                promiseAjax.put(`/pdse/${id}`, params)
-                    .then(res => {
-                        console.log(res,"res.edit")
-                    if (!res.success) {
-                        return message.error(res.message || '保存失败！');
-                    }
-                    message.success('保存成功！', 1, () => browserHistory.goBack());
-                }).finally(() => this.setState({saving: false}));
-            // }
-        } else {
-            promiseAjax.post('/pdse', params).then(res => {
-                if (!res.success) {
-                    return message.error(res.message || '保存失败！');
+                this.setState({saving: true});
+
+                if (isEdit) {
+                    // if (json.taskId !== editId) {
+                    //     message.error('任务id不允许修改！');
+                    // } else {
+                    params.id = id;
+                    promiseAjax.put(`/pdse/${id}`, params)
+                        .then(res => {
+                            console.log(res,"res.edit")
+                            if (!res.success) {
+                                return message.error(res.message || '保存失败！');
+                            }
+                            message.success('保存成功！', 1, () => browserHistory.goBack());
+                        }).finally(() => this.setState({saving: false}));
+                    // }
+                } else {
+                    promiseAjax.post('/pdse', params).then(res => {
+                        if (!res.success) {
+                            return message.error(res.message || '保存失败！');
+                        }
+                        message.success('保存成功！', 1, () => browserHistory.goBack());
+                    }).finally(() => this.setState({saving: false}));
                 }
-                message.success('保存成功！', 1, () => browserHistory.goBack());
-            }).finally(() => this.setState({saving: false}));
-        }
+            }
+        })
     };
 
     render() {
-        const {xml, editorHeight, toJsonClicked, isEdit, disableXML} = this.state;
+        const {xml, editorHeight, toJsonClicked, disable, disableXML} = this.state;
         const {form: {getFieldDecorator}} = this.props;
         return (
             <PageContent className="special-task">
@@ -164,16 +176,30 @@ export default class Edit extends Component {
                     >
                         {getFieldDecorator('name', {
                             rules: [
-                                {required: false, message: '请输入数据源名称'},
+                                {required: true, message: '请输入数据源名称'},
                             ],
                         })(
                             <Input  placeholder="请输入数据源名称"/>
                         )}
                     </FormItem>
+                    <Col span={24}>
+                        <FormItem
+                            label="数据源识别码"
+                        >
+                            {getFieldDecorator('code', {
+                                initialValue: null,
+                                rules: [
+                                    {required: true, message: '请输入数据源识别码'},
+                                ],
+                            })(
+                                <Input disabled={disable}  placeholder="请输入数据源识别码"/>
+                            )}
+                        </FormItem>
+                    </Col>
                     <Row style={{marginTop:15}}>
                         <Col>
                             <FormItem
-                                label="数据源解释"
+                                label="数据源详细解释"
                             >
                                 {getFieldDecorator('declares', {
                                     // rules: [
