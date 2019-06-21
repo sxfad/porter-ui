@@ -440,6 +440,8 @@ export class LayoutComponent extends Component {
                     dataSource,
                 });
                 message.success('操作成功', 3);
+            }else{
+                message.error(rsp.message, 3);
             }
         }).finally(() => {
             this.setState({
