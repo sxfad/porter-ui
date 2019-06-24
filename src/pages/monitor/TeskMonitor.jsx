@@ -116,7 +116,7 @@ export class LayoutComponent extends Component {
             title: '插入失败(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-error">{record.insertFailure}&nbsp;&nbsp;({record.insertFailureByDay}↓)</span>
+                    <span className="text-error">{record.insertFailure}&nbsp;&nbsp;({record.insertFailureByDay}↑)</span>
                 );
             },
             key: uuid()
@@ -134,7 +134,7 @@ export class LayoutComponent extends Component {
             title: '更新失败(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-error">{record.updateFailure}&nbsp;&nbsp;({record.updateFailureByDay}↓)</span>
+                    <span className="text-error">{record.updateFailure}&nbsp;&nbsp;({record.updateFailureByDay}↑)</span>
                 );
             },
             key: uuid()
@@ -152,7 +152,7 @@ export class LayoutComponent extends Component {
             title: '删除失败(本日增量)',
             render: (text, record) => {
                 return (
-                    <span className="text-error">{record.deleteFailure}&nbsp;&nbsp;({record.deleteFailureByDay}↓)</span>
+                    <span className="text-error">{record.deleteFailure}&nbsp;&nbsp;({record.deleteFailureByDay}↑)</span>
                 );
             },
             key: uuid()
