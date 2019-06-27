@@ -14,6 +14,7 @@
     "antd": "^2.9.0",
     "axios": "^0.16.1",
     "axios-mock-adapter": "^1.8.1",
+    "babel-polyfill": "6.23.0",
     "browserslist": "^2.2.2",
     "classnames": "^2.2.5",
     "cropperjs": "^1.0.0-rc",
@@ -40,7 +41,6 @@
     "redux-logger": "^3.0.0",
     "redux-thunk": "^2.2.0",
     "redux-undo": "^0.6.1",
-    "sx-ui": "^1.0.1",
     "uuid": "^3.0.1",
     "vis": "^4.21.0",
     "whatwg-fetch": "^1.0.0"

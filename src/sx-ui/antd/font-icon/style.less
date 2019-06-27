@@ -1,0 +1,80 @@
+.select-font-icon {
+  .icons-head {
+    line-height: 32px;
+    padding-left: 8px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #d9d9d9;
+  }
+  .icons-content {
+    width: 100%;
+    overflow: auto;
+  }
+  .current-selected-icon {
+    display: inline-block;
+    //font-size: 16px;
+    margin-left: 8px;
+    .current-selected-icon-class {
+      margin-left: 16px;
+    }
+  }
+  .type-title, .section-title {
+    padding: 16px 0 0 0;
+    margin-left: 8px;
+    a {
+      padding: 0 8px;
+      opacity: 0;
+      transition: 300ms;
+    }
+    &:hover {
+      a {
+        opacity: 1;
+      }
+    }
+  }
+  .type-title {
+    font-size: 18px;
+  }
+  .section-title {
+    font-size: 16px;
+  }
+  .icon-wrapper {
+    display: inline-block;
+    padding: 16px 8px;
+    margin: 8px;
+    width: 100px;
+    border: 1px solid #d9d9d9;
+    border-radius: 3px;
+    text-align: center;
+    transition: 300ms;
+    cursor: pointer;
+    i {
+      transition: 300ms;
+    }
+    &:hover, &.active {
+      background: #0083cd;
+      color: #fff;
+      i {
+        transform: scale(1.2);
+      }
+    }
+  }
+  .icon-class {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.font-icon-modal-wrap {
+  display: inline-block;
+  .pre-view {
+    float: left;
+    text-align: center;
+    width: 30px;
+  }
+  .font-button {
+    float: right;
+  }
+
+}

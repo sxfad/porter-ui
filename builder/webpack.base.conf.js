@@ -13,7 +13,8 @@ module.exports = {
         extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx'],
         modules: [path.resolve(__dirname, '../', 'node_modules'), sourcePath],
         alias: {
-            src: '../src',
+            src: path.resolve(__dirname, '../', 'src'),
+            'sx-ui': path.resolve(__dirname, '../', 'src', 'sx-ui'),
         },
     },
     module: {
@@ -30,7 +31,7 @@ module.exports = {
             // },
             {
                 test: /\.(js|jsx)$/,
-                exclude: /node_modules[\\/](?!(sx-ui)[\\/]).*/, // sx-ui需要webpack构建 exclude: /node_modules\/(?!(MY-MODULE|ANOTHER-ONE)\/).*/,
+                exclude: /node_modules/,
                 loader: ['happypack/loader'],
             },
             {
