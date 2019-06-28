@@ -186,14 +186,6 @@ export class LayoutComponent extends Component {
                                     {taskData.nodesString && taskData.nodesString}
                                 </Col>
                             </Row>
-                            {/*<Row>*/}
-                                {/*<Col span={3} style={labelStyle}>*/}
-                                    {/*告警通知人：*/}
-                                {/*</Col>*/}
-                                {/*<Col span={9}>*/}
-                                    {/*{this.state.userStr}*/}
-                                {/*</Col>*/}
-                            {/*</Row>*/}
                             <Row>
                                 <Col span={3} style={labelStyle}>
                                     消费插件：
