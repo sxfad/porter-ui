@@ -105,7 +105,9 @@ export class LayoutComponent extends Component {
 
     validateName = (rule, value, callback) => {
         const {params: {UserId}} = this.props;
-        console.log(this.props)
+        const {userInfo} = this.state;
+
+        if(userInfo.loginname === value)  return callback();
         // if (UserId === 'UserId') {
             promiseAjax.get(`/cuser/findByNameOrEmail`, {loginname: value}).then(rsp => {
                 if (rsp.success && !rsp.data) {
@@ -120,6 +122,9 @@ export class LayoutComponent extends Component {
     };
 
     validateEmail = (rule, value, callback) => {
+        const {userInfo} = this.state;
+
+        if(userInfo.email === value)  return callback();
         const {params: {UserId}} = this.props;
         // if (UserId === 'UserId') {
             promiseAjax.get(`/cuser/findByNameOrEmail`, {email: value}).then(rsp => {
@@ -129,6 +134,7 @@ export class LayoutComponent extends Component {
                     callback();
                 }
             });
+        callback();
         // } else {
         //     callback();
         // }
