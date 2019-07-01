@@ -172,6 +172,7 @@ export class LayoutComponent extends Component {
     ];
 
     renderNumber = (record)=> {
+
         return (
             <div className="monitor-data">
                 <span>处理进度: <a className="text-gray">{record.disposeSchedule}</a></span>
@@ -353,8 +354,9 @@ export class LayoutComponent extends Component {
                         loading={tabLoading}
                         size="middle"
                         columns={this.columns}
+                        rowKey="id"
                         pagination={false}
-                        expandedRowRender={record => this.renderNumber(record)}
+                        expandedRowRender={record =>this.renderNumber(record)}
                         defaultExpandAllRows={true}
                     />
                 </div>
