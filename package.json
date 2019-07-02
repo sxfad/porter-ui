@@ -7,6 +7,7 @@
   "scripts": {
     "dll": "webpack --config ./builder/webpack.dll.conf.js",
     "dev": "yarn run dll && cross-env NODE_ENV=development HTTP_PORT=8081 node ./builder/dev-server.js",
+    "start": "yarn dev",
     "build": "cross-env NODE_ENV=production node ./builder/build.js"
   },
   "dependencies": {
@@ -28,6 +29,7 @@
     "mockjs": "^1.0.1-beta3",
     "moment": "^2.19.3",
     "nprogress": "^0.2.0",
+    "ora": "^3.4.0",
     "prop-types": "^15.5.8",
     "query-string": "^4.2.2",
     "react": "15.4.2",

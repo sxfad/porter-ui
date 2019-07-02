@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {Router, browserHistory} from 'react-router';
-import allPageRoutes from '../route/all-routes';
+import allPageRoutes from '../../all-routes';
 import connectComponent from '../redux/store/connectComponent.js';
-import pageRoutes from '../route/page-routes';
+import pageRoutes from '../../page-routes';
 
 let Error404;
 let Frame;

@@ -1,7 +1,7 @@
 import {createAction} from 'redux-actions';
 import * as types from '../actionTypes';
 import * as Storage from '../../utils/storage';
-import pageInitState from '../page-init-state';
+import pageInitState from '../../../page-init-state';
 
 // 同步本地数据到state中
 export const getStateFromStorage = createAction(types.GET_STATE_FROM_STORAGE, () => {
