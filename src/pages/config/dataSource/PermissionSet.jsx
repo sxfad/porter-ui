@@ -5,7 +5,7 @@ import {promiseAjax} from 'sx-ui';
 import connectComponent from "../../../redux/store/connectComponent";
 import {browserHistory} from "react-router";
 
-export const PAGE_ROUTE = "/publicDataSource/+PermissionSet/:id";
+export const PAGE_ROUTE = "/dataSource/+PermissionSet/:id";
 const FormItem = Form.Item;
 const Option = Select.Option;
 @Form.create()
