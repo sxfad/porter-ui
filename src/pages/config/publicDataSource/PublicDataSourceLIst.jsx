@@ -9,7 +9,7 @@ import moment from 'moment';
 import {getBeforeHoursTime, formatDefaultTime} from '../../common/getTime';
 import {browserHistory} from 'react-router';
 import connectComponent from '../../../redux/store/connectComponent';
-import {handlePermissionSet, permissionSet} from '../../common/permissionSet';
+import {handlePublicDataPermissionSet, publicDataPermissionSet} from '../../common/publicDataPermissionSet';
 import '../../common/style.less'
 
 const Option = Select.Option;
@@ -35,7 +35,7 @@ export class LayoutComponent extends Component {
             key: '__num',
             render: (text, record, index) => record.dataSign ?
                 <Tooltip title="权限设置">
-                    <a onClick={ () => handlePermissionSet(record) }>
+                    <a onClick={ () => handlePublicDataPermissionSet(record) }>
                         <Tag color="cyan"
                              style={{ width: 20, height: 20}}
                         >权</Tag>
