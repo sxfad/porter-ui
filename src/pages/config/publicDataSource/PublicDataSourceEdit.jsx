@@ -130,8 +130,9 @@ export default class Edit extends Component {
                 const json = this.jsonEditor.get();
                 const jsonText = window.JSON.stringify(json);
                 const name = getFieldValue('name');
+                const code = getFieldValue('code');
                 const declares = getFieldValue('declares');
-                const params = {name,declares,xmlText, jsonText};
+                const params = {name,code,declares,xmlText, jsonText};
 
                 this.setState({saving: true});
 
